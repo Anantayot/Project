@@ -8,6 +8,7 @@ if (!isset($_SESSION['admin_id'])) {
   exit;
 }
 
+
 // ✅ ดึงข้อมูลสรุปจากฐานข้อมูล
 $total_products   = $conn->query("SELECT COUNT(*) FROM product")->fetchColumn();
 $total_categories = $conn->query("SELECT COUNT(*) FROM category")->fetchColumn();

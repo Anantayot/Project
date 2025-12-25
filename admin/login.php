@@ -3,7 +3,7 @@ session_start();
 include __DIR__ . "/partials/connectdb.php";
 
 // ถ้ามีการล็อกอินอยู่แล้ว → กลับไปหน้า Dashboard
-if (isset($_SESSION['admin'])) {
+if (isset($_SESSION['admin_id'])) {
   header("Location: index.php");
   exit;
 }
@@ -16,7 +16,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   // 🌟 แบบทดสอบ (ในอนาคตเชื่อมฐานข้อมูลได้)
   if ($username === "admin" && $password === "1234") {
-    $_SESSION['admin'] = $username;
+
+    // ✅ ตั้ง session ให้ตรงกับ index.php
+    $_SESSION['admin_id'] = 1;              // ไอดีสมมติ
+    $_SESSION['admin_username'] = $username;
+
     header("Location: index.php");
     exit;
   } else {
@@ -24,7 +28,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -50,7 +53,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       overflow: hidden;
     }
 
-    /* 💫 เอฟเฟกต์ดาวเคลื่อนไหวพื้นหลัง */
     .stars {
       position: absolute;
       width: 200%;
@@ -66,7 +68,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       to { transform: translateY(-1000px); }
     }
 
-    /* กล่อง Login */
     .login-card {
       position: relative;
       z-index: 2;
@@ -133,7 +134,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       border-radius: 10px;
     }
 
-    /* โลโก้ไอคอน */
     .login-icon {
       font-size: 3rem;
       color: #22c55e;
@@ -173,7 +173,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </p>
   </div>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
