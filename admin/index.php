@@ -2,6 +2,12 @@
 session_start();
 include __DIR__ . "/partials/connectdb.php";
 
+// ✅ บังคับให้ต้องล็อกอินก่อนถึงจะเข้า Dashboard ได้
+if (!isset($_SESSION['admin_id'])) {
+  header("Location: login.php");
+  exit;
+}
+
 // ✅ ดึงข้อมูลสรุปจากฐานข้อมูล
 $total_products   = $conn->query("SELECT COUNT(*) FROM product")->fetchColumn();
 $total_categories = $conn->query("SELECT COUNT(*) FROM category")->fetchColumn();
@@ -50,6 +56,21 @@ foreach ($months_all as $m) {
   $customers_per_month[] = $customer_map[$m] ?? 0;
   $income_per_month[] = $income_map[$m] ?? 0;
 }
+
+// ✅ แปลงเดือนเป็น label ภาษาไทยสำหรับกราฟ เช่น "ม.ค. 2025"
+$thaiMonths = [
+  1 => 'ม.ค.', 2 => 'ก.พ.', 3 => 'มี.ค.', 4 => 'เม.ย.',
+  5 => 'พ.ค.', 6 => 'มิ.ย.', 7 => 'ก.ค.', 8 => 'ส.ค.',
+  9 => 'ก.ย.', 10 => 'ต.ค.', 11 => 'พ.ย.', 12 => 'ธ.ค.'
+];
+
+$month_labels = [];
+foreach ($months_all as $m) {
+  [$y, $mon] = explode('-', $m);
+  $monNum = (int)$mon;
+  $label = ($thaiMonths[$monNum] ?? $m) . " " . $y; // เช่น ม.ค. 2025
+  $month_labels[] = $label;
+}
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -63,6 +84,7 @@ foreach ($months_all as $m) {
 
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap');
+
 body {
   background: #0d1117;
   font-family: "Prompt", sans-serif;
@@ -168,11 +190,36 @@ body {
   box-shadow: inset 0 0 12px rgba(255,50,50,0.2);
 }
 
-/* ✅ Responsive */
+/* ✅ Navbar มือถือ */
+.navbar {
+  display: none;
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.6rem;
+  padding: 8px 14px;
+}
+
 @media (max-width: 991px) {
   #sidebar { left: -250px; }
   #sidebar.show { left: 0; }
-  .navbar { display: flex; position: sticky; top: 0; z-index: 999; background: #161b22; }
+  .navbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: #161b22;
+    padding: 10px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+  .navbar h5 {
+    color: #fff;
+  }
   .main-panel { margin-left: 0; padding-top: 80px; }
 }
   </style>
@@ -259,14 +306,22 @@ body {
     <div class="row mt-5">
       <div class="col-md-6">
         <div class="card card-custom p-3">
-          <h5 class="text-center text-info mb-3"><i class="bi bi-person-lines-fill"></i> ลูกค้าใหม่รายเดือน</h5>
-          <div class="chart-container"><canvas id="customerChart"></canvas></div>
+          <h5 class="text-center text-info mb-3">
+            <i class="bi bi-person-lines-fill"></i> ลูกค้าใหม่รายเดือน
+          </h5>
+          <div class="chart-container">
+            <canvas id="customerChart"></canvas>
+          </div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="card card-custom p-3">
-          <h5 class="text-center text-warning mb-3"><i class="bi bi-graph-up-arrow"></i> รายได้รวมรายเดือน (เฉพาะชำระเงินแล้ว)</h5>
-          <div class="chart-container"><canvas id="incomeChart"></canvas></div>
+          <h5 class="text-center text-warning mb-3">
+            <i class="bi bi-graph-up-arrow"></i> รายได้รวมรายเดือน (เฉพาะชำระเงินแล้ว)
+          </h5>
+          <div class="chart-container">
+            <canvas id="incomeChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -278,13 +333,17 @@ body {
   // ✅ Sidebar toggle
   const sidebar = document.getElementById('sidebar');
   const toggleBtn = document.getElementById('menuToggle');
-  if (toggleBtn) toggleBtn.addEventListener('click', () => sidebar.classList.toggle('show'));
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
+    });
+  }
 
   // ✅ กราฟลูกค้าใหม่รายเดือน
   new Chart(document.getElementById('customerChart'), {
     type: 'bar',
     data: {
-      labels: <?= json_encode($months_all) ?>,
+      labels: <?= json_encode($month_labels, JSON_UNESCAPED_UNICODE) ?>,
       datasets: [{
         label: 'ลูกค้าใหม่',
         data: <?= json_encode($customers_per_month) ?>,
@@ -297,8 +356,15 @@ body {
     options: {
       indexAxis: 'y',
       scales: {
-        x: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-        y: { ticks: { color: '#fff' }, grid: { display: false } }
+        x: {
+          beginAtZero: true,
+          ticks: { color: '#fff' },
+          grid: { color: 'rgba(255,255,255,0.1)' }
+        },
+        y: {
+          ticks: { color: '#fff' },
+          grid: { display: false }
+        }
       },
       plugins: {
         legend: { display: false },
@@ -317,7 +383,7 @@ body {
   new Chart(document.getElementById('incomeChart'), {
     type: 'line',
     data: {
-      labels: <?= json_encode($months_all) ?>,
+      labels: <?= json_encode($month_labels, JSON_UNESCAPED_UNICODE) ?>,
       datasets: [{
         label: 'รายได้ (บาท)',
         data: <?= json_encode($income_per_month) ?>,
@@ -333,8 +399,15 @@ body {
     },
     options: {
       scales: {
-        y: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-        x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#fff' },
+          grid: { color: 'rgba(255,255,255,0.1)' }
+        },
+        x: {
+          ticks: { color: '#fff' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
       },
       plugins: {
         legend: { display: false },
