@@ -21,17 +21,12 @@ if (!$product) {
 
 // ✅ ตั้ง path รูปสินค้า
 $imgPath = "../admin/uploads/" . $product['p_image'];
-if (!file_exists($imgPath) || empty($product['p_image'])) {
+if (empty($product['p_image']) || !file_exists($imgPath)) {
   $imgPath = "img/default.png";
 }
 
-// ✅ ดึงจำนวนสินค้าที่ขายไปแล้ว (รวมยอด order_details)
-$soldStmt = $conn->prepare("SELECT COALESCE(SUM(quantity), 0) AS sold_qty FROM order_details WHERE p_id = ?");
-$soldStmt->execute([$id]);
-$soldQty = $soldStmt->fetchColumn();
-
-// ✅ คำนวณจำนวนที่เหลือในสต็อก (ถ้ามีฟิลด์ p_stock)
-$remainQty = isset($product['p_stock']) ? max(0, $product['p_stock'] - $soldQty) : 'ไม่ระบุ';
+// ✅ วิธี 1: สต็อกจริงใช้จาก product.p_stock โดยตรง
+$remainQty = isset($product['p_stock']) ? (int)$product['p_stock'] : null;
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -91,22 +86,45 @@ $remainQty = isset($product['p_stock']) ? max(0, $product['p_stock'] - $soldQty)
         <h4 class="fw-bold mb-3"><?= number_format($product['p_price'], 2) ?> บาท</h4>
         <p class="mb-4"><?= nl2br(htmlspecialchars($product['p_description'])) ?></p>
 
-        <!-- ✅ แสดงจำนวนขายและจำนวนคงเหลือ -->
-        <p><strong class="text-success">✅ ขายแล้ว:</strong> <?= $soldQty ?> ชิ้น</p>
-        <p><strong class="text-primary">📦 คงเหลือในสต็อก:</strong> <?= is_numeric($remainQty) ? $remainQty . ' ชิ้น' : $remainQty ?></p>
+        <!-- ✅ แสดงสต็อกจริง -->
+        <p>
+          <strong class="text-primary">📦 คงเหลือในสต็อก:</strong>
+          <?= is_null($remainQty) ? 'ไม่ระบุ' : $remainQty . ' ชิ้น' ?>
+        </p>
 
         <div class="mt-3">
           <?php if (isset($_SESSION['customer_id'])): ?>
-            <!-- ✅ ส่งข้อมูลไป cart_add.php -->
-            <form method="post" action="cart_add.php">
-              <input type="hidden" name="id" value="<?= $product['p_id'] ?>">
-              <div class="d-flex align-items-center gap-2 mb-3">
-                <label for="qty" class="fw-semibold">จำนวน:</label>
-                <input type="number" name="qty" id="qty" min="1" value="1" class="form-control w-25 text-center">
+
+            <?php if (!is_null($remainQty) && $remainQty <= 0): ?>
+              <div class="alert alert-danger mt-3">
+                ❌ สินค้าหมดสต็อก
               </div>
-              <button type="submit" class="btn btn-success me-2">🛒 เพิ่มลงตะกร้า</button>
               <a href="index.php" class="btn btn-secondary">⬅️ กลับหน้าร้าน</a>
-            </form>
+
+            <?php else: ?>
+              <!-- ✅ ส่งข้อมูลไป cart_add.php -->
+              <form method="post" action="cart_add.php">
+                <input type="hidden" name="id" value="<?= (int)$product['p_id'] ?>">
+
+                <div class="d-flex align-items-center gap-2 mb-3">
+                  <label for="qty" class="fw-semibold">จำนวน:</label>
+                  <input
+                    type="number"
+                    name="qty"
+                    id="qty"
+                    min="1"
+                    value="1"
+                    class="form-control w-25 text-center"
+                    <?= (!is_null($remainQty) ? 'max="'.$remainQty.'"' : '') ?>
+                    required
+                  >
+                </div>
+
+                <button type="submit" class="btn btn-success me-2">🛒 เพิ่มลงตะกร้า</button>
+                <a href="index.php" class="btn btn-secondary">⬅️ กลับหน้าร้าน</a>
+              </form>
+            <?php endif; ?>
+
           <?php else: ?>
             <div class="alert alert-warning mt-3">
               🔑 กรุณาเข้าสู่ระบบก่อนเพื่อทำการสั่งซื้อ
@@ -115,6 +133,7 @@ $remainQty = isset($product['p_stock']) ? max(0, $product['p_stock'] - $soldQty)
             <a href="index.php" class="btn btn-secondary">⬅️ กลับหน้าร้าน</a>
           <?php endif; ?>
         </div>
+
       </div>
     </div>
   </div>
