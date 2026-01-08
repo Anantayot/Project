@@ -208,7 +208,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </tbody>
           </table>
           <div class="text-muted small">
-            * ยอดรวมตอนยืนยันระบบจะคำนวณจาก “ราคาจริงในฐานข้อมูล” และเช็คสต็อกจริงก่อนตัดสต็อก
+
           </div>
         </div>
       </div>
