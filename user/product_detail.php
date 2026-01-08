@@ -28,14 +28,16 @@ if (empty($product['p_image']) || !file_exists($imgPath)) {
 // ✅ วิธี 1: สต็อกจริงใช้จาก product.p_stock โดยตรง
 $remainQty = isset($product['p_stock']) ? (int)$product['p_stock'] : null;
 
-// ✅ แสดงขายแล้ว: รวมจำนวนจาก order_details (หมายเหตุ: เป็นยอดรวมในตารางนี้ทั้งหมด)
+// ✅ วิธี B: ขายแล้ว = รวมจำนวนจาก order_details เฉพาะออเดอร์ที่ไม่ถูกยกเลิก
 $soldStmt = $conn->prepare("
-  SELECT COALESCE(SUM(quantity), 0) AS sold_qty
-  FROM order_details
-  WHERE p_id = ?
+  SELECT COALESCE(SUM(od.quantity), 0) AS sold_qty
+  FROM order_details od
+  INNER JOIN orders o ON o.order_id = od.order_id
+  WHERE od.p_id = ?
+    AND o.payment_status <> 'ยกเลิก'
 ");
 $soldStmt->execute([$id]);
-$soldQty = (int)$soldStmt->fetchColumn(); // ดึงคอลัมน์เดียว :contentReference[oaicite:1]{index=1}
+$soldQty = (int)$soldStmt->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -92,7 +94,7 @@ $soldQty = (int)$soldStmt->fetchColumn(); // ดึงคอลัมน์เ�
         <h4 class="fw-bold mb-3"><?= number_format($product['p_price'], 2) ?> บาท</h4>
         <p class="mb-4"><?= nl2br(htmlspecialchars($product['p_description'])) ?></p>
 
-        <!-- ✅ ขายแล้ว -->
+        <!-- ✅ ขายแล้ว (ไม่นับออเดอร์ยกเลิก) -->
         <p><strong class="text-success">✅ ขายแล้ว:</strong> <?= $soldQty ?> ชิ้น</p>
 
         <!-- ✅ คงเหลือจริง -->
