@@ -20,24 +20,49 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $cat_id = $_POST['cat_id'];
   $desc   = $_POST['description'];
 
-  // 🔹 จัดการอัปโหลดรูปภาพ
-  $image = $p['p_image']; // เก็บชื่อเดิมไว้ก่อน
+  // flag ว่าผู้ใช้ติ๊ก "ลบรูปเดิม" ไหม
+  $deleteImage = isset($_POST['delete_image']) && $_POST['delete_image'] === '1';
+
+  // path โฟลเดอร์อัปโหลด
+  $uploadDir = __DIR__ . "/../uploads/";
+
+  // ค่า default = รูปเดิมในฐานข้อมูล
+  $image = $p['p_image'];
+
+  // 1) ถ้าติ๊ก "ลบรูปเดิม" ให้ลบไฟล์เก่าทิ้งก่อน
+  if ($deleteImage && !empty($p['p_image'])) {
+    $oldPath = $uploadDir . $p['p_image'];
+    if (file_exists($oldPath)) {
+      unlink($oldPath); // ลบไฟล์ออกจากเซิร์ฟเวอร์
+    }
+    $image = null; // ล้างค่าในฐานข้อมูล
+  }
+
+  // 2) ถ้ามีอัปโหลดรูปใหม่เข้ามา
   if (!empty($_FILES['image']['name'])) {
-    $image = time() . "_" . basename($_FILES['image']['name']); // กันชื่อซ้ำ
-
-    // ✅ path โฟลเดอร์อัปโหลด (อยู่นอก /product/)
-    $targetDir = __DIR__ . "/../uploads/";
-
-    if (!is_dir($targetDir)) {
-      mkdir($targetDir, 0777, true);
+    // ถ้ามีรูปเดิม และยังไม่ถูกลบในขั้นตอนข้างบน ก็ลบด้วย (กันไฟล์ค้าง)
+    if (!$deleteImage && !empty($p['p_image'])) {
+      $oldPath = $uploadDir . $p['p_image'];
+      if (file_exists($oldPath)) {
+        unlink($oldPath);
+      }
     }
 
-    if (!move_uploaded_file($_FILES['image']['tmp_name'], $targetDir . $image)) {
+    // กันชื่อซ้ำ
+    $image = time() . "_" . basename($_FILES['image']['name']);
+
+    // ถ้าโฟลเดอร์ยังไม่มีให้สร้าง
+    if (!is_dir($uploadDir)) {
+      mkdir($uploadDir, 0777, true);
+    }
+
+    // ย้ายไฟล์อัปโหลดไปไว้ในโฟลเดอร์ uploads
+    if (!move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $image)) {
       die("❌ ไม่สามารถอัปโหลดรูปภาพได้");
     }
   }
 
-  // 🔹 อัปเดตฐานข้อมูล
+  // อัปเดตฐานข้อมูล
   $stmt = $conn->prepare("UPDATE product 
                           SET p_name=?, p_price=?, p_stock=?, p_description=?, p_image=?, cat_id=? 
                           WHERE p_id=?");
@@ -92,8 +117,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <label class="form-label">รูปภาพ</label><br>
     <?php 
       $imagePath = "../uploads/" . htmlspecialchars($p['p_image']);
-      if (!empty($p['p_image']) && file_exists(__DIR__ . "/../uploads/" . $p['p_image'])): ?>
+      $fileOnDisk = __DIR__ . "/../uploads/" . $p['p_image'];
+      if (!empty($p['p_image']) && file_exists($fileOnDisk)): ?>
         <img src="<?= $imagePath ?>" width="100" class="rounded mb-2"><br>
+
+        <!-- checkbox ลบรูปเดิม -->
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" value="1" id="delete_image" name="delete_image">
+          <label class="form-check-label" for="delete_image">
+            ลบรูปภาพเดิม
+          </label>
+        </div>
+
       <?php else: ?>
         <span class="text-muted">ยังไม่มีรูปภาพ</span><br>
       <?php endif; ?>
