@@ -27,6 +27,15 @@ if (empty($product['p_image']) || !file_exists($imgPath)) {
 
 // ✅ วิธี 1: สต็อกจริงใช้จาก product.p_stock โดยตรง
 $remainQty = isset($product['p_stock']) ? (int)$product['p_stock'] : null;
+
+// ✅ แสดงขายแล้ว: รวมจำนวนจาก order_details (หมายเหตุ: เป็นยอดรวมในตารางนี้ทั้งหมด)
+$soldStmt = $conn->prepare("
+  SELECT COALESCE(SUM(quantity), 0) AS sold_qty
+  FROM order_details
+  WHERE p_id = ?
+");
+$soldStmt->execute([$id]);
+$soldQty = (int)$soldStmt->fetchColumn(); // ดึงคอลัมน์เดียว :contentReference[oaicite:1]{index=1}
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -56,10 +65,8 @@ $remainQty = isset($product['p_stock']) ? (int)$product['p_stock'] : null;
 </head>
 <body>
 
-<!-- ✅ Navbar -->
 <?php include("navbar_user.php"); ?>
 
-<!-- 🔔 Toast แจ้งเตือน -->
 <?php if (isset($_SESSION['toast_success'])): ?>
   <div class="toast-container position-fixed top-0 end-0 p-3">
     <div class="toast align-items-center text-bg-success border-0 show" role="alert">
@@ -72,7 +79,6 @@ $remainQty = isset($product['p_stock']) ? (int)$product['p_stock'] : null;
   <?php unset($_SESSION['toast_success']); ?>
 <?php endif; ?>
 
-<!-- ✅ ส่วนแสดงรายละเอียดสินค้า -->
 <div class="container mt-5">
   <div class="card shadow p-4">
     <div class="row g-4 align-items-center">
@@ -86,7 +92,10 @@ $remainQty = isset($product['p_stock']) ? (int)$product['p_stock'] : null;
         <h4 class="fw-bold mb-3"><?= number_format($product['p_price'], 2) ?> บาท</h4>
         <p class="mb-4"><?= nl2br(htmlspecialchars($product['p_description'])) ?></p>
 
-        <!-- ✅ แสดงสต็อกจริง -->
+        <!-- ✅ ขายแล้ว -->
+        <p><strong class="text-success">✅ ขายแล้ว:</strong> <?= $soldQty ?> ชิ้น</p>
+
+        <!-- ✅ คงเหลือจริง -->
         <p>
           <strong class="text-primary">📦 คงเหลือในสต็อก:</strong>
           <?= is_null($remainQty) ? 'ไม่ระบุ' : $remainQty . ' ชิ้น' ?>
@@ -102,7 +111,6 @@ $remainQty = isset($product['p_stock']) ? (int)$product['p_stock'] : null;
               <a href="index.php" class="btn btn-secondary">⬅️ กลับหน้าร้าน</a>
 
             <?php else: ?>
-              <!-- ✅ ส่งข้อมูลไป cart_add.php -->
               <form method="post" action="cart_add.php">
                 <input type="hidden" name="id" value="<?= (int)$product['p_id'] ?>">
 
@@ -139,7 +147,6 @@ $remainQty = isset($product['p_stock']) ? (int)$product['p_stock'] : null;
   </div>
 </div>
 
-<!-- ✅ Footer -->
 <footer class="text-center">
   © <?= date('Y') ?> MyCommiss | รายละเอียดสินค้า
 </footer>
