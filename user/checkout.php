@@ -34,15 +34,56 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $_SESSION['toast_error'] = "⚠️ กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เฉพาะตัวเลข 10 หลัก)";
   } else {
     try {
-      $conn->beginTransaction();
+      // ✅ เริ่ม transaction
+      $conn->beginTransaction(); // :contentReference[oaicite:2]{index=2}
 
-      // ✅ คำนวณราคารวม
+      // ✅ เตรียม statement สำหรับล็อกสต็อก + อัปเดตสต็อก
+      $stmtLock = $conn->prepare("SELECT p_id, p_name, p_price, p_stock FROM product WHERE p_id = ? FOR UPDATE");
+      $stmtUpdateStock = $conn->prepare("UPDATE product SET p_stock = p_stock - ? WHERE p_id = ?");
+
+      // ✅ คำนวณราคารวมจาก DB + เช็คสต็อกจริง
       $totalPrice = 0;
+      $itemsForInsert = []; // เก็บข้อมูลที่จะ insert ลง order_details แบบเชื่อถือได้
+
       foreach ($cart as $item) {
-        $totalPrice += $item['price'] * $item['qty'];
+        $pid = (int)$item['id'];
+        $qty = (int)$item['qty'];
+
+        if ($qty <= 0) {
+          throw new Exception("จำนวนสินค้าไม่ถูกต้อง");
+        }
+
+        // 🔒 ล็อกแถวสินค้าและอ่านสต็อกล่าสุด (FOR UPDATE) :contentReference[oaicite:3]{index=3}
+        $stmtLock->execute([$pid]);
+        $p = $stmtLock->fetch(PDO::FETCH_ASSOC);
+
+        if (!$p) {
+          throw new Exception("ไม่พบสินค้า ID: {$pid}");
+        }
+
+        $stock = (int)$p['p_stock'];
+        $price = (float)$p['p_price'];
+
+        // ✅ เช็คสต็อกพอไหม
+        if ($qty > $stock) {
+          throw new Exception("สินค้า \"{$p['p_name']}\" เหลือไม่พอ (คงเหลือ {$stock} ชิ้น)");
+        }
+
+        // ✅ ตัดสต็อกจริง
+        $stmtUpdateStock->execute([$qty, $pid]);
+
+        // ✅ รวมราคา (ใช้ราคาจาก DB เท่านั้น)
+        $totalPrice += $price * $qty;
+
+        // ✅ เตรียมข้อมูลสำหรับ order_details (ใช้ราคา DB)
+        $itemsForInsert[] = [
+          'pid' => $pid,
+          'qty' => $qty,
+          'price' => $price
+        ];
       }
 
-      // ✅ เพิ่มคำสั่งซื้อ
+      // ✅ เพิ่มคำสั่งซื้อ (ยังเป็น 'รอดำเนินการ' เหมือนเดิม)
       $stmt = $conn->prepare("INSERT INTO orders 
         (customer_id, shipping_address, payment_method, total_price, order_date, payment_status) 
         VALUES (:cid, :address, :payment, :total, NOW(), 'รอดำเนินการ')");
@@ -53,21 +94,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ':total' => $totalPrice
       ]);
 
-      $orderId = $conn->lastInsertId();
+      // ✅ เอา order id
+      $orderId = $conn->lastInsertId(); // :contentReference[oaicite:4]{index=4}
 
-      // ✅ เพิ่มรายละเอียดสินค้า
+      // ✅ เพิ่มรายละเอียดสินค้า (ใช้ข้อมูลที่ผ่านการเช็คแล้ว)
       $stmtDetail = $conn->prepare("INSERT INTO order_details (order_id, p_id, quantity, price)
                                    VALUES (:oid, :pid, :qty, :price)");
-      foreach ($cart as $item) {
+      foreach ($itemsForInsert as $it) {
         $stmtDetail->execute([
           ':oid' => $orderId,
-          ':pid' => $item['id'],
-          ':qty' => $item['qty'],
-          ':price' => $item['price']
+          ':pid' => $it['pid'],
+          ':qty' => $it['qty'],
+          ':price' => $it['price']
         ]);
       }
 
-      $conn->commit();
+      // ✅ commit
+      $conn->commit(); // :contentReference[oaicite:5]{index=5}
 
       unset($_SESSION['cart']);
       $_SESSION['toast_success'] = "✅ ขอบคุณคุณ " . htmlspecialchars($user['name']) . " 🎉 คำสั่งซื้อของคุณถูกบันทึกแล้ว";
@@ -75,8 +118,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       exit;
 
     } catch (Exception $e) {
-      $conn->rollBack();
-      $_SESSION['toast_error'] = "❌ เกิดข้อผิดพลาด: " . $e->getMessage();
+      // ✅ rollback เมื่อมีปัญหา :contentReference[oaicite:6]{index=6}
+      if ($conn->inTransaction()) {
+        $conn->rollBack();
+      }
+      $_SESSION['toast_error'] = "❌ " . $e->getMessage();
     }
   }
 }
@@ -88,59 +134,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <title>MyCommiss | ชำระเงิน</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      background-color: #fff;
-      font-family: "Prompt", sans-serif;
-    }
-
-    h3 {
-      color: #D10024;
-    }
-
-    .card-header {
-      background-color: #D10024;
-      color: #fff;
-      font-weight: 600;
-    }
-
-    .btn-success {
-      background-color: #D10024;
-      border: none;
-    }
-    .btn-success:hover {
-      background-color: #a5001b;
-    }
-
-    .btn-secondary {
-      border-radius: 8px;
-    }
-
-    .table thead {
-      background-color: #f8f9fa;
-    }
-
-    footer {
-      background-color: #D10024;
-      color: #fff;
-      margin-top: 50px;
-      padding: 15px;
-      font-size: 0.9rem;
-    }
-
-    .toast-success {
-      background-color: #28a745 !important;
-    }
-    .toast-danger {
-      background-color: #dc3545 !important;
-    }
+    body { background-color: #fff; font-family: "Prompt", sans-serif; }
+    h3 { color: #D10024; }
+    .card-header { background-color: #D10024; color: #fff; font-weight: 600; }
+    .btn-success { background-color: #D10024; border: none; }
+    .btn-success:hover { background-color: #a5001b; }
+    .btn-secondary { border-radius: 8px; }
+    .table thead { background-color: #f8f9fa; }
+    footer { background-color: #D10024; color: #fff; margin-top: 50px; padding: 15px; font-size: 0.9rem; }
   </style>
 </head>
 <body>
 
-<!-- ✅ Navbar -->
 <?php include("navbar_user.php"); ?>
 
-<!-- ✅ Toast แจ้งเตือน -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:3000;">
   <?php if (isset($_SESSION['toast_success'])): ?>
     <div class="toast align-items-center text-bg-success border-0 show" role="alert">
@@ -163,12 +170,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <?php endif; ?>
 </div>
 
-<!-- ✅ ส่วนเนื้อหา -->
 <div class="container mt-4">
   <h3 class="fw-bold mb-4 text-center">💳 ยืนยันคำสั่งซื้อ</h3>
 
   <div class="row">
-    <!-- 🔹 สินค้าในตะกร้า -->
     <div class="col-md-7 mb-4">
       <div class="card shadow-sm border-0">
         <div class="card-header">สินค้าในตะกร้า</div>
@@ -191,22 +196,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               ?>
               <tr class="text-center">
                 <td><?= htmlspecialchars($item['name']) ?></td>
-                <td><?= $item['qty'] ?></td>
-                <td><?= number_format($item['price'], 2) ?></td>
-                <td><?= number_format($sum, 2) ?></td>
+                <td><?= (int)$item['qty'] ?></td>
+                <td><?= number_format((float)$item['price'], 2) ?></td>
+                <td><?= number_format((float)$sum, 2) ?></td>
               </tr>
               <?php endforeach; ?>
               <tr class="fw-bold text-danger text-end">
                 <td colspan="3">💰 ราคารวมทั้งหมด</td>
-                <td><?= number_format($total, 2) ?> บาท</td>
+                <td><?= number_format((float)$total, 2) ?> บาท</td>
               </tr>
             </tbody>
           </table>
+          <div class="text-muted small">
+            * ยอดรวมตอนยืนยันระบบจะคำนวณจาก “ราคาจริงในฐานข้อมูล” และเช็คสต็อกจริงก่อนตัดสต็อก
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 🔹 ฟอร์มข้อมูลผู้สั่งซื้อ -->
     <div class="col-md-5">
       <div class="card shadow-sm border-0">
         <div class="card-header">ข้อมูลผู้สั่งซื้อ</div>
@@ -246,6 +253,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
