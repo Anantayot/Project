@@ -8,6 +8,9 @@ if (!isset($_SESSION['customer_id'])) {
   exit;
 }
 
+// ✅ ดึงข้อมูลตะกร้า
+$cart = $_SESSION['cart'] ?? [];
+
 // ✅ ฟังก์ชันลบสินค้าออกจากตะกร้า
 if (isset($_GET['remove'])) {
   $id = intval($_GET['remove']);
@@ -17,23 +20,98 @@ if (isset($_GET['remove'])) {
   exit;
 }
 
-// ✅ ฟังก์ชันอัปเดตจำนวนสินค้า
+/**
+ * ✅ helper: ดึงสต็อกจาก DB ตามรายการสินค้าในตะกร้า (ครั้งเดียว)
+ */
+function fetchStocks(PDO $conn, array $cart): array {
+  if (empty($cart)) return [];
+
+  $ids = array_map(fn($it) => (int)$it['id'], $cart);
+  $ids = array_values(array_unique(array_filter($ids)));
+
+  if (empty($ids)) return [];
+
+  $placeholders = implode(',', array_fill(0, count($ids), '?'));
+  $sql = "SELECT p_id, p_stock FROM product WHERE p_id IN ($placeholders)";
+  $stmt = $conn->prepare($sql);
+  $stmt->execute($ids);
+  $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  $stocks = [];
+  foreach ($rows as $r) {
+    $stocks[(int)$r['p_id']] = (int)$r['p_stock'];
+  }
+  return $stocks;
+}
+
+// ✅ ฟังก์ชันอัปเดตจำนวนสินค้า (เช็คสต็อกจริงจาก DB)
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update'])) {
+
+  $cart = $_SESSION['cart'] ?? [];
+  $stocks = fetchStocks($conn, $cart);
+
+  $hadAdjust = false;
+  $hadRemove = false;
+
   foreach ($_POST['qty'] as $id => $qty) {
+    $id = (int)$id;
+    $qty = (int)$qty;
+
+    // ถ้าไม่พบสินค้าในตะกร้าจริง ข้าม
+    if (!isset($_SESSION['cart'][$id])) continue;
+
+    // ถ้าผู้ใช้ใส่ 0 หรือติดลบ -> ลบออก
     if ($qty <= 0) {
       unset($_SESSION['cart'][$id]);
+      $hadRemove = true;
+      continue;
+    }
+
+    // สต็อกจาก DB (ถ้าไม่พบสินค้าใน DB ให้ลบออกจากตะกร้า)
+    if (!isset($stocks[$id])) {
+      unset($_SESSION['cart'][$id]);
+      $hadRemove = true;
+      continue;
+    }
+
+    $stock = (int)$stocks[$id];
+
+    // ถ้าหมดสต็อก -> ลบออก
+    if ($stock <= 0) {
+      unset($_SESSION['cart'][$id]);
+      $hadRemove = true;
+      continue;
+    }
+
+    // ถ้าใส่เกินสต็อก -> ปรับให้เท่าสต็อก
+    if ($qty > $stock) {
+      $_SESSION['cart'][$id]['qty'] = $stock;
+      $hadAdjust = true;
     } else {
-      $_SESSION['cart'][$id]['qty'] = intval($qty);
+      $_SESSION['cart'][$id]['qty'] = $qty;
     }
   }
-  $_SESSION['toast_success'] = "🔁 อัปเดตจำนวนสินค้าเรียบร้อยแล้ว";
+
+  if ($hadRemove && $hadAdjust) {
+    $_SESSION['toast_error'] = "⚠️ ปรับจำนวนตามสต็อกจริง และลบสินค้าที่หมด/ไม่พบออกจากตะกร้าแล้ว";
+  } elseif ($hadRemove) {
+    $_SESSION['toast_error'] = "⚠️ ลบสินค้าที่หมดสต็อก/ไม่พบออกจากตะกร้าแล้ว";
+  } elseif ($hadAdjust) {
+    $_SESSION['toast_error'] = "⚠️ ปรับจำนวนตามสต็อกจริงแล้ว";
+  } else {
+    $_SESSION['toast_success'] = "🔁 อัปเดตจำนวนสินค้าเรียบร้อยแล้ว";
+  }
+
   header("Location: cart.php");
   exit;
 }
 
-// ✅ ดึงข้อมูลตะกร้า
+// โหลด cart หลังอัปเดต
 $cart = $_SESSION['cart'] ?? [];
 $total = 0;
+
+// ✅ (เสริม) ดึงสต็อกมาเพื่อเอาไปใส่ max ใน input ให้กรอกไม่เกิน
+$stocks = fetchStocks($conn, $cart);
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -46,58 +124,19 @@ $total = 0;
       background-color: #fff;
       font-family: "Prompt", sans-serif;
     }
+    h3 { color: #D10024; }
 
-    h3 {
-      color: #D10024;
-    }
+    .btn-primary { background-color: #D10024; border: none; }
+    .btn-primary:hover { background-color: #a5001b; }
+    .btn-danger { background-color: #D10024; border: none; }
+    .btn-danger:hover { background-color: #a5001b; }
+    .btn-warning { background-color: #fbb900; border: none; color: #000; }
+    .btn-warning:hover { background-color: #e0a700; }
+    .btn-success { background-color: #28a745; border: none; }
+    .btn-success:hover { background-color: #1e7e34; }
 
-    /* 🔹 ปุ่มหลัก */
-    .btn-primary {
-      background-color: #D10024;
-      border: none;
-    }
-    .btn-primary:hover {
-      background-color: #a5001b;
-    }
-    .btn-danger {
-      background-color: #D10024;
-      border: none;
-    }
-    .btn-danger:hover {
-      background-color: #a5001b;
-    }
-    .btn-warning {
-      background-color: #fbb900;
-      border: none;
-      color: #000;
-    }
-    .btn-warning:hover {
-      background-color: #e0a700;
-    }
-    .btn-success {
-      background-color: #28a745;
-      border: none;
-    }
-    .btn-success:hover {
-      background-color: #1e7e34;
-    }
-
-    /* 🔹 ตาราง */
-    .table thead {
-      background-color: #D10024;
-      color: white;
-    }
-    .table th, .table td {
-      vertical-align: middle !important;
-    }
-
-    /* 🔹 Toast */
-    .toast-success {
-      background-color: #28a745 !important;
-    }
-    .toast-danger {
-      background-color: #dc3545 !important;
-    }
+    .table thead { background-color: #D10024; color: white; }
+    .table th, .table td { vertical-align: middle !important; }
 
     footer {
       background-color: #D10024;
@@ -109,7 +148,6 @@ $total = 0;
 </head>
 <body>
 
-<!-- ✅ Navbar -->
 <?php include("navbar_user.php"); ?>
 
 <!-- 🔔 Toast -->
@@ -137,7 +175,6 @@ $total = 0;
   </div>
 <?php endif; ?>
 
-<!-- ✅ ส่วนแสดงตะกร้า -->
 <div class="container mt-4">
   <h3 class="fw-bold mb-4 text-center">🛒 ตะกร้าสินค้าของคุณ</h3>
 
@@ -162,26 +199,39 @@ $total = 0;
             </tr>
           </thead>
           <tbody>
-            <?php foreach ($cart as $item): 
+            <?php foreach ($cart as $item):
               $sum = $item['price'] * $item['qty'];
               $total += $sum;
 
               $imgPath = "../admin/uploads/" . $item['image'];
-              if (!file_exists($imgPath) || empty($item['image'])) {
+              if (empty($item['image']) || !file_exists($imgPath)) {
                 $imgPath = "img/default.png";
               }
+
+              $id = (int)$item['id'];
+              $maxStock = $stocks[$id] ?? null;
             ?>
               <tr>
                 <td><img src="<?= $imgPath ?>" width="80" height="80" class="rounded shadow-sm"></td>
                 <td><?= htmlspecialchars($item['name']) ?></td>
                 <td><?= number_format($item['price'], 2) ?> บาท</td>
-                <td style="width:100px;">
-                  <input type="number" name="qty[<?= $item['id'] ?>]" value="<?= $item['qty'] ?>" 
-                         min="1" class="form-control text-center">
+                <td style="width:120px;">
+                  <input
+                    type="number"
+                    name="qty[<?= $id ?>]"
+                    value="<?= (int)$item['qty'] ?>"
+                    min="1"
+                    class="form-control text-center"
+                    <?= (!is_null($maxStock) ? 'max="'.$maxStock.'"' : '') ?>
+                    required
+                  >
+                  <?php if (!is_null($maxStock)): ?>
+                    <small class="text-muted">คงเหลือ: <?= (int)$maxStock ?></small>
+                  <?php endif; ?>
                 </td>
                 <td><?= number_format($sum, 2) ?> บาท</td>
                 <td>
-                  <a href="cart.php?remove=<?= $item['id'] ?>" class="btn btn-sm btn-danger"
+                  <a href="cart.php?remove=<?= $id ?>" class="btn btn-sm btn-danger"
                      onclick="return confirm('ลบสินค้านี้ออกจากตะกร้า?');">ลบ</a>
                 </td>
               </tr>
