@@ -8,7 +8,7 @@ if (!isset($_SESSION['customer_id'])) {
   exit;
 }
 
-$customer_id = $_SESSION['customer_id'];
+$customer_id = (int)$_SESSION['customer_id'];
 
 // ✅ ตรวจสอบว่ามี id คำสั่งซื้อหรือไม่
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -17,44 +17,78 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
   exit;
 }
 
-$order_id = intval($_GET['id']);
+$order_id = (int)$_GET['id'];
 
-// ✅ ตรวจสอบคำสั่งซื้อของผู้ใช้ (ป้องกันแก้ URL)
-$stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ? AND customer_id = ?");
-$stmt->execute([$order_id, $customer_id]);
-$order = $stmt->fetch(PDO::FETCH_ASSOC);
+try {
+  $conn->beginTransaction(); // 
 
-if (!$order) {
-  $_SESSION['toast_error'] = "❌ ไม่พบคำสั่งซื้อของคุณ";
+  // ✅ ล็อกแถวคำสั่งซื้อของผู้ใช้นี้ (กันกดยกเลิกซ้อน/ชนกัน)
+  $stmt = $conn->prepare("SELECT order_id, order_status, payment_status
+                          FROM orders
+                          WHERE order_id = ? AND customer_id = ?
+                          FOR UPDATE");
+  $stmt->execute([$order_id, $customer_id]);
+  $order = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  if (!$order) {
+    throw new Exception("❌ ไม่พบคำสั่งซื้อของคุณ");
+  }
+
+  // ✅ ตรวจสอบสถานะก่อนยกเลิก
+  // (คง logic เดิม: ยกเลิกได้เฉพาะ 'รอดำเนินการ')
+  if (($order['order_status'] ?? '') !== 'รอดำเนินการ') {
+    throw new Exception("⚠️ คำสั่งซื้อนี้ไม่สามารถยกเลิกได้");
+  }
+
+  // ✅ ดึงรายการสินค้าในคำสั่งซื้อ
+  $stmtItems = $conn->prepare("SELECT p_id, quantity FROM order_details WHERE order_id = ?");
+  $stmtItems->execute([$order_id]);
+  $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
+
+  // ✅ คืนสต็อก (ไม่ลบ order_details)
+  if (!empty($items)) {
+    $stmtRestock = $conn->prepare("UPDATE product SET p_stock = p_stock + ? WHERE p_id = ?");
+
+    foreach ($items as $it) {
+      $pid = (int)$it['p_id'];
+      $qty = (int)$it['quantity'];
+
+      if ($qty > 0) {
+        $stmtRestock->execute([$qty, $pid]);
+      }
+    }
+  }
+
+  // ✅ เปลี่ยนสถานะเป็น 'ยกเลิก'
+  $update = $conn->prepare("
+    UPDATE orders
+    SET order_status = 'ยกเลิก',
+        payment_status = 'ยกเลิก'
+    WHERE order_id = ? AND customer_id = ?
+  ");
+  $update->execute([$order_id, $customer_id]);
+
+  $conn->commit(); // 
+
+  // ✅ Toast แจ้งเตือนสำเร็จ
+  $_SESSION['toast_success'] = "✅ ยกเลิกคำสั่งซื้อเรียบร้อยแล้ว (คืนสต็อกแล้ว)";
   header("Location: orders.php");
   exit;
-}
 
-// ✅ ตรวจสอบสถานะก่อนยกเลิก
-if ($order['order_status'] !== 'รอดำเนินการ') {
-  $_SESSION['toast_error'] = "⚠️ คำสั่งซื้อนี้ไม่สามารถยกเลิกได้";
+} catch (Exception $e) {
+  if ($conn->inTransaction()) {
+    $conn->rollBack(); // 
+  }
+  $_SESSION['toast_error'] = "❌ " . $e->getMessage();
+  header("Location: order_detail.php?id=" . $order_id);
+  exit;
+
+} catch (PDOException $e) {
+  if ($conn->inTransaction()) {
+    $conn->rollBack(); // 
+  }
+  $_SESSION['toast_error'] = "❌ เกิดข้อผิดพลาดในการยกเลิกคำสั่งซื้อ: " . $e->getMessage();
   header("Location: order_detail.php?id=" . $order_id);
   exit;
 }
-
-// ✅ ดำเนินการยกเลิกคำสั่งซื้อ
-try {
-  $update = $conn->prepare("
-    UPDATE orders 
-    SET order_status = 'ยกเลิก', 
-        payment_status = 'ยกเลิก' 
-    WHERE order_id = ?
-  ");
-  $update->execute([$order_id]);
-
-  // ✅ Toast แจ้งเตือนสำเร็จ
-  $_SESSION['toast_error'] = "✅ ยกเลิกคำสั่งซื้อเรียบร้อยแล้ว";
-} catch (PDOException $e) {
-  // ✅ กรณีมีปัญหาการเชื่อมต่อหรือ SQL error
-  $_SESSION['toast_error'] = "❌ เกิดข้อผิดพลาดในการยกเลิกคำสั่งซื้อ: " . $e->getMessage();
-}
-
-// ✅ กลับไปหน้า orders.php พร้อม Toast
-header("Location: orders.php");
-exit;
 ?>
