@@ -174,13 +174,13 @@ foreach ($orders as $o):
       $badgeClass = 'danger';  
       break;
     default:
-      $badgeClass = 'secondary'; 
+      $badgeClass = 'warning'; 
   }
 
   /* ===== สีสถานะคำสั่งซื้อ ===== */
   switch ($order_status) {
     case 'รอดำเนินการ':
-      $orderBadge = 'secondary'; 
+      $orderBadge = 'warning'; 
       break;
     case 'กำลังจัดเตรียม':
       $orderBadge = 'info'; 
@@ -195,7 +195,7 @@ foreach ($orders as $o):
       $orderBadge = 'danger'; 
       break;
     default:
-      $orderBadge = 'secondary';
+      $orderBadge = 'warning';
   }
 
   /* ===== แปลงวิธีชำระเงิน ===== */
