@@ -174,6 +174,7 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
           $paymentBadge = ($payment_status === 'ชำระเงินแล้ว') ? 'success' :
                           (($payment_status === 'ยกเลิก') ? 'danger' : 'warning');
           $orderBadge = ($order_status === 'จัดส่งแล้ว') ? 'success' :
+                        (($order_status === 'สำเร็จ') ? 'success' :
                         (($order_status === 'กำลังจัดเตรียม') ? 'info' :
                         (($order_status === 'ยกเลิก') ? 'danger' : 'warning'));
           $adminBadge = ($admin_verified === 'อนุมัติ') ? 'success' :
