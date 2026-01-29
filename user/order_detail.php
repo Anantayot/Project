@@ -177,7 +177,8 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
                         (($order_status === 'กำลังจัดเตรียม') ? 'info' :
                         (($order_status === 'ยกเลิก') ? 'danger' : 'warning'));
           $adminBadge = ($admin_verified === 'อนุมัติ') ? 'success' :
-                        (($admin_verified === 'ปฏิเสธ') ? 'danger' : 'warning');
+                        (($admin_verified === 'กำลังตรวจสอบ') ? 'info' 
+                        (($admin_verified === 'ปฏิเสธ') ? 'danger' : 'warning'));
           ?>
 
           <p><strong>วิธีชำระเงิน:</strong> <?= $methodText ?></p>
