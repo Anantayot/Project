@@ -174,13 +174,13 @@ foreach ($orders as $o):
       $badgeClass = 'danger';  // แดง
       break;
     default:
-      $badgeClass = 'warning'; // ส้ม = รอดำเนินการ
+      $badgeClass = 'badge badge-secondary'; // ส้ม = รอดำเนินการ
   }
 
   /* ===== สีสถานะคำสั่งซื้อ ===== */
   switch ($order_status) {
     case 'รอดำเนินการ':
-      $orderBadge = 'danger';   // แดง
+      $orderBadge = 'badge badge-secondary';   // แดง
       break;
     case 'กำลังจัดเตรียม':
       $orderBadge = 'info';     // ฟ้า
@@ -192,10 +192,10 @@ foreach ($orders as $o):
       $orderBadge = 'success';  // เขียว
       break;
     case 'ยกเลิก':
-      $orderBadge = 'secondary'; // เทา
+      $orderBadge = 'danger'; // เทา
       break;
     default:
-      $orderBadge = 'secondary';
+      $orderBadge = 'badge badge-secondary';
   }
 
   /* ===== แปลงวิธีชำระเงิน ===== */
