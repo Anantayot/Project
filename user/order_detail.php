@@ -89,12 +89,6 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
       color: #fff;
       font-weight: 600;
     }
-    
-    .badge.bg-warning{
-      background:#ff9800 !important;
-      color:#fff !important;
-     }
-
 
     .btn {
       border-radius: 8px;
@@ -179,10 +173,9 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
           $paymentBadge = ($payment_status === 'ชำระเงินแล้ว') ? 'success' :
                           (($payment_status === 'ยกเลิก') ? 'danger' : 'warning');
-          $orderBadge = ($order_status === 'จัดส่งแล้ว') ? 'success' :
-                        ($order_status === 'สำเร็จ') ? 'success' :
-                        ($order_status === 'กำลังจัดเตรียม') ? 'warning' :
-                        (($order_status === 'ยกเลิก') ? 'danger' : 'secondary');
+          $orderBadge = ($order_status === 'จัดส่งแล้ว' || $order_status === 'สำเร็จ') ? 'success' :
+                        (($order_status === 'กำลังจัดเตรียม') ? 'info' :
+                        (($order_status === 'ยกเลิก') ? 'danger' : 'warning'));
           $adminBadge = ($admin_verified === 'อนุมัติ') ? 'success' :
                         (($admin_verified === 'ปฏิเสธ') ? 'danger' : 'warning');
           ?>
