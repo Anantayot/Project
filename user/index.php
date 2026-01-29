@@ -197,7 +197,7 @@ if (empty($search) && empty($cat_id)) {
           foreach ($grouped as $catName => $products):
             $count = count($products);
         ?>
-          <h5 class="category-header"><?= htmlspecialchars($catName) ?> (<?= $count ?> ชิ้น)</h5>
+          <h5 class="category-header"></h5>
           <div class="row row-cols-1 row-cols-md-4 g-4">
             <?php foreach ($products as $p):
               $img = "../admin/uploads/" . $p['p_image'];
