@@ -204,9 +204,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
       <form method="post" enctype="multipart/form-data" class="mt-4 text-start">
         <div class="mb-3">
-          <label for="slip" class="form-label">📎 แนบสลิปการชำระเงิน (ถ้ามี)</label>
+          <label for="slip" class="form-label">📎 แนบสลิปการชำระเงิน</label>
           <input type="file" name="slip" id="slip" class="form-control" accept="image/*">
-          <small class="text-muted">* หากไม่มีสลิป สามารถกดยืนยันได้ ระบบจะรอตรวจสอบโดยแอดมิน</small>
         </div>
 
         <div class="d-grid gap-2 mt-4">
