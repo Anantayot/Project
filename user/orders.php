@@ -168,34 +168,34 @@ foreach ($orders as $o):
   /* ===== สีสถานะการชำระเงิน ===== */
   switch ($status) {
     case 'ชำระเงินแล้ว':
-      $badgeClass = 'success'; // เขียว
+      $badgeClass = 'success';
       break;
     case 'ยกเลิก':
-      $badgeClass = 'danger';  // แดง
+      $badgeClass = 'danger';  
       break;
     default:
-      $badgeClass = 'badge-secondary'; // ส้ม = รอดำเนินการ
+      $badgeClass = 'secondary'; 
   }
 
   /* ===== สีสถานะคำสั่งซื้อ ===== */
   switch ($order_status) {
     case 'รอดำเนินการ':
-      $orderBadge = 'badge-secondary';   // แดง
+      $orderBadge = 'secondary'; 
       break;
     case 'กำลังจัดเตรียม':
-      $orderBadge = 'info';     // ฟ้า
+      $orderBadge = 'info'; 
       break;
     case 'จัดส่งแล้ว':
-      $orderBadge = 'success';  // เขียว
+      $orderBadge = 'success'; 
       break;
     case 'สำเร็จ':
-      $orderBadge = 'success';  // เขียว
+      $orderBadge = 'success'; 
       break;
     case 'ยกเลิก':
-      $orderBadge = 'danger'; // เทา
+      $orderBadge = 'danger'; 
       break;
     default:
-      $orderBadge = 'badge-secondary';
+      $orderBadge = 'secondary';
   }
 
   /* ===== แปลงวิธีชำระเงิน ===== */
