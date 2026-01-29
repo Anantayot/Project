@@ -183,7 +183,7 @@ if (empty($search) && empty($cat_id)) {
 
   <?php if (!empty($search) || !empty($cat_id)): ?>
     <h3 class="section-title">
-      <?= ($cat_id === 'all') ? 'สินค้าทั้งหมด (เรียงตามหมวดหมู่)' : 'ผลการค้นหา' ?>
+      <?= ($cat_id === 'all') ? 'สินค้าทั้งหมด' : 'ผลการค้นหา' ?>
     </h3>
 
     <?php if (count($searchResults) > 0): ?>
