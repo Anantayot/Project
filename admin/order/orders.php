@@ -57,7 +57,7 @@ try {
                   <?php
                     $status = $o['order_status'] ?? 'รอดำเนินการ';
                     if ($status == 'สำเร็จ') $badge = 'success'; // เขียว
-                    elseif ($status == 'กำลังจัดเตรียม') $badge = 'badge badge-warning'; // เหลือง
+                    elseif ($status == 'กำลังจัดเตรียม') $badge = 'badge badge-info'; // เหลือง
                     elseif ($status == 'จัดส่งแล้ว') $badge = 'success'; // ฟ้า
                     elseif ($status == 'ยกเลิก') $badge = 'danger'; // แดง
                     else $badge = 'badge badge-warning'; // เทา
@@ -73,7 +73,7 @@ try {
                     $verify = $o['admin_verified'] ?? 'รอตรวจสอบ';
                     if ($verify == 'อนุมัติ') $vbadge = 'success'; // เขียว
                     elseif ($verify == 'ปฏิเสธ') $vbadge = 'danger'; // แดง MyCommiss
-                    elseif ($verify == 'กำลังตรวจสอบ') $vbadge = 'badge badge-warning'; // ม่วงอมฟ้า
+                    elseif ($verify == 'กำลังตรวจสอบ') $vbadge = 'badge badge-info'; // ม่วงอมฟ้า
                     else $vbadge = 'badge badge-warning'; // เทา
                   ?>
                   <span class="badge bg-<?= $vbadge ?> px-3 py-2 rounded-pill">
