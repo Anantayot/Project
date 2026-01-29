@@ -158,73 +158,100 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </tr>
         </thead>
         <tbody>
-          <?php 
-          $index = 1; 
-          foreach ($orders as $o): 
-            $status = $o['payment_status'] ?? 'รอดำเนินการ';
-            $order_status = $o['order_status'] ?? 'รอดำเนินการ';
-            $admin_verified = $o['admin_verified'] ?? 'รอตรวจสอบ';
+        <?php 
+$index = 1; 
+foreach ($orders as $o): 
+  $status = $o['payment_status'] ?? 'รอดำเนินการ';
+  $order_status = $o['order_status'] ?? 'รอดำเนินการ';
+  $admin_verified = $o['admin_verified'] ?? 'รอตรวจสอบ';
 
-            // สีของ payment_status
-            if ($status === 'ชำระเงินแล้ว') {
-              $badgeClass = 'success';
-            } elseif ($status === 'ยกเลิก') {
-              $badgeClass = 'danger';
-            } else {
-              $badgeClass = 'warning';
-            }
+  /* ===== สีสถานะการชำระเงิน ===== */
+  switch ($status) {
+    case 'ชำระเงินแล้ว':
+      $badgeClass = 'success'; // เขียว
+      break;
+    case 'ยกเลิก':
+      $badgeClass = 'danger';  // แดง
+      break;
+    default:
+      $badgeClass = 'warning'; // ส้ม = รอดำเนินการ
+  }
 
-            // สีของ order_status
-            if ($order_status === 'จัดส่งแล้ว') {
-              $orderBadge = 'success';
-            } elseif ($order_status === 'กำลังจัดเตรียม') {
-              $orderBadge = 'info';
-            } elseif ($order_status === 'ยกเลิก') {
-              $orderBadge = 'danger';
-            } else {
-              $orderBadge = 'secondary';
-            }
+  /* ===== สีสถานะคำสั่งซื้อ ===== */
+  switch ($order_status) {
+    case 'รอดำเนินการ':
+      $orderBadge = 'danger';   // แดง
+      break;
+    case 'กำลังจัดเตรียม':
+      $orderBadge = 'info';     // ฟ้า
+      break;
+    case 'จัดส่งแล้ว':
+      $orderBadge = 'success';  // เขียว
+      break;
+    case 'สำเร็จ':
+      $orderBadge = 'success';  // เขียว
+      break;
+    case 'ยกเลิก':
+      $orderBadge = 'secondary'; // เทา
+      break;
+    default:
+      $orderBadge = 'secondary';
+  }
 
-            // แปลง payment_method เป็นไทย
-            if ($o['payment_method'] === 'QR') {
-              $methodText = 'ชำระด้วย QR Code';
-            } elseif ($o['payment_method'] === 'COD') {
-              $methodText = 'เก็บเงินปลายทาง';
-            } else {
-              $methodText = htmlspecialchars($o['payment_method']);
-            }
+  /* ===== แปลงวิธีชำระเงิน ===== */
+  if ($o['payment_method'] === 'QR') {
+    $methodText = 'ชำระด้วย QR Code';
+  } elseif ($o['payment_method'] === 'COD') {
+    $methodText = 'เก็บเงินปลายทาง';
+  } else {
+    $methodText = htmlspecialchars($o['payment_method']);
+  }
 
-            $rowClass = ($order_status === 'ยกเลิก') ? 'table-danger' : '';
-          ?>
-            <tr class="<?= $rowClass ?>">
-              <td>#<?= $index ?></td>
-              <td><?= date('d/m/Y H:i', strtotime($o['order_date'])) ?></td>
-              <td><?= $methodText ?></td>
-              <td class="fw-semibold text-danger"><?= number_format($o['total_price'], 2) ?> บาท</td>
-              <td><span class="badge bg-<?= $badgeClass ?>"><?= htmlspecialchars($status) ?></span></td>
-              <td><span class="badge bg-<?= $orderBadge ?>"><?= htmlspecialchars($order_status) ?></span></td>
-              <td>
-                <div class="d-flex justify-content-center flex-wrap gap-2">
-                  <?php if (
-                    $o['payment_method'] === 'QR' &&
-                    $status === 'รอดำเนินการ' &&
-                    !in_array($admin_verified, ['กำลังตรวจสอบ', 'อนุมัติ'])
-                  ): ?>
-                    <a href="payment_confirm.php?id=<?= $o['order_id'] ?>" class="btn btn-sm btn-warning">
-                      💰 แจ้งชำระเงิน
-                    </a>
-                  <?php endif; ?>
+  $rowClass = ($order_status === 'ยกเลิก') ? 'table-danger' : '';
+?>
+  <tr class="<?= $rowClass ?>">
+    <td>#<?= $index ?></td>
+    <td><?= date('d/m/Y H:i', strtotime($o['order_date'])) ?></td>
+    <td><?= $methodText ?></td>
+    <td class="fw-semibold text-danger"><?= number_format($o['total_price'], 2) ?> บาท</td>
 
-                  <a href="order_detail.php?id=<?= $o['order_id'] ?>" class="btn btn-sm btn-outline-primary">
-                    🔍 ดูรายละเอียด
-                  </a>
-                </div>
-              </td>
-            </tr>
-          <?php 
-          $index++; 
-          endforeach; 
-          ?>
+    <!-- สถานะการชำระเงิน -->
+    <td>
+      <span class="badge bg-<?= $badgeClass ?>">
+        <?= htmlspecialchars($status) ?>
+      </span>
+    </td>
+
+    <!-- สถานะคำสั่งซื้อ -->
+    <td>
+      <span class="badge bg-<?= $orderBadge ?>">
+        <?= htmlspecialchars($order_status) ?>
+      </span>
+    </td>
+
+    <td>
+      <div class="d-flex justify-content-center flex-wrap gap-2">
+        <?php if (
+          $o['payment_method'] === 'QR' &&
+          $status === 'รอดำเนินการ' &&
+          !in_array($admin_verified, ['กำลังตรวจสอบ', 'อนุมัติ'])
+        ): ?>
+          <a href="payment_confirm.php?id=<?= $o['order_id'] ?>" class="btn btn-sm btn-warning">
+            💰 แจ้งชำระเงิน
+          </a>
+        <?php endif; ?>
+
+        <a href="order_detail.php?id=<?= $o['order_id'] ?>" class="btn btn-sm btn-outline-primary">
+          🔍 ดูรายละเอียด
+        </a>
+      </div>
+    </td>
+  </tr>
+<?php 
+$index++; 
+endforeach; 
+?>
+
         </tbody>
       </table>
     </div>
