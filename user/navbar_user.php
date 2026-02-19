@@ -13,7 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
    <img src="icon_mycommiss.ico" 
      alt="MyCommiss Logo"
-     height="36"
+     height="46"
      class="me-2">
 
   <span>MyCommiss</span>
