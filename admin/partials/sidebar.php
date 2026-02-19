@@ -1,7 +1,7 @@
 <nav id="sidebar" class="sidebar sidebar-offcanvas" style="background:#0d1117; min-height:100vh; border-right:1px solid #2c313a;">
 <div class="sidebar-brand-wrapper text-center py-4 border-bottom border-secondary">
   <div class="d-flex align-items-center justify-content-center">
-    <img src="../../user/logo.png" alt="Logo" class="sidebar-logo me-2">
+    <img src="../../user/icon_mycommiss.png" alt="Logo" class="sidebar-logo me-2">
     <span class="text-white fw-bold fs-5">MyCommiss</span>
   </div>
 </div>
