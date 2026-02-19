@@ -33,6 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
   <meta charset="UTF-8">
   <title>เข้าสู่ระบบ - MyCommiss Admin</title>
+  <link rel="icon" href="partials/icon_mycommiss.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap + Icons -->
