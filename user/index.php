@@ -323,16 +323,23 @@ if (empty($search) && empty($cat_id)) {
 <script>
   document.querySelectorAll('.mySwiper').forEach(swiperEl => {
     new Swiper(swiperEl, {
-      slidesPerView: "auto",
+      slidesPerView: 4,   // จาก 5 เหลือ 4
       spaceBetween: 20,
       autoplay: { delay: 3000, disableOnInteraction: false },
       navigation: {
         nextEl: swiperEl.querySelector('.swiper-button-next'),
         prevEl: swiperEl.querySelector('.swiper-button-prev'),
-      }
+      },
+      breakpoints: {
+        320: { slidesPerView: 1 },
+        768: { slidesPerView: 2 },
+        992: { slidesPerView: 3 },
+        1200: { slidesPerView: 4 },  // จาก 5 เหลือ 4
+      },
     });
   });
 </script>
+
 
 </body>
 </html>
