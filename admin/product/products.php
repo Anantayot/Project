@@ -15,6 +15,7 @@ $products = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 <!-- 🔹 ส่วนหัว -->
 <h3 class="mb-4 text-center fw-bold text-white">
   <i class="bi bi-box-seam"></i> จัดการสินค้า
+  <link rel="icon" href="partials/icon_mycommiss.ico">
 </h3>
 
 <div class="card shadow-lg border-0"
