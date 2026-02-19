@@ -183,7 +183,7 @@ body {
     <a class="navbar-brand fw-bold d-flex align-items-center" 
       href="index.php" 
       style="color:#D10024;">
-      <img src="../user/icon_mycommiss.ico" 
+      <img src="icon_mycommiss.ico" 
        alt="MyCommiss Logo"
        height="44"
        class="me-2">
