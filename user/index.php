@@ -128,13 +128,13 @@ if (empty($search) && empty($cat_id)) {
       height: 300px;
       object-fit: cover;
       width: 100%;
-      border-radius: 8px;
+      border-radius: 16px;
     }
     .product-card .card-body { text-align: center; }
     .product-card .btn {
       background-color: #D10024;
       border: none;
-      border-radius: 8px;
+      border-radius: 16px;
     }
     .product-card .btn:hover { background-color: #a5001b; }
 
