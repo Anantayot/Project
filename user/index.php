@@ -323,21 +323,16 @@ if (empty($search) && empty($cat_id)) {
 <script>
   document.querySelectorAll('.mySwiper').forEach(swiperEl => {
     new Swiper(swiperEl, {
-      slidesPerView: 5,
+      slidesPerView: "auto",
       spaceBetween: 20,
       autoplay: { delay: 3000, disableOnInteraction: false },
       navigation: {
         nextEl: swiperEl.querySelector('.swiper-button-next'),
         prevEl: swiperEl.querySelector('.swiper-button-prev'),
-      },
-      breakpoints: {
-        320: { slidesPerView: 2 },
-        768: { slidesPerView: 3 },
-        992: { slidesPerView: 4 },
-        1200: { slidesPerView: 5 },
-      },
+      }
     });
   });
 </script>
+
 </body>
 </html>
