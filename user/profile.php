@@ -49,6 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <title>โปรไฟล์ของฉัน | MyCommiss</title>
+  <link rel="icon" href="icon_mycommiss.ico">
+  <link rel="icon" href="icon_mycommiss.ico">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root {

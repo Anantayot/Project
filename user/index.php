@@ -63,7 +63,7 @@ if (empty($search) && empty($cat_id)) {
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>MyCommiss | หน้าร้าน</title>
+  <title>หน้าร้าน | MyCommiss</title>
   <link rel="icon" href="icon_mycommiss.ico">
 
   <!-- Bootstrap -->
