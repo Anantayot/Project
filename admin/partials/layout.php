@@ -192,7 +192,7 @@ body {
 
 <!-- 🟩 Sidebar -->
 <aside id="sidebar">
-  <div class="brand"><img src="../user/icon_mycommiss.png" alt="Logo" class="logo me-2">
+  <div class="brand"><img src="../../user/icon_mycommiss.png" alt="Logo" class="logo me-2">
   <span>MyCommiss</span></div>
   <ul>
     <li><a href="../index.php" class="<?= basename($_SERVER['PHP_SELF'])=='index.php'?'active':'' ?>"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
