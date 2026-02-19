@@ -179,7 +179,17 @@ body {
 
 <!-- 🟩 Sidebar -->
 <aside id="sidebar">
-  <div class="brand"><i class="bi bi-laptop"></i> MyCommiss</div>
+  <div class="brand">
+    <a class="navbar-brand fw-bold d-flex align-items-center" 
+      href="index.php" 
+      style="color:#D10024;">
+      <img src="../user/icon_mycommiss.ico" 
+       alt="MyCommiss Logo"
+       height="44"
+       class="me-2">
+      <span>MyCommiss</span>
+    </a>
+  </div>
   <ul>
     <li><a href="../index.php" class="<?= basename($_SERVER['PHP_SELF'])=='index.php'?'active':'' ?>"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
     <li><a href="../product/products.php" class="<?= strpos($_SERVER['PHP_SELF'],'product')?'active':'' ?>"><i class="bi bi-box-seam"></i> จัดการสินค้า</a></li>
