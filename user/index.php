@@ -139,7 +139,7 @@ if (empty($search) && empty($cat_id)) {
     .product-card .btn:hover { background-color: #a5001b; }
 
     .swiper { width: 100%; padding-bottom: 40px; }
-    .swiper-slide { width: 290px; }
+    .swiper-slide { width: 310px; }
     .swiper-button-next, .swiper-button-prev { color: #D10024; }
 
     footer {
