@@ -172,19 +172,6 @@ body {
     padding: 80px 20px 30px;
   }
 }
-
-#sidebar .brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 0;
-}
-
-#sidebar .brand .logo {
-  max-height: 40px;
-  width: auto;
-}
-
   </style>
 </head>
 
@@ -192,8 +179,7 @@ body {
 
 <!-- 🟩 Sidebar -->
 <aside id="sidebar">
-  <div class="brand"><img src="../../user/icon_mycommiss.png" alt="Logo" class="logo me-2">
-  <span>MyCommiss</span></div>
+  <div class="brand"><i class="bi bi-laptop"></i> MyCommiss</div>
   <ul>
     <li><a href="../index.php" class="<?= basename($_SERVER['PHP_SELF'])=='index.php'?'active':'' ?>"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
     <li><a href="../product/products.php" class="<?= strpos($_SERVER['PHP_SELF'],'product')?'active':'' ?>"><i class="bi bi-box-seam"></i> จัดการสินค้า</a></li>

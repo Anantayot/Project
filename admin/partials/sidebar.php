@@ -1,10 +1,9 @@
 <nav id="sidebar" class="sidebar sidebar-offcanvas" style="background:#0d1117; min-height:100vh; border-right:1px solid #2c313a;">
-<div class="sidebar-brand-wrapper text-center py-4 border-bottom border-secondary">
-  <div class="d-flex align-items-center justify-content-center">
-    <img src="../../user/icon_mycommiss.png" alt="Logo" class="sidebar-logo me-2">
-    <span class="text-white fw-bold fs-5">MyCommiss</span>
+  <div class="sidebar-brand-wrapper text-center py-4 border-bottom border-secondary">
+    <h4 class="text-white fw-bold mb-0">
+      <i class="bi bi-laptop"></i> MyCommiss
+    </h4>
   </div>
-</div>
 
   <ul class="nav flex-column mt-3">
     <li class="nav-item mb-1">
