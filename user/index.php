@@ -128,18 +128,18 @@ if (empty($search) && empty($cat_id)) {
       height: 300px;
       object-fit: cover;
       width: 100%;
-      border-radius: 16px;
+      border-radius: 8px;
     }
     .product-card .card-body { text-align: center; }
     .product-card .btn {
       background-color: #D10024;
       border: none;
-      border-radius: 16px;
+      border-radius: 8px;
     }
     .product-card .btn:hover { background-color: #a5001b; }
 
     .swiper { width: 100%; padding-bottom: 40px; }
-    .swiper-slide { width: 220px; }
+    .swiper-slide { width: 300px; }
     .swiper-button-next, .swiper-button-prev { color: #D10024; }
 
     footer {
