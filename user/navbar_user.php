@@ -8,15 +8,17 @@ if (session_status() === PHP_SESSION_NONE) {
   <div class="container">
     <!-- 🔹 โลโก้ร้าน -->
     <a class="navbar-brand fw-bold d-flex align-items-center" 
-      href="index.php" 
-      style="color:#D10024 !important;">
+   href="index.php" 
+   style="color:#D10024;">
 
-      <img src="icon_mycommiss.png" 
-        alt="MyCommiss Logo" 
-        height="40" 
-         class="me-2">
-         MyCommiss
-    </a>
+  <img src="icon_mycommiss.png"
+       alt="MyCommiss Logo"
+       height="40"
+       class="me-2">
+
+  <span>MyCommiss</span>
+</a>
+
 
     <!-- 🔹 ปุ่มแสดงเมนูในมือถือ -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
