@@ -114,7 +114,7 @@ if (empty($search) && empty($cat_id)) {
 
     .product-card {
       border: 1px solid #eee;
-      border-radius: 18px;
+      border-radius: 12px;
       transition: all 0.3s ease;
       overflow: hidden;
       background: #fff;
