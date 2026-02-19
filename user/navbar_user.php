@@ -11,10 +11,10 @@ if (session_status() === PHP_SESSION_NONE) {
    href="index.php" 
    style="color:#D10024;">
 
-  <img src="icon_mycommiss.png"
-       alt="MyCommiss Logo"
-       height="40"
-       class="me-2">
+   <img src="icon_mycommiss.ico" 
+     alt="MyCommiss Logo"
+     height="36"
+     class="me-2">
 
   <span>MyCommiss</span>
 </a>
