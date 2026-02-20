@@ -113,8 +113,7 @@ if (empty($search) && empty($cat_id)) {
     .section-title {
       font-weight: 700;
       color: #D10024;
-      margin: 30px 0 20px;
-      padding-top: 20px;
+      margin: 50px 0 20px;
       text-align:center;
     }
 
