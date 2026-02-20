@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= $pageTitle ?? 'MyCommiss Admin' ?></title>
-  <link rel="icon" href="../partials/icon_mycommiss.ico">
+  <link rel="icon" type="image/png" href="partials/icon_mycommiss.png">
   <!-- CSS -->
   <link rel="stylesheet" href="../template_corona/assets/vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="../template_corona/assets/css/style.css">
