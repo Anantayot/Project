@@ -44,7 +44,7 @@ $soldQty = (int)$soldStmt->fetchColumn();
 <head>
   <meta charset="UTF-8">
   <title>รายละเอียดสินค้า | MyCommiss</title>
-  <link rel="icon" href="icon_mycommiss.ico">
+  <link rel="icon" type="image/png" href="icon_mycommiss.png">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
