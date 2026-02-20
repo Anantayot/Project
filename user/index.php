@@ -110,7 +110,13 @@ if (empty($search) && empty($cat_id)) {
     }
     .search-bar button:hover { background: #a5001b; }
 
-    .section-title { font-weight: 700; color: #D10024; margin: 30px 0 20px; text-align:center; }
+    .section-title {
+      font-weight: 700;
+      color: #D10024;
+      margin: 30px 0 20px;
+      padding-top: 20px;
+      text-align:center;
+    }
 
     .product-card {
       border: 1px solid #eee;
