@@ -86,7 +86,7 @@ if (empty($search) && empty($cat_id)) {
       border-radius: 50px;
       padding: 15px 25px;
       margin: 30px auto;
-      max-width: 1200px;
+      max-width: 1000;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     .search-bar input, .search-bar select {
