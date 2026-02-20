@@ -252,78 +252,74 @@ if (empty($search) && empty($cat_id)) {
       <p class="text-center text-muted mt-4">😢 ไม่พบสินค้าที่ค้นหา</p>
     <?php endif; ?>
 
-  <?php else: ?>
-    <!-- 🆕 แสดงสินค้าสามหมวดตามเดิม -->
-    <h3 class="section-title">สินค้าใหม่ล่าสุด</h3>
-    <div class="swiper mySwiper">
-      <div class="swiper-wrapper">
-        <?php foreach ($newProducts as $p):
-          $img = "../admin/uploads/" . $p['p_image'];
-          if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
-        ?>
-          <div class="swiper-slide">
-            <div class="product-card card h-100">
-              <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
-              <div class="card-body">
-                <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
-                <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
-                <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
-              </div>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
-    </div>
+    <?php else: ?>
 
-    <h3 class="section-title">สินค้าขายดีที่สุด</h3>
-    <div class="swiper mySwiper">
-      <div class="swiper-wrapper">
-        <?php foreach ($bestSellers as $p):
-          $img = "../admin/uploads/" . $p['p_image'];
-          if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
-        ?>
-          <div class="swiper-slide">
-            <div class="product-card card h-100 border-warning">
-              <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
-              <div class="card-body">
-                <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
-                <span class="badge bg-warning text-dark mb-2">ขายแล้ว <?= $p['total_sold'] ?> ชิ้น</span>
-                <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
-                <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
-              </div>
-            </div>
-          </div>
-        <?php endforeach; ?>
+<!-- 🆕 สินค้าใหม่ล่าสุด -->
+<h3 class="section-title">สินค้าใหม่ล่าสุด</h3>
+<div class="row row-cols-1 row-cols-md-4 g-4">
+  <?php foreach ($newProducts as $p):
+    $img = "../admin/uploads/" . $p['p_image'];
+    if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
+  ?>
+    <div class="col">
+      <div class="product-card card h-100">
+        <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
+        <div class="card-body">
+          <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
+          <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
+          <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
+        </div>
       </div>
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
     </div>
+  <?php endforeach; ?>
+</div>
 
-    <h3 class="section-title">สินค้าแนะนำ</h3>
-    <div class="swiper mySwiper">
-      <div class="swiper-wrapper">
-        <?php foreach ($randomProducts as $p):
-          $img = "../admin/uploads/" . $p['p_image'];
-          if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
-        ?>
-          <div class="swiper-slide">
-            <div class="product-card card h-100">
-              <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
-              <div class="card-body">
-                <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
-                <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
-                <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
-              </div>
-            </div>
-          </div>
-        <?php endforeach; ?>
+
+<!-- 🔥 สินค้าขายดีที่สุด -->
+<h3 class="section-title mt-5">สินค้าขายดีที่สุด</h3>
+<div class="row row-cols-1 row-cols-md-4 g-4">
+  <?php foreach ($bestSellers as $p):
+    $img = "../admin/uploads/" . $p['p_image'];
+    if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
+  ?>
+    <div class="col">
+      <div class="product-card card h-100 border-warning">
+        <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
+        <div class="card-body">
+          <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
+          <span class="badge bg-warning text-dark mb-2">
+            ขายแล้ว <?= $p['total_sold'] ?> ชิ้น
+          </span>
+          <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
+          <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
+        </div>
       </div>
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
     </div>
-  <?php endif; ?>
+  <?php endforeach; ?>
+</div>
+
+
+<!-- ⭐ สินค้าแนะนำ -->
+<h3 class="section-title mt-5">สินค้าแนะนำ</h3>
+<div class="row row-cols-1 row-cols-md-4 g-4">
+  <?php foreach ($randomProducts as $p):
+    $img = "../admin/uploads/" . $p['p_image'];
+    if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
+  ?>
+    <div class="col">
+      <div class="product-card card h-100">
+        <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
+        <div class="card-body">
+          <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
+          <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
+          <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
+        </div>
+      </div>
+    </div>
+  <?php endforeach; ?>
+</div>
+
+<?php endif; ?>
 </div>
 
 <footer class="text-center mt-5">
