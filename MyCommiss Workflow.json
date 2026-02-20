@@ -1,0 +1,924 @@
+{
+  "name": "MyCommiss Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  DATE(o.order_date)   AS sale_date,\n  o.order_id,\n  c.name               AS customer_name,\n  ct.cat_name          AS cat_name,\n  p.p_name             AS product_name,\n  od.quantity          AS qty,\n  od.price             AS unit_price,\n  od.subtotal          AS subtotal,\n  o.payment_status     AS payment_status,\n  o.payment_method     AS payment_method,\n  o.order_status       AS shipping_status\nFROM orders o\nJOIN customers c       ON o.customer_id = c.customer_id\nJOIN order_details od  ON o.order_id = od.order_id\nJOIN product p         ON od.p_id = p.p_id\nJOIN category ct       ON p.cat_id = ct.cat_id\nWHERE DATE(o.order_date) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)\nORDER BY o.order_id, od.id;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        176
+      ],
+      "id": "34ba0a88-4113-4945-81bd-e10e9491b9b7",
+      "name": "Execute a SQL query",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "JBTP6ufZQoCmYc8K",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw",
+          "mode": "list",
+          "cachedResultName": "MyCommiss",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 931964946,
+          "mode": "list",
+          "cachedResultName": "Order",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit#gid=931964946"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "order_detail_id"
+          ],
+          "schema": [
+            {
+              "id": "order_detail_id",
+              "displayName": "order_detail_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sale_date",
+              "displayName": "sale_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_phone",
+              "displayName": "customer_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "shipping_address",
+              "displayName": "shipping_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cat_name",
+              "displayName": "cat_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "qty",
+              "displayName": "qty",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "unit_price",
+              "displayName": "unit_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "subtotal",
+              "displayName": "subtotal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payment_status",
+              "displayName": "payment_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payment_method",
+              "displayName": "payment_method",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "shipping_status",
+              "displayName": "shipping_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        16
+      ],
+      "id": "95acbbca-f504-4ced-a0cf-55d44cced921",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleApi": {
+          "id": "MEjPFhTSowgWJ5hO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let sale_date = null;\nlet paid_total = 0;\nlet unpaid_total = 0;\nlet ordersMap = {};\n\n// เมื่อวานตามเวลาไทย (Asia/Bangkok) แบบนิ่ง ไม่พึ่ง timezone ของเครื่อง\nconst nowBkk = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));\nnowBkk.setDate(nowBkk.getDate() - 1);\nconst yesterdayText = nowBkk.toLocaleDateString('th-TH');\n\nconst sheet_url = \"https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=sharing\";\n\n// items = ข้อมูลจาก node ก่อนหน้าใน n8n (แต่ละ item = 1 row)\nfor (const item of items) {\n  const j = item.json;\n\n  sale_date = sale_date || j.sale_date;\n  const amount = Number(j.subtotal || 0);\n\n  if (j.payment_status === 'ชำระเงินแล้ว') paid_total += amount;\n  else unpaid_total += amount;\n\n  // ===== เพิ่ม: แปลงวิธีชำระเงิน (COD = เงินสด) =====\n  let paymentMethodText = 'ไม่มีข้อมูล';\n  if (j.payment_method === 'COD') paymentMethodText = '💵 เงินสด';\n  else if (j.payment_method === 'QR') paymentMethodText = '📲 โอนผ่านธนาคาร';\n\n  if (!ordersMap[j.order_id]) {\n    ordersMap[j.order_id] = {\n      customer_name: j.customer_name,\n      payment_status: j.payment_status,\n      payment_method: paymentMethodText,     // << เพิ่ม\n      total_amount: 0,\n      categories: {}\n    };\n  }\n\n  const catName = j.cat_name || 'ทั่วไป';\n  if (!ordersMap[j.order_id].categories[catName]) {\n    ordersMap[j.order_id].categories[catName] = [];\n  }\n\n  ordersMap[j.order_id].categories[catName].push(`      ◦ ${j.product_name}\\n(จำนวน ${j.qty} ชิ้น)`);\n  ordersMap[j.order_id].total_amount += amount;\n}\n\n// ทำรายละเอียดรายออเดอร์\nlet detail_lines = [];\nfor (const order_id in ordersMap) {\n  const order = ordersMap[order_id];\n\n  let categorySections = [];\n  for (const cat in order.categories) {\n    categorySections.push(`   📂 หมวดหมู่: ${cat}\\n${order.categories[cat].join('\\n')}`);\n  }\n\n  detail_lines.push(\n`🆔 ออเดอร์: #${order_id}\n👤 ลูกค้า: คุณ ${order.customer_name}\n${categorySections.join('\\n')}\n💰 ยอดรวม: ${order.total_amount.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n📍 สถานะชำระเงิน: ${order.payment_status === 'ชำระเงินแล้ว' ? '✅ จ่ายแล้ว' : '⏳ รอชำระ'}\n💳 วิธีชำระ: ${order.payment_method}`\n  );\n}\n\n// ===== ส่วนที่คุณขอ: unshift สรุปขึ้นก่อน =====\nlet all_messages = [];\n\nall_messages.unshift(\n`┏━━━━━━━━━━━━━┓\n        📊 สรุปยอดขายประจำวัน\n┗━━━━━━━━━━━━━┛\n📅 วันที่: ${yesterdayText}\n\n💰 ยอดรวมทั้งหมด: ${(paid_total + unpaid_total).toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n----------------------------------\n✅ จ่ายแล้ว: ${paid_total.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n❌ ยังไม่จ่าย: ${unpaid_total.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n\n📁 ตรวจสอบรายการทั้งหมด:\n🔗 ${sheet_url}\n\nภาพรวมวันนี้ประมาณนี้ครับ 😎`\n);\n\n// เติมรายละเอียดตามหลัง (ทีละ 5)\nfor (let i = 0; i < detail_lines.length; i += 5) {\n  const chunk = detail_lines.slice(i, i + 5);\n\n  all_messages.push(\n`📝 รายละเอียดรายการ (${i + 1}-${Math.min(i + 5, detail_lines.length)})\n━━━━━━━━━━━━━━\n${chunk.join('\\n------------------------------\\n')}\n━━━━━━━━━━━━━━`\n  );\n}\n\n// คืนค่าเป็นหลาย items เพื่อให้ Split Out ทำงานต่อ\nreturn all_messages.map(msg => ({ json: { line_text: msg } }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        96
+      ],
+      "id": "0c16c2fa-683e-4515-82f6-ab7ce0ea7a18",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"U207465dbcb10b31129ea7c68a9cf2ccd\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.line_text.replace(/\\n/g, '\\\\n') }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1136,
+        112
+      ],
+      "id": "73d35bfa-6018-4242-8844-e3395777eaf4",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "4mDmMKndGIStlP5J",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT p.p_name, c.cat_name, p.p_stock\nFROM product p\nJOIN category c ON p.cat_id = c.cat_id\nWHERE p.p_stock < 6;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        1104,
+        432
+      ],
+      "id": "13197994-dd10-4693-9e83-04ff7e0081c9",
+      "name": "Execute a SQL query1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "JBTP6ufZQoCmYc8K",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "line_text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        656,
+        96
+      ],
+      "id": "c2fca5fd-ae84-4b07-811d-b1467704a2ab",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e16aa7fb-6640-4165-9e19-d5f0f3526228",
+              "leftValue": "={{ Object.keys($json).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        176
+      ],
+      "id": "fc18f644-5b68-4eb9-a186-f4d0014cf1df",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f24fb7a4-4a58-40e4-9526-c298b5f36a17",
+              "name": "=line_text",
+              "value": "=┏━━━━━━━━━━━━━┓\\n        📊 สรุปยอดขายประจำวัน\\n┗━━━━━━━━━━━━━┛📅 วันที่: {{ \n  (() => {\n    const nowBkk = new Date(\n      new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })\n    );\n    nowBkk.setDate(nowBkk.getDate() - 1);\n    return nowBkk.toLocaleDateString('th-TH');\n  })()\n}}\n \\nวันนี้ไม่มีออเดอร์เข้ามาครับ\\nงานเรียบร้อยดี พักผ่อนได้เลยครับ! ----------------------------------\\n📁 ตรวจสอบรายการย้อนหลังได้ที่นี่ :\\n🔗 https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=sharing",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        256
+      ],
+      "id": "f3e86a93-027f-4f04-b9da-00284ade2964",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"U207465dbcb10b31129ea7c68a9cf2ccd\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.line_text.replace(/\\n/g, '\\\\n') }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        656,
+        256
+      ],
+      "id": "b3d58608-e123-4011-93b3-e20e2e1c9ead",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "4mDmMKndGIStlP5J",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        96
+      ],
+      "id": "01964def-72d1-46c3-9ee0-86d019927a7f",
+      "name": "Schedule Trigger",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "66d95e8e-1f33-469d-a401-5b1d6fa4c766",
+              "leftValue": "={{ Object.keys($json).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1296,
+        432
+      ],
+      "id": "4c352d15-ac25-4655-8a2a-d644ca7687ca",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "if (items.length === 0) return [];\n\n// 1. จัดกลุ่มสินค้าตามหมวดหมู่\nlet categoryMap = {};\n\nfor (const item of items) {\n  const p = item.json;\n  const catName = p.cat_name || 'ทั่วไป';\n  \n  if (!categoryMap[catName]) {\n    categoryMap[catName] = [];\n  }\n  // ตกแต่งรายการสินค้าให้ดูเด่นชัด\n  categoryMap[catName].push(`   ◦ ${p.p_name}\\n     คงเหลือจำนวน: ⚠️ ${p.p_stock} ชิ้น`);\n}\n// เมื่อวานตามเวลาไทย (Asia/Bangkok) แบบนิ่ง ไม่พึ่ง timezone ของเครื่อง\nconst nowBkk = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));\nnowBkk.setDate(nowBkk.getDate() - 1);\nconst yesterdayText = nowBkk.toLocaleDateString('th-TH');\n\n\n// 2. สร้างเนื้อหาข้อความโดยเอาหมวดหมู่ขึ้นก่อน\nlet reportLines = [];\nfor (const catName in categoryMap) {\n  reportLines.push(`📂 หมวดหมู่: ${catName}\\n${categoryMap[catName].join('\\n\\n')}`);\n}\n\n// 3. แบ่งส่งเป็นชุดๆ (กล่องละ 5 หมวดหมู่ เพื่อไม่ให้ยาวเกิน)\nlet all_messages = [];\n// ปรับ Header ให้สวยงามเหมือนสรุปยอดขาย\nconst header = \n`┏━━━━━━━━━━━━━┓\n          ⚠️ แจ้งเตือนสต๊อกต่ำ! \n┗━━━━━━━━━━━━━┛\n📅 วันที่: ${yesterdayText}`\n\nfor (let i = 0; i < reportLines.length; i += 5) {\n  const chunk = reportLines.slice(i, i + 5);\n  all_messages.push(\n`${header}\n\n${chunk.join('\\n------------------------------\\n')}\n\n━━━━━━━━━━━━━━\nอย่าลืมสั่งของเพิ่มนะครับ! 📦`\n  );\n}\n\nreturn all_messages.map(msg => {\n  return { json: { line_text: msg } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        336
+      ],
+      "id": "cbb06c12-1699-4e38-b9d7-e87ad8672acd",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "line_text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        336
+      ],
+      "id": "5d416dec-70b6-4b86-8747-34bebc832ee6",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"U207465dbcb10b31129ea7c68a9cf2ccd\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.line_text.replace(/\\n/g, '\\\\n') }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2240,
+        352
+      ],
+      "id": "d1ce6d02-7b68-4fbe-8080-06bba5fca62b",
+      "name": "HTTP Request2",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "4mDmMKndGIStlP5J",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"U207465dbcb10b31129ea7c68a9cf2ccd\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.line_text.replace(/\\n/g, '\\\\n') }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1776,
+        512
+      ],
+      "id": "e926bcbf-e49f-4e1a-a10e-d95bb21bd895",
+      "name": "HTTP Request3",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "4mDmMKndGIStlP5J",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f24fb7a4-4a58-40e4-9526-c298b5f36a17",
+              "name": "line_text",
+              "value": "=┏━━━━━━━━━━━━━┓\\n          📦 เช็คสต๊อกเรียบร้อย\\n┗━━━━━━━━━━━━━┛\\n📅 วันที่: {{ \n  (() => {\n    const nowBkk = new Date(\n      new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })\n    );\n    nowBkk.setDate(nowBkk.getDate() - 1);\n    return nowBkk.toLocaleDateString('th-TH');\n  })()\n}}\n\\nวันนี้ไม่มีสินค้าสต๊อกต่ำครับพี่ \\nของในร้านยังแน่นๆ ทุกหมวดหมู่ครับ!\\nพักผ่อนได้เลยครับผม 😎",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        512
+      ],
+      "id": "bb1fd2d4-a4b1-4488-9500-9e1a5bfe5ba6",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        896,
+        96
+      ],
+      "id": "ffdf9136-6271-4fc4-91f5-098a8904b4c2",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2000,
+        336
+      ],
+      "id": "02e08abb-db9a-478c-bc21-73a31aef0c3d",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  od.id AS order_detail_id,  -- ✅ ใช้เป็น Key Column (ถาวร)\n  DATE(o.order_date) AS sale_date,\n  o.order_id,\n  c.name AS customer_name,\n  c.phone AS customer_phone,\n  c.address AS shipping_address,\n  ct.cat_name AS cat_name,\n  p.p_name AS product_name,\n  od.quantity AS qty,\n  od.price AS unit_price,\n  od.subtotal AS subtotal,\n  o.payment_status AS payment_status,\n  o.payment_method AS payment_method,\n  o.order_status AS shipping_status\nFROM orders o\nJOIN customers c  ON o.customer_id = c.customer_id\nJOIN order_details od ON o.order_id = od.order_id\nJOIN product p    ON od.p_id = p.p_id\nJOIN category ct  ON p.cat_id = ct.cat_id\nORDER BY o.order_date, o.order_id, od.id;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        16
+      ],
+      "id": "cce8b4a6-9b80-4929-9111-317821434abd",
+      "name": "Execute a SQL query2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "JBTP6ufZQoCmYc8K",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 9,
+              "triggerAtMinute": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        512
+      ],
+      "id": "8d2250af-1955-4658-ad10-227bda855db2",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    p.p_id,\n    p.p_name AS product_name,\n    ct.cat_name AS category_name,\n    SUM(od.quantity) AS total_qty_sold\nFROM orders o\nJOIN order_details od ON o.order_id = od.order_id\nJOIN product p ON od.p_id = p.p_id\nJOIN category ct ON p.cat_id = ct.cat_id\nWHERE \n    o.order_date >= DATE_SUB(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 1 MONTH)\n    AND o.order_date < DATE_FORMAT(CURDATE(), '%Y-%m-01')\n    AND o.payment_status = 'ชำระเงินแล้ว'\nGROUP BY \n    p.p_id,\n    p.p_name,\n    ct.cat_name\nORDER BY total_qty_sold DESC;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        -48,
+        512
+      ],
+      "id": "38678e98-991a-4516-88d7-7205fcd07328",
+      "name": "Execute a SQL query3",
+      "credentials": {
+        "mySql": {
+          "id": "JBTP6ufZQoCmYc8K",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let totalQtyAll = 0;\n\n// ===== เดือนที่แล้ว (เวลาไทย) =====\nconst nowBkk = new Date(\n  new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })\n);\n\nconst firstDayThisMonth = new Date(\n  nowBkk.getFullYear(),\n  nowBkk.getMonth(),\n  1\n);\n\nconst firstDayLastMonth = new Date(firstDayThisMonth);\nfirstDayLastMonth.setMonth(firstDayLastMonth.getMonth() - 1);\n\nconst monthText = firstDayLastMonth.toLocaleDateString('th-TH', {\n  year: 'numeric',\n  month: 'long'\n});\n\n// ===== เอาแค่ 5 อันดับแรก =====\nconst top5 = items.slice(0, 5);\n\n// ===== รวมจำนวนทั้งหมด (เฉพาะ Top 5) =====\nfor (const item of top5) {\n  totalQtyAll += Number(item.json.total_qty_sold || 0);\n}\n\n// ===== สร้างข้อความ =====\nlet detail_lines = top5.map((item, index) => {\n  const category =\n    item.json.category_name ||\n    item.json.cat_name ||\n    'ไม่ระบุหมวดหมู่';\n\n  return `${index + 1}. 🏆 ${item.json.product_name}\n   📂 หมวดหมู่: ${category}\n   📦 ขายได้: ${Number(item.json.total_qty_sold).toLocaleString()} ชิ้น`;\n});\n\nlet message = `┏━━━━━━━━━━━━━┓\n          📊 5 อันดับสินค้าขายดี\n┗━━━━━━━━━━━━━┛\n📅 เดือน: ${monthText}\n━━━━━━━━━━━━━━\n${detail_lines.join('\\n------------------------------\\n')}\n━━━━━━━━━━━━━━`;\n\nreturn [\n  {\n    json: {\n      line_text: message\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        512
+      ],
+      "id": "f2c2222e-ff32-4a7d-91e1-8889feaaea24",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"U207465dbcb10b31129ea7c68a9cf2ccd\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": {{ JSON.stringify($json.line_text) }}\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        368,
+        512
+      ],
+      "id": "6a0e3b9f-531a-4fac-ae75-69ba021b8248",
+      "name": "HTTP Request4",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "4mDmMKndGIStlP5J",
+          "name": "Bearer Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute a SQL query2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query2": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Bangkok",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "c8ee1c8c-db19-4bbd-961d-eff3d278bdbc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "897fa275083eef3a820e0b41d7de24b01122dca0848a5de4d3e67b1846c14d72"
+  },
+  "id": "HVZL3YcAlSmUtlsa",
+  "tags": []
+}
