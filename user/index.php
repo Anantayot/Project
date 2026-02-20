@@ -242,7 +242,7 @@ if (empty($search) && empty($cat_id)) {
 
   <?php else: ?>
     <!-- 🆕 แสดงสินค้าสามหมวดตามเดิม -->
-    <h3 class="section-title">สินค้าใหม่ล่าสุด</h3><br>
+    <h3 class="section-title">สินค้าใหม่ล่าสุด</h3>
     <div class="swiper mySwiper">
       <div class="swiper-wrapper">
         <?php foreach ($newProducts as $p):
