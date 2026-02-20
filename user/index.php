@@ -130,7 +130,10 @@ if (empty($search) && empty($cat_id)) {
       width: 100%;
       border-radius: 8px;
     }
-    .product-card .card-body { text-align: center; }
+    .product-card .card-body {
+      text-align: center;
+      padding: 25px 20px;   /* เพิ่มระยะห่างด้านใน */
+    }
     .product-card .btn {
       background-color: #D10024;
       border: none;
