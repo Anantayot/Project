@@ -86,7 +86,7 @@ if (empty($search) && empty($cat_id)) {
       border-radius: 50px;
       padding: 15px 25px;
       margin: 30px auto;
-      max-width: 900px;
+      max-width: 800px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     .search-bar input, .search-bar select {
@@ -110,12 +110,7 @@ if (empty($search) && empty($cat_id)) {
     }
     .search-bar button:hover { background: #a5001b; }
 
-    .section-title {
-      font-weight: 700;
-      color: #D10024;
-      margin: 20px 0 30px;
-      text-align:center;
-    }
+    .section-title { font-weight: 700; color: #D10024; margin: 30px 0 20px; text-align:center; }
 
     .product-card {
       border: 1px solid #eee;
@@ -135,9 +130,7 @@ if (empty($search) && empty($cat_id)) {
       width: 100%;
       border-radius: 8px;
     }
-    .product-card .card-body {
-      text-align: center;
-    }
+    .product-card .card-body { text-align: center; }
     .product-card .btn {
       background-color: #D10024;
       border: none;
@@ -145,13 +138,8 @@ if (empty($search) && empty($cat_id)) {
     }
     .product-card .btn:hover { background-color: #a5001b; }
 
-    .swiper {
-      width: 100%;
-      padding-bottom: 40px;
-    }
-    .swiper-slide {
-      width: 500px;
-    }
+    .swiper { width: 100%; padding-bottom: 40px; }
+    .swiper-slide { width: 310px; }
     .swiper-button-next, .swiper-button-prev { color: #D10024; }
 
     footer {
