@@ -150,7 +150,7 @@ if (empty($search) && empty($cat_id)) {
       padding-bottom: 40px;
     }
     .swiper-slide {
-      width: 350px;
+      width: 500px;
     }
     .swiper-button-next, .swiper-button-prev { color: #D10024; }
 
