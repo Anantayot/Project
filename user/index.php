@@ -123,6 +123,7 @@ if (empty($search) && empty($cat_id)) {
       transition: all 0.3s ease;
       overflow: hidden;
       background: #fff;
+      min-height: 560px;
     }
     .product-card:hover {
       transform: translateY(-4px);
