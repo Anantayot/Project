@@ -699,7 +699,7 @@
             {
               "id": "679ed58a-d2f8-4e95-9d39-66d7d9e56c31",
               "name": "html",
-              "value": "=<h2>สวัสดีคุณ {{$json[\"name\"]}}</h2> <p>ขอแจ้งโปรโมชั่นพิเศษประจำเดือน</p> <ul> <li>ลด 20% ทุกหมวด</li> <li>ซื้อครบ 1,000 บาท ส่งฟรี</li> </ul> <p>หมดเขตสิ้นเดือนนี้</p>",
+              "value": "=<h2>สวัสดีคุณ {{$json[\"name\"]}}</h2> <p>ขอแจ้งโปรโมชั่นพิเศษประจำเดือน</p> <ul> <li>ลด 20% ทุกหมวด</li> <li>ซื้อครบ 1,000 บาท ส่งฟรี</li> </ul> <p>หมดเขตสิ้นเดือนนี้</p> http://103.40.119.91/Project/user/index.php",
               "type": "string"
             }
           ]
@@ -718,11 +718,13 @@
     },
     {
       "parameters": {
-        "fromEmail": "67010974018@msu.ac.th",
+        "fromEmail": "mycommiss.info@gmail.com",
         "toEmail": "={{ $json.email }}",
         "subject": "={{ $json.subject }}",
         "html": "={{ $json.html }}",
-        "options": {}
+        "options": {
+          "appendAttribution": false
+        }
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
@@ -1033,7 +1035,7 @@
     "timezone": "Asia/Bangkok",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "9ba1f9c3-5ee3-4cef-ac8f-7dbdaa165a5d",
+  "versionId": "4bbc0332-4b54-4f25-9c20-45810234a1a4",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "897fa275083eef3a820e0b41d7de24b01122dca0848a5de4d3e67b1846c14d72"
