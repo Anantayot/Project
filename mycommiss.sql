@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 19, 2026 at 12:46 PM
+-- Generation Time: Feb 28, 2026 at 01:27 PM
 -- Server version: 10.5.29-MariaDB-0+deb11u1
 -- PHP Version: 7.4.33
 
@@ -52,9 +52,9 @@ INSERT INTO `admins` (`admin_id`, `username`, `password`, `name`, `created_at`) 
 
 CREATE TABLE `category` (
   `cat_id` int(11) NOT NULL,
-  `cat_name` varchar(255) NOT NULL,
-  `cat_description` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `cat_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cat_description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `category`
@@ -104,11 +104,12 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`customer_id`, `name`, `email`, `password`, `phone`, `address`, `created_at`, `subscribe`) VALUES
-(1, 'อนันตยศ อินทราพงษ์', '67010974018@msu.ac.th', '$2y$10$g2TOwNeq8WS/qknez/Dml.eHW.AdPRzysgMa7RcKhqjHCaeDQkUYi', '0903262100', 'ประจวบ', '2025-10-16 09:11:21', 0),
+(1, 'อนันตยศ อินทราพงษ์', '67010974018@msu.ac.th', '$2y$10$g2TOwNeq8WS/qknez/Dml.eHW.AdPRzysgMa7RcKhqjHCaeDQkUYi', '0903262100', 'ประจวบ', '2025-10-16 09:11:21', 1),
 (2, 'นายวีรภัทร สุพร', '67010974016@msu.ac.th', '$2y$10$0BEEyQ050EjANd8vHl2Qju.15EijEZGyb2BT6zSf9xAuW9r9hDRHe', '0933705611', '57/4', '2025-10-18 01:53:15', 0),
 (3, 'Ronaldo', '67010974003@msu.ac.th', '$2y$10$333UZ7MH5uDB/Jle9GNxVeTPdZpNA7zbuGMqu6S3SWnxTU58wWE5i', '0622301236', 'โปรตุเกต', '2025-10-18 06:10:54', 0),
-(4, 'ฟหกฟหกฟห', 'aatad@asdasd', '$2y$10$eLOcVFss4Zc9V83ebKcIgut/1NsuLIIPR/Ly6cPHd8vXaCXbnVopu', '4894984894', '84894', '2025-10-18 06:28:08', 0),
-(5, 'รัฐศาสตร์ บรรจงกุล', '67010974013@msu.ac.th', '$2y$10$XeqiNnPnqjtg2zre/VEZGeqI9CDy0rGDEsEUrvOiKj3NPU43UXTkK', '0826968780', 'ปารีส', '2025-10-18 06:46:38', 0);
+(4, 'ฟหกฟหกฟห', 'nicolas.note.th@gmail.com', '$2y$10$eLOcVFss4Zc9V83ebKcIgut/1NsuLIIPR/Ly6cPHd8vXaCXbnVopu', '4894984894', '84894', '2025-10-18 06:28:08', 1),
+(5, 'รัฐศาสตร์ บรรจงกุล', '67010974013@msu.ac.th', '$2y$10$XeqiNnPnqjtg2zre/VEZGeqI9CDy0rGDEsEUrvOiKj3NPU43UXTkK', '0826968780', 'ปารีส', '2025-10-18 06:46:38', 0),
+(6, 'อภิญญา ประสม', '66010916079@msu.ac.th', '$2y$10$q3NBvoXZWfYoOYdPSzdbReB.Ak0xty/PREwf5vmcGPEZCooG1.F5C', '0900000000', 'พิษณุโลก', '2026-02-28 04:35:08', 0);
 
 -- --------------------------------------------------------
 
@@ -143,7 +144,15 @@ INSERT INTO `orders` (`order_id`, `customer_id`, `total_price`, `shipping_addres
 (3, 1, '5380.00', 'ประจวบ', 'COD', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-02-16 05:47:51', NULL, NULL, NULL),
 (4, 1, '11890.00', 'ประจวบ', 'COD', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-02-16 05:48:37', NULL, NULL, NULL),
 (5, 1, '7980.00', 'ประจวบ', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'สำเร็จ', '2026-02-18 03:42:54', NULL, NULL, NULL),
-(6, 1, '12340.00', 'ประจวบ', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-02-18 03:43:11', NULL, NULL, NULL);
+(6, 1, '12340.00', 'ประจวบ', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-02-18 03:43:11', NULL, NULL, NULL),
+(7, 1, '35660.00', 'ประจวบ', 'QR', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-02-19 06:22:31', NULL, NULL, NULL),
+(8, 1, '890.00', 'ประจวบ', 'COD', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-02-19 06:23:14', NULL, NULL, NULL),
+(9, 1, '2180.00', 'ประจวบ', 'COD', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-02-20 08:16:35', NULL, NULL, NULL),
+(10, 1, '5980.00', 'ประจวบ', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-02-20 08:16:45', NULL, NULL, NULL),
+(11, 1, '1290.00', 'ประจวบ', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'จัดส่งแล้ว', '2026-02-20 08:16:52', NULL, NULL, NULL),
+(12, 1, '1090.00', 'ประจวบ', 'QR', NULL, NULL, 'ยกเลิก', 'รอตรวจสอบ', 'ยกเลิก', '2026-02-20 08:18:48', NULL, NULL, NULL),
+(13, 6, '18190.00', 'พิษณุโลก', 'QR', NULL, NULL, 'รอดำเนินการ', NULL, 'รอดำเนินการ', '2026-02-28 04:36:42', NULL, NULL, NULL),
+(14, 6, '15390.00', 'พิษณุโลก', 'COD', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-02-28 05:53:52', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -178,7 +187,20 @@ INSERT INTO `order_details` (`id`, `order_id`, `p_id`, `quantity`, `price`) VALU
 (11, 5, 189, 1, '3990.00'),
 (12, 6, 141, 1, '3290.00'),
 (13, 6, 129, 1, '1150.00'),
-(14, 6, 170, 1, '7900.00');
+(14, 6, 170, 1, '7900.00'),
+(15, 7, 154, 1, '3860.00'),
+(16, 7, 196, 2, '15900.00'),
+(17, 8, 90, 1, '890.00'),
+(18, 9, 172, 1, '1290.00'),
+(19, 9, 87, 1, '890.00'),
+(20, 10, 63, 1, '5290.00'),
+(21, 10, 50, 1, '690.00'),
+(22, 11, 142, 1, '1290.00'),
+(23, 12, 183, 1, '1090.00'),
+(24, 13, 19, 1, '1290.00'),
+(25, 13, 24, 1, '16900.00'),
+(26, 14, 135, 1, '12400.00'),
+(27, 14, 192, 1, '2990.00');
 
 -- --------------------------------------------------------
 
@@ -220,12 +242,12 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (16, 'RAZER ORNATA V3 X (BLACK) (MEMBRANE - RGB -EN/TH)', '1090.00', 14, '• Membrane\r\n• RGB LED\r\n• English / Thai Keycap\r\n• ANSI\r\n• Wired USB', '1770969253_1.jpg', 2, '2026-02-13 07:54:13'),
 (17, 'STEELSERIES APEX 5 (STEELSERIES HYBRID BLUE MECHANICAL RGB SWITCH) (RGB LED) (EN)', '4590.00', 18, '• SteelSeries Hybrid Blue Mechanical RGB Switch (Clicky)\r\n• RGB LED\r\n• English Legend (Font)\r\n• Wired USB 2.0\r\n• OLED Smart Display', '1770969289_1.jpg', 2, '2026-02-13 07:54:49'),
 (18, 'AJAZZ AK680 LETS PLAY (RED-WHITE) (BLUE SWITCH RAINBOW LED EN/TH)', '650.00', 17, '• Blue Switch (Clicky)\r\n• Rainbow LED\r\n• English / Thai Keycap\r\n• ANSI\r\n• Wired (Detachable USB-C to USB-A)\r\n• Windows / macOS / Android', '1770969319_1.jpg', 2, '2026-02-13 07:55:19'),
-(19, 'REDRAGON K617 FIZZ (WHITE & GREY) (BLUE SWITCH - RGB LED - EN/TH)', '1290.00', 17, '• Blue Switch (Clicky)\r\n• RGB LED\r\n• English / Thai Legends (Font)\r\n• ANSI\r\n• Wired USB (USB-C to USB-A)\r\n• Hot Swappable', '1770969344_1.jpg', 2, '2026-02-13 07:55:44'),
+(19, 'REDRAGON K617 FIZZ (WHITE & GREY) (BLUE SWITCH - RGB LED - EN/TH)', '1290.00', 16, '• Blue Switch (Clicky)\r\n• RGB LED\r\n• English / Thai Legends (Font)\r\n• ANSI\r\n• Wired USB (USB-C to USB-A)\r\n• Hot Swappable', '1770969344_1.jpg', 2, '2026-02-13 07:55:44'),
 (20, 'AJAZZ AK820MAX MAGNETIC SWTICH EDITION (MOUNTAIN MIST) (MAGNETIC SWITCH RGB EN/TH)', '2290.00', 15, '• Magnetic Switch\r\n• RGB\r\n• English / Thai Keycap\r\n• ANSI\r\n• Wired (Detachable USB-C to USB-A)\r\n• Hot Swappable', '1770969369_1.jpg', 2, '2026-02-13 07:56:09'),
 (21, 'SIGNO E-SPORT BAROCCO (GC-203BW) (BLACK-WHITE)', '4490.00', 5, 'Gaming Chair', '1770969464_1.jpg', 3, '2026-02-13 07:57:33'),
 (22, 'ONEX GX3 (BLACK)', '5890.00', 12, 'Gaming Chair', '1770969493_1.jpg', 3, '2026-02-13 07:58:13'),
 (23, 'ANDA SEAT DARK SERIES (AD4XL-WIZARD-B-PV/C) (BLACK)', '12900.00', 18, 'Gaming Chair', '1770969521_1.jpg', 3, '2026-02-13 07:58:41'),
-(24, 'THERMALTAKE CYBERCHAIR E500 (GGC-EG5-BBLFDM-01) (BLACK)', '16900.00', 19, 'Gaming Chair', '1770969563_1.jpg', 3, '2026-02-13 07:59:23'),
+(24, 'THERMALTAKE CYBERCHAIR E500 (GGC-EG5-BBLFDM-01) (BLACK)', '16900.00', 18, 'Gaming Chair', '1770969563_1.jpg', 3, '2026-02-13 07:59:23'),
 (25, 'ONEX GX3 (BLACK-RED)', '5890.00', 19, 'Gaming Chair', '1770969590_1.jpg', 3, '2026-02-13 07:59:50'),
 (26, 'OCPC SATAN SERIES (OC-GC-SAT-BW) (BLUE-WHITE)', '6990.00', 15, 'Gaming Chair', '1770969617_1.jpg', 3, '2026-02-13 08:00:17'),
 (27, 'ANDA SEAT JIB SERIES (AD12XL-02-S-PV-JIB) (BLUE)', '15990.00', 12, 'Gaming Chair', '1770969666_1.jpg', 3, '2026-02-13 08:01:06'),
@@ -251,7 +273,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (47, 'RAZER WOLVERINE V2 PRO PS (WHITE)', '9990.00', 14, '• Razer™ HyperSpeed Wireless\r\n• Razer™ Mecha-Tactile Action Buttons\r\n• 8-Way Microswitch D-Pad', '1770970649_1.jpg', 5, '2026-02-13 08:17:29'),
 (48, 'FANTECH EOS PRO MULTI-PLATFORM GAMEPAD (WHITE) (WGP-15)', '1390.00', 14, '• รองรับ PC, PS, Android, IOS, MacOS, TvOS, SWITCH, CLOUD GAMING/GAMEPASS, TESLA VEHICLES\r\n• อุปกรณ์รองรับถึงแค่ ps3', '1770970673_1.jpg', 5, '2026-02-13 08:17:53'),
 (49, 'REDRAGON HARROW PRO G808', '990.00', 14, '• PC with Windows XP or higher and Android\r\n• Compatible with Xinput and Dinput for enhanced gaming compatibility', '1770970698_1.jpg', 5, '2026-02-13 08:18:13'),
-(50, 'ONIKUMA IRUKA TRI-MODE GAMING WIRELESS (WHITE)', '690.00', 21, '• รองรับ 2.4 GHz / Bluetooth / Type-C Cable\r\n• ปุ่ม Full Hall Trigger ควบคุมแม่นยำยิ่งขึ้น\r\n• มีปุ่ม Macro ด้านหลัง 2 ปุ่ม MR / ML สามารถปรับแต่งได้\r\n• มีระบบสั่นในด้ามจับจอยทั้ง 2 ข้าง ปรับความแรงได้\r\n• รองรับ 6-Axis Gyroscope\r\n• มีเอฟเฟกต์แสงไฟ RGB ปรับได้\r\n• แบบเตอรี่ 800 mAh เล่นได้ประมาณ 16 ชั่วโมง\r\n• มีฟังก์ชัน Turbo Rapid Fire\r\n• รองรับการใช้งาน Switch / iOS / Android / PC Steam', '1770970722_1.jpg', 5, '2026-02-13 08:18:42'),
+(50, 'ONIKUMA IRUKA TRI-MODE GAMING WIRELESS (WHITE)', '690.00', 20, '• รองรับ 2.4 GHz / Bluetooth / Type-C Cable\r\n• ปุ่ม Full Hall Trigger ควบคุมแม่นยำยิ่งขึ้น\r\n• มีปุ่ม Macro ด้านหลัง 2 ปุ่ม MR / ML สามารถปรับแต่งได้\r\n• มีระบบสั่นในด้ามจับจอยทั้ง 2 ข้าง ปรับความแรงได้\r\n• รองรับ 6-Axis Gyroscope\r\n• มีเอฟเฟกต์แสงไฟ RGB ปรับได้\r\n• แบบเตอรี่ 800 mAh เล่นได้ประมาณ 16 ชั่วโมง\r\n• มีฟังก์ชัน Turbo Rapid Fire\r\n• รองรับการใช้งาน Switch / iOS / Android / PC Steam', '1770970722_1.jpg', 5, '2026-02-13 08:18:42'),
 (51, 'HYTE THICC Q60 (WHITE)', '9990.00', 14, '• Intel Socket LGA 1700, 1200, 115x, 1151, 1150, 1155, 1156, 2011, 2066\r\n• AMD Socket AM5, AM4, TR4\r\n• 5” 720 x 1280 60Hz Ultraslim IPS Display', '1770970785_1.jpg', 6, '2026-02-13 08:19:45'),
 (52, 'THERMALRIGHT FROZEN WARFRAME 240 BLACK ARGB', '3990.00', 14, '• Intel Socket LGA 1700, 1200, 115x, 2011, 2066\r\n• AMD Socket AM5, AM4', '1770970810_1.jpg', 6, '2026-02-13 08:20:10'),
 (53, 'CORSAIR NAUTILUS 360 RS ARGB (BLACK)', '3890.00', 15, '• Intel Socket LGA 1851, 1700\r\n• AMD Socket AM5, AM4\r\n• Asus Aura Sync, MSI Mystic Light RGB, Asrock Polychrome RGB, Gigabyte RGB Fusion', '1770970843_1.jpg', 6, '2026-02-13 08:20:43'),
@@ -264,7 +286,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (60, 'DEEPCOOL MYSTIQUE 240 (BLACK)', '3990.00', 13, '• Intel Socket LGA 1700, 1200, 1151, 1150, 1155\r\n• AMD Socket AM5, AM4\r\n• Aura Sync, Razer Chroma RGB, RGB Fusion, Mystic Light RGB, Polychrome RGB', '1770971086_1.jpg', 6, '2026-02-13 08:24:46'),
 (61, 'INTEL CORE I7-14700K - 20C 28T 2.5-5.6GHz', '12900.00', 15, '• 20 (8P+12E) Cores\r\n• 28 Threads\r\n• CPU cooler NOT included\r\n• Intel UHD graphics 770\r\n• PCIe 5.0 and 4.0\r\n• Compatible with H610, B660, B760, H670, H770, Z690, Z790 chipset', '1770971281_1.jpg', 7, '2026-02-13 08:28:01'),
 (62, 'INTEL CORE I3-12100F 3.3 GHz', '3590.00', 13, '• 4 (4P) Cores\r\n• 8 Threads\r\n• Discrete Graphics Required, No Integrated Graphics\r\n• PCIe 5.0 and 4.0', '1770971312_1.jpg', 7, '2026-02-13 08:28:32'),
-(63, 'INTEL CORE I5-12400F 2.5 GHz', '5290.00', 15, '• 6 (6P) Cores\r\n• 12 Threads\r\n• Discrete Graphics Required, No Integrated Graphics\r\n• PCIe 5.0 and 4.0', '1770971336_1.jpg', 7, '2026-02-13 08:28:56'),
+(63, 'INTEL CORE I5-12400F 2.5 GHz', '5290.00', 14, '• 6 (6P) Cores\r\n• 12 Threads\r\n• Discrete Graphics Required, No Integrated Graphics\r\n• PCIe 5.0 and 4.0', '1770971336_1.jpg', 7, '2026-02-13 08:28:56'),
 (64, 'INTEL CORE I5-14400F - 10C 16T 1.8-4.7GHz', '5790.00', 15, '• 10 (6P+4E) Cores\r\n• 16 Threads\r\n• No integrated graphics, discrete graphics required\r\n• PCIe 5.0 and 4.0\r\n• Compatible with H610, B660, B760, H670, H770, Z690, Z790 chipset', '1770971365_1.jpg', 7, '2026-02-13 08:29:25'),
 (65, 'INTEL CORE I9-14900K - 24C 32T 2.4-6.0GHz', '17400.00', 15, '• 24 (8P+16E) Cores\r\n• 32 Threads\r\n• CPU cooler NOT included\r\n• Intel UHD graphics 770\r\n• PCIe 5.0 and 4.0\r\n• Compatible with H610, B660, B760, H670, H770, Z690, Z790 chipset', '1770971393_1.webp', 7, '2026-02-13 08:29:53'),
 (66, 'AMD RYZEN 7 9800X3D - 8C 16T 4.7-5.2GHz', '17990.00', 13, '• 8 Cores\r\n• 16 Threads\r\n• CPU cooler NOT included\r\n• AMD Radeon Graphics\r\n• PCIe 5.0\r\n• Compatible with A620, B650, B650E, B840, B850, X670, X670E, X870, X870E chipset', '1770971442_1.jpg', 7, '2026-02-13 08:30:30'),
@@ -288,10 +310,10 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (84, 'FANTECH WHG02 (BLACK)', '1490.00', 15, '• Bluetooth / 2.4GHz Wireless / Wired connection\r\n• Battery 1050 mAh', '1771227697_1.jpg', 9, '2026-02-16 07:41:37'),
 (85, 'ONIKUMA X31 RGB 3.5MM - BLACK', '459.00', 12, '• ไดร์เวอร์ขนาด 50 มม.\r\n• เอฟเฟกต์แสงไฟ RGB ที่โดดเด่น\r\n• ให้เสียงที่คมชัดรอบทิศทาง\r\n• ไมโครโฟน HD เสียงคมชัด\r\n• ไมโครโฟนปรับได้ 360 องศา\r\n• ฟองน้ำนุ่ม ถ่ายเทอากาศ สวมใส่สบาย\r\n• เชื่อมต่อด้วย USB + 3.5mm', '1771228248_1.jpg', 9, '2026-02-16 07:50:48'),
 (86, 'EGA TYPE H17 - WHITE', '690.00', 23, '• การเชื่อมต่อ Bluetooth 5.4 / 2.4GHz Wireless / AUX 3.5mm\r\n• ไฟ LED Lighting\r\n• ไมโครโฟนยืดหยุ่น ปรับได้ตามการใช้งาน\r\n• แผงควบคุมบนตัวหูฟัง (เปิด/ปิด, เพิ่ม/ลดเสียง)\r\n• ระยะส่งสัญญาณสูงสุด 10 เมตร\r\n• แบตเตอรี่ในตัว ขนาด 600mAh\r\n• มีอุปกรณ์เสริม สายชาร์จ USB-to-Type-C / อะแดปเตอร์ OTG สำหรับใช้งานร่วมกับโทรศัพท์', '1771228372_1.jpg', 9, '2026-02-16 07:52:52'),
-(87, 'FANTECH HG30 CARBON 7.1 - WHITE', '890.00', 12, '• เชื่อมต่อผ่านสาย USB-A\r\n• ไดรเวอร์ขนาด 40 มม. ปรับจูนพิเศษ ให้คุณภาพเสียงยอดเยี่ยม\r\n• ระบบเสียงรอบทิศทางเสมือนจริงแบบ 7.1\r\n• ไมโครโฟนตัดเสียงรบกวน\r\n• รองรับการใช้งานหลากหลายแพลตฟอร์ม MAC, PC, PS4, PS5 และ Nintendo Switch', '1771228898_1.jpg', 9, '2026-02-16 08:01:38'),
+(87, 'FANTECH HG30 CARBON 7.1 - WHITE', '890.00', 11, '• เชื่อมต่อผ่านสาย USB-A\r\n• ไดรเวอร์ขนาด 40 มม. ปรับจูนพิเศษ ให้คุณภาพเสียงยอดเยี่ยม\r\n• ระบบเสียงรอบทิศทางเสมือนจริงแบบ 7.1\r\n• ไมโครโฟนตัดเสียงรบกวน\r\n• รองรับการใช้งานหลากหลายแพลตฟอร์ม MAC, PC, PS4, PS5 และ Nintendo Switch', '1771228898_1.jpg', 9, '2026-02-16 08:01:38'),
 (88, 'HYPERX CLOUD FLIGHT 2 - WHITE', '4790.00', 21, '• เชื่อมต่อไร้สายผ่าน 2.4GHz, Bluetooth และระบบ Instant Pair\r\n• ไฟ RGB ปรับแต่งได้ พร้อมแผ่นตกแต่งถอดเปลี่ยนได้\r\n• แบตเตอรี่ใช้งานได้นานสูงสุด 100 ชั่วโมง\r\n• ออกแบบให้สวมใส่สบาย มีไมโครโฟนให้เลือก 2 แบบ\r\n• รองรับการใช้งานกับ PC, PS5, PS4, Nintendo Switch, Mac และมือถือ; รองรับซอฟต์แวร์ NGENUITY', '1771229112_1.jpg', 9, '2026-02-16 08:05:12'),
 (89, 'RAZER BLACKSHARK V3 PRO - WHITE', '8490.00', 21, '• ไดรเวอร์ Razer TriForce Bio-Cellulose 50 มม. Gen-2 ให้เสียงคมชัดและสมจริง\r\n• ระบบ Hybrid ANC ตัดเสียงรบกวนรอบข้างได้อย่างมีประสิทธิภาพ\r\n• รองรับการเชื่อมต่อ 2.4GHz / Bluetooth / USB / 3.5 มม.\r\n• ไมโครโฟนถอดได้ HyperClear Full Band 12 มม. ให้เสียงคมชัด\r\n• แบตเตอรี่ใช้งานได้สูงสุด 70 ชม.\r\n• รองรับ THX Spatial Audio เพื่อประสบการณ์เสียงรอบทิศทาง', '1771229688_1.jpg', 9, '2026-02-16 08:14:48'),
-(90, 'AULA G7 - WHITE', '890.00', 14, '• รองรับการเชื่อมต่อ 3 โหมด แจ็ค 3.5 มม. / ไร้สาย 2.4 GHz / บลูทูธ\r\n• ค่าหน่วงต่ำเพียง 10ms เหมาะสำหรับการเล่นเกมส์แบบเรียลไทม์\r\n• ไดรเวอร์ขนาด 40 มม. ให้เสียงคมชัด ทรงพลัง\r\n• ไมโครโฟนถอดได้ พร้อมฟังก์ชั่นตัดเสียงรบกวน\r\n• แบตเตอรี่ใช้งานยาวนานสูงสุด 60 ชั่วโมง\r\n• ดีไซน์สวมใส่สบาย ระบายอากาศดี ไม่อับร้อน', '1771229743_1.jpg', 9, '2026-02-16 08:15:43'),
+(90, 'AULA G7 - WHITE', '890.00', 13, '• รองรับการเชื่อมต่อ 3 โหมด แจ็ค 3.5 มม. / ไร้สาย 2.4 GHz / บลูทูธ\r\n• ค่าหน่วงต่ำเพียง 10ms เหมาะสำหรับการเล่นเกมส์แบบเรียลไทม์\r\n• ไดรเวอร์ขนาด 40 มม. ให้เสียงคมชัด ทรงพลัง\r\n• ไมโครโฟนถอดได้ พร้อมฟังก์ชั่นตัดเสียงรบกวน\r\n• แบตเตอรี่ใช้งานยาวนานสูงสุด 60 ชั่วโมง\r\n• ดีไซน์สวมใส่สบาย ระบายอากาศดี ไม่อับร้อน', '1771229743_1.jpg', 9, '2026-02-16 08:15:43'),
 (91, 'FANTECH SONAR GS202 MOBILE GAMING & MUSIC SPEAKER (BLACK)', '300.00', 23, '• Portable USB2.0 Speaker\r\n• 45MM Driver Unit\r\n• RGB Illumination', '1771232416_1.jpg', 10, '2026-02-16 09:00:16'),
 (92, 'CREATIVE STAGE AIR V2 - BLACK', '1690.00', 21, '2 x 5W, Total System Peak power: 20W', '1771232515_1.jpg', 10, '2026-02-16 09:01:55'),
 (93, 'JBL FLIP 6 (BLACK)', '5190.00', 12, '20 Watt', '1771232618_1.jpg', 10, '2026-02-16 09:03:38'),
@@ -336,14 +358,14 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (132, 'KINGSTON FURY BEAST 32GB (16GBx2) DDR5 5200MHz', '12900.00', 11, '• 32GB (16GBx2)\r\n• DDR5\r\n• 5200 MHz\r\n• KF552C40BBK2-32', '1771243925_1.jpg', 14, '2026-02-16 12:12:05'),
 (133, 'G.SKILL RIPJAWS V 16GB (8GBx2) DDR4 3200MHz', '3990.00', 16, '• 16GB (8GBx2)\r\n• DDR4\r\n• 3200MHz\r\n• F4-3200C16D-16GVKB', '1771243994_1.jpg', 14, '2026-02-16 12:13:14'),
 (134, 'G.SKILL TRIDENT Z NEO 16GB (8GBx2) DDR4 3200MHz', '3990.00', 8, '• 16GB (8GBx2)\r\n• DDR4\r\n• 3200MHz\r\n• F4-3200C16D-16GTZN\r\n• RGB Lighting', '1771244084_1.jpg', 14, '2026-02-16 12:14:44'),
-(135, 'CORSAIR VENGEANCE 32GB (16GBx2) DDR5 5200MHz', '12400.00', 17, '• 32GB (16GBx2)\r\n• DDR5\r\n• 5200MHz\r\n• CL40\r\n• Intel XMP\r\n• CMK32GX5M2B5200C40', '1771244139_1.jpg', 14, '2026-02-16 12:15:39'),
+(135, 'CORSAIR VENGEANCE 32GB (16GBx2) DDR5 5200MHz', '12400.00', 16, '• 32GB (16GBx2)\r\n• DDR5\r\n• 5200MHz\r\n• CL40\r\n• Intel XMP\r\n• CMK32GX5M2B5200C40', '1771244139_1.jpg', 14, '2026-02-16 12:15:39'),
 (136, 'CORSAIR VENGEANCE LPX 16GB (8GBx2) DDR4 3200MHz', '4350.00', 16, '• 16GB (8GBx2)\r\n• DDR4\r\n• 3200MHz\r\n• CMK16GX4M2B3200C16W', '1771244270_1.jpg', 14, '2026-02-16 12:17:50'),
 (137, 'CORSAIR VENGEANCE RGB 32GB (16GBx2) DDR5 6000MHz', '15900.00', 15, '• 32GB (16GBx2)\r\n• DDR5\r\n• 6000MHz\r\n• CL36\r\n• Intel XMP\r\n• CMH32GX5M2E6000C36', '1771244345_1.jpg', 14, '2026-02-16 12:19:05'),
 (138, 'G.SKILL TRIDENT Z RGB 32GB (16GBx2) DDR4 3200MHz', '9990.00', 15, '• 32GB (16GBx2)\r\n• DDR4\r\n• 3200MHz\r\n• F4-3200C16D-32GTZR', '1771244433_1.jpg', 14, '2026-02-16 12:20:34'),
 (139, 'KINGSTON FURY BEAST 16GB (8GBx2) DDR5 5200MHz', '5990.00', 15, '• 16GB (8GBx2)\r\n• DDR5\r\n• 5200MHz\r\n• CL40\r\n• KF552C40BBAK2-16', '1771244545_1.jpg', 14, '2026-02-16 12:22:25'),
 (140, ' KINGSTON FURY RENEGADE 32GB (16GBx2) DDR5 6400MHz', '13400.00', 13, '• 32GB (16GBx2)\r\n• DDR5\r\n• 6400MHz\r\n• CL32\r\n• KF564C32RSAK2-32', '1771244654_1.jpg', 14, '2026-02-16 12:24:14'),
 (141, 'SSD SAMSUNG 980 PRO 1 TB PCIe 4x4/NVMe M.2 2280 ', '3290.00', 7, '• 1 TB\r\n• Sequential Read (up to) 7,000 MB/s\r\n• Sequential Write (up to) 5,000 MB/s\r\n• PCIe Gen 4 x 4', '1771245521_1.jpg', 15, '2026-02-16 12:38:41'),
-(142, 'SSD WD BLACK SN770 500 GB PCIe 4x4/NVMe M.2 2280', '1290.00', 12, '• 500 GB\r\n• Sequential Read (up to) 5,000 MB/s\r\n• Sequential Write (up to) 4,000 MB/s\r\n• PCIe Gen 4 x 4', '1771245802_1.jpg', 15, '2026-02-16 12:43:22'),
+(142, 'SSD WD BLACK SN770 500 GB PCIe 4x4/NVMe M.2 2280', '1290.00', 11, '• 500 GB\r\n• Sequential Read (up to) 5,000 MB/s\r\n• Sequential Write (up to) 4,000 MB/s\r\n• PCIe Gen 4 x 4', '1771245802_1.jpg', 15, '2026-02-16 12:43:22'),
 (143, 'SSD HIKSEMI FUTURE 1 TB PCIe 4x4/NVMe M.2 2280', '5450.00', 17, '• 1 TB\r\n• Up to 7,450 MB/s Read\r\n• Up to 6,600 MB/s Write\r\n• PCIe Gen 4 x 4', '1771245911_1.jpg', 15, '2026-02-16 12:45:11'),
 (144, 'SSD KINGSTON NV2 500 GB PCIe 4/NVMe M.2 2280', '1290.00', 14, '• 500 GB\r\n• Up to 3,500 MB/s Read\r\n• Up to 2,100 MB/s Write\r\n• PCIe 4.0', '1771246021_1.jpg', 15, '2026-02-16 12:47:01'),
 (145, 'SSD KINGSTON FURY RENEGADE 1 TB  PCIe 4x4/NVMe M.2 2280 (SFYRS/1000G)', '3990.00', 14, '• 1 TB\r\n• Sequential Read (up to) 7,300 MB/s\r\n• Sequential Write (up to) 6,000 MB/s\r\n• PCIe Gen 4 x 4', '1771246155_1.jpg', 15, '2026-02-16 12:49:15'),
@@ -355,7 +377,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (151, 'ASROCK B450M STEEL LEGEND - AMD SOCKET AM4 DDR4 MICRO-ATX', '2790.00', 14, '• Socket AM4 for AMD Ryzen 2000, 3000, 4000 G, 5000 & 5000 G-Series Processors\r\n• AMD B450\r\n• DDR4, 4 x DIMM\r\n• 1 x DP\r\n• 1 x HDMI\r\n• 2 x M.2 Sockets\r\n• 4 x SATA3 Connectors\r\n• 1 x USB 3.2 Gen1 Type-A Header (front)\r\n• 1 x USB 3.2 Gen2 Type-C (rear)\r\n• 1 x USB 3.2 Gen2 Type-A (rear)\r\n• 1 x PS/2\r\n• 1 Gigabit LAN', '1771255671_1.jpg', 16, '2026-02-16 15:27:51'),
 (152, 'MSI PRO B760M-P - INTEL SOCKET 1700 DDR5 MICRO-ATX', '2390.00', 8, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• 4 DIMMs, DDR 5\r\n• 1 x PCIe 4.0 x 16 slot\r\n• 1 x HDMI, 1 x DisplayPort, 1 x D-Sub (VGA)\r\n• 2 x M.2 Gen 4 x 4 slots & 4 x SATA 3\r\n• 1 x USB 3.2 Gen 1 Type-A front panel connector\r\n• 1 x USB 3.2 Gen 2 Type-C\r\n• 1 Gigabit LAN', '1771255813_1.jpg', 16, '2026-02-16 15:30:13'),
 (153, 'ASUS PRIME B760M-A WIFI (DDR5) (SOCKET LGA 1700) (MICRO-ATX)', '4090.00', 9, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• CPU with base power greater than 125W is not supported\r\n• 4 x DIMM, DDR5\r\n• 1 x DisplayPort\r\n• 2 x HDMI\r\n• 2 x M.2 slots & 4x SATA 3\r\n• 1 x USB 3.2 Gen 1 Type-C front panel connector\r\n• 2 x USB 3.2 Gen 2 Type-A\r\n• 1 x PS/2\r\n• 2.5Gb Ethernet, Wi-Fi 6, Bluetooth v5.2\r\n• Aura Sync RGB header', '1771255891_1.jpg', 16, '2026-02-16 15:31:31'),
-(154, 'MSI B760M GAMING PLUS WIFI - INTEL SOCKET 1700 DDR5 MICRO-ATX', '3860.00', 6, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• Intel B760\r\n• DDR5, 4 x DIMM\r\n• 2 x DP\r\n• 2 x HDMI\r\n• 2 x M.2 slots\r\n• 4 x SATA 6Gb/s ports\r\n• 1 x USB 3.2 Gen 1 Type-C connector (front)\r\n• 2 x USB 3.2 Gen 2 Type-A (rear)\r\n• 2 x USB 3.2 Gen 1 Type-A (rear)\r\n• 1 x PS/2\r\n• 2.5Gbps LAN\r\n• Intel Wi-Fi 6E\r\n• Bluetooth 5.3', '1771255950_1.jpg', 16, '2026-02-16 15:32:30'),
+(154, 'MSI B760M GAMING PLUS WIFI - INTEL SOCKET 1700 DDR5 MICRO-ATX', '3860.00', 5, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• Intel B760\r\n• DDR5, 4 x DIMM\r\n• 2 x DP\r\n• 2 x HDMI\r\n• 2 x M.2 slots\r\n• 4 x SATA 6Gb/s ports\r\n• 1 x USB 3.2 Gen 1 Type-C connector (front)\r\n• 2 x USB 3.2 Gen 2 Type-A (rear)\r\n• 2 x USB 3.2 Gen 1 Type-A (rear)\r\n• 1 x PS/2\r\n• 2.5Gbps LAN\r\n• Intel Wi-Fi 6E\r\n• Bluetooth 5.3', '1771255950_1.jpg', 16, '2026-02-16 15:32:30'),
 (155, 'ASUS TUF GAMING B760M-PLUS WIFI II - INTEL SOCKET 1700 DDR5 MICRO-ATX', '4950.00', 16, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• Intel B760\r\n• DDR5, 4 x DIMM\r\n• 1 x DP\r\n• 1 x HDMI\r\n• 3 x M.2 slots\r\n• 4 x SATA 6Gb/s ports\r\n• 1 x USB Type-C 10Gbps connector (front)\r\n• 1 x USB Type-C 20Gbps (rear)\r\n• 1 x USB Type-A 10Gbps (rear)\r\n• 2.5Gb Ethernet\r\n• Wi-Fi 6E\r\n• Bluetooth v5.3', '1771256131_1.jpg', 16, '2026-02-16 15:35:31'),
 (156, 'GIGABYTE B760M GAMING X DDR4 (REV. 1.0) (SOCKET LGA 1700) (MICRO-ATX)', '4190.00', 15, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• DDR4 4 DIMMs\r\n• 2 PCIe 4.0 x4 M.2 Connectors\r\n• 2.5GbE LAN\r\n• Front USB-C 10Gb/s, DP, HDMI', '1771256270_1.jpg', 16, '2026-02-16 15:37:50'),
 (157, 'ASROCK B550M STEEL LEGEND - SOCKET AM4 DDR4 MICRO-ATX', '3890.00', 14, '• Supports AMD AM4 Socket Ryzen 3000, 3000 G, 4000 G, 5000 & 5000 G-Series Processors*\r\n• AMD B550\r\n• DDR4, 4 x DIMM\r\n• 1 x DisplayPort\r\n• 1 x HDMI\r\n• 2 x M.2 socket\r\n• 6 x SATA 3 connectors\r\n• 2 x USB 3.2 Gen2 (Rear Type A+C)\r\n• 8 x USB 3.2 Gen1 (4 Front, 4 Rear)\r\n• AMD CrossFireX\r\n• Dragon 2.5G LAN\r\n• *Not compatible with AMD Athlon Processors.', '1771256465_1.jpg', 16, '2026-02-16 15:41:05'),
@@ -373,7 +395,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (169, 'SUPER FLOWER LEADEX III GOLD ATX 3.1 850W - 850W 80 PLUS GOLD BLACK ATX', '3690.00', 12, '• 850 Watt\r\n• 80 Plus Gold\r\n• Fully Modular\r\n• ATX\r\n• 16 Pin Connector (12V-2x6)', '1771258527_1.jpg', 17, '2026-02-16 16:15:27'),
 (170, 'ASUS ROG STRIX 1000W PLATINUM BLACK ATX', '7900.00', 13, '• กำลังไฟ : 1000 วัตต์\r\n• ประสิทธิภาพ : 80 Plus Platinum\r\n• มอดุลาร์ : Fully Modular\r\n• ฟอร์มแฟกเตอร์ : ATX', '1771258726_1.jpg', 17, '2026-02-16 16:18:46'),
 (171, 'LOGITECH GAMING G640 LARGE', '990.00', 12, 'Dimension 460 x 400 x 3 mm', '1771261237_1.jpg', 18, '2026-02-16 17:00:37'),
-(172, 'RAZER GOLIATHUS CHROMA', '1290.00', 16, 'DIMENSION 355 X 255 X 3 MM', '1771261365_1.jpg', 18, '2026-02-16 17:02:45'),
+(172, 'RAZER GOLIATHUS CHROMA', '1290.00', 15, 'DIMENSION 355 X 255 X 3 MM', '1771261365_1.jpg', 18, '2026-02-16 17:02:45'),
 (173, 'SIGNO MT-310 CORVUS', '100.00', 11, '• Speed Edition\r\n• Medium Size 320 x 240 x 4 mm', '1771261558_1.jpg', 18, '2026-02-16 17:05:58'),
 (174, 'RAZER GIGANTUS V2 LARGE', '590.00', 17, 'Dimension 450 x 400 x 3 mm', '1771261648_1.jpg', 18, '2026-02-16 17:07:28'),
 (175, 'SIGNO MT-300', '50.00', 16, 'Dimension 270 x 230 x 3 mm', '1771261763_1.jpg', 18, '2026-02-16 17:08:59'),
@@ -393,11 +415,11 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (189, 'CREATIVE SOUND BLASTER GC7', '3990.00', 16, 'Game Streaming USB DAC and Amp with Programmable Buttons and Super X-Fi', '1771263615_1.jpg', 19, '2026-02-16 17:40:15'),
 (190, 'CREATIVE SOUND BLASTER X AE-5 PLUS (BLACK)', '4290.00', 15, '7.1 Channel Type PCI Express Card', '1771263660_1.jpg', 19, '2026-02-16 17:41:00'),
 (191, 'THERMALTAKE VERSA J21 TEMPERED GLASS EDITION (BLACK) (ATX)', '1490.00', 16, '• MB Support : ATX, Micro-ATX, Mini-DTX, Mini-ITX\r\n• Max. CPU cooler height : 160 mm\r\n• Max. GPU length : 310 mm\r\n• Max. PSU length : 220 mm\r\n• Compatible PSU : ATX\r\n• Expansion slots : 7\r\n• 3.5\" / 2.5\" combo bay x 2\r\n• 2.5\" bay x 2', '1771263937_1.jpg', 20, '2026-02-16 17:45:37'),
-(192, 'ASUS TUF GAMING GT501 (BLACK) (E-ATX)', '2990.00', 14, '• Maximum CPU Cooler Height : 180 mm\r\n• 3.5\" & 2.5\" Combo Bay x 4\r\n• 2.5\" Bay x 3', '1771263972_1.jpg', 20, '2026-02-16 17:46:12'),
+(192, 'ASUS TUF GAMING GT501 (BLACK) (E-ATX)', '2990.00', 13, '• Maximum CPU Cooler Height : 180 mm\r\n• 3.5\" & 2.5\" Combo Bay x 4\r\n• 2.5\" Bay x 3', '1771263972_1.jpg', 20, '2026-02-16 17:46:12'),
 (193, 'MONTECH X2 MESH (BLACK) (ATX)', '1290.00', 17, '• MB Support : ATX, Micro-ATX, Mini-DTX, Mini-ITX\r\n• Max. CPU cooler height : 165 mm\r\n• Max. GPU length : 305 mm\r\n• Compatible PSU : ATX\r\n• Expansion slots : 7\r\n• 3.5\" / 2.5\" combo bay x 1\r\n• 3.5\" bay x 1\r\n• 2.5\" bay x 2', '1771264004_1.jpg', 20, '2026-02-16 17:46:44'),
 (194, 'ASUS ROG STRIX HELIOS WHITE EDITION (E-ATX) (GX601)', '9900.00', 15, '• Mainboard Support : E-ATX, ATX, Micro-ATX, Mini-DTX, Mini-ITX\r\n• Max. CPU Cooler Height : 190 mm\r\n• Max. GPU Length : 450 mm\r\n• Max. PSU Length : 220 mm\r\n• Compatible PSU : ATX\r\n• Expansion Slots : 8+2\r\n• 3.5\" / 2.5\" Combo Bay x 2\r\n• 2.5\" Bay x 4\r\n• Aura Sync ARGB\r\n• Stylish Fabric Handles', '1771264070_1.jpg', 20, '2026-02-16 17:47:50'),
 (195, 'MONTECH X2 MESH (WHITE) (ATX)', '1350.00', 7, '• MB Support : ATX, Micro-ATX, Mini-DTX, Mini-ITX\r\n• Max. CPU cooler height : 165 mm\r\n• Max. GPU length : 305 mm\r\n• Compatible PSU : ATX\r\n• Expansion slots : 7\r\n• 3.5\" / 2.5\" combo bay x 1\r\n• 3.5\" bay x 1\r\n• 2.5\" bay x 2', '1771264111_1.jpg', 20, '2026-02-16 17:48:31'),
-(196, 'ASUS ROG HYPERION GR701 (BLACK) (E-ATX)', '15900.00', 14, '• Maximum CPU Cooler Height : 190 mm\r\n• 3.5\" / 2.5\" Combo Bay x 2\r\n• 2.5\" Bay x 5\r\n• Aura Sync ARGB', '1771264164_1.jpg', 20, '2026-02-16 17:49:24'),
+(196, 'ASUS ROG HYPERION GR701 (BLACK) (E-ATX)', '15900.00', 12, '• Maximum CPU Cooler Height : 190 mm\r\n• 3.5\" / 2.5\" Combo Bay x 2\r\n• 2.5\" Bay x 5\r\n• Aura Sync ARGB', '1771264164_1.jpg', 20, '2026-02-16 17:49:24'),
 (197, 'DEEPCOOL MACUBE 110 (BLACK)', '1590.00', 15, '• Dimension : 400 x 225 x 431 mm\r\n• Maximum CPU Cooler Height : 165 mm\r\n• 3.5\" Bay x 2\r\n• 2.5\" Bay x 2\r\n• 5.25\" Bay x -', '1771264203_1.jpg', 20, '2026-02-16 17:50:03'),
 (198, 'AEROCOOL CS-107 (BLACK) (MICRO-ATX)', '990.00', 11, '• Mainboard Support : Micro-ATX, Mini-DTX, Mini-ITX\r\n• Max. CPU Cooler Height : 157 mm\r\n• Max. GPU Length : 286 mm\r\n• Max. PSU Length : 159 mm\r\n• Compatible PSU : ATX\r\n• Expansion Slots : 4\r\n• 3.5\" Bay x 1\r\n• 2.5\" Bay x 2', '1771264247_1.jpg', 20, '2026-02-16 17:50:14'),
 (199, 'MONTECH X3 MESH (BLACK)', '1690.00', 16, '• Dimension : 370 x 210 x 480 mm\r\n• Maximum CPU Cooler Height : 160 mm\r\n• 3.5\" Bay x 2\r\n• 2.5\" Bay x 2', '1771264291_1.jpg', 20, '2026-02-16 17:51:31'),
@@ -468,19 +490,19 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `product`
