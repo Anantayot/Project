@@ -144,6 +144,7 @@ if (empty($search) && empty($cat_id)) {
     }
     .swiper-slide { 
       width: 310px;
+      height: auto;
     }
     .swiper-button-next, .swiper-button-prev { color: #D10024; }
 
