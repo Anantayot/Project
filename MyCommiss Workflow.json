@@ -653,6 +653,92 @@
           "name": "Bearer Auth account"
         }
       }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -304
+      ],
+      "id": "e2397b4a-f34a-42c9-97a0-619bdbab81b0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT name, email, subscribe\nFROM customers\nWHERE subscribe = 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        -32,
+        -304
+      ],
+      "id": "65f03930-5e57-4294-8585-10b2e9a46e16",
+      "name": "Execute a SQL query4",
+      "credentials": {
+        "mySql": {
+          "id": "JBTP6ufZQoCmYc8K",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f83d6cf2-366e-4a7e-aa20-853314b568c2",
+              "name": "subject",
+              "value": "โปรโมชั่นพิเศษประจำเดือนนี้ 🎉",
+              "type": "string"
+            },
+            {
+              "id": "679ed58a-d2f8-4e95-9d39-66d7d9e56c31",
+              "name": "html",
+              "value": "=<h2>สวัสดีคุณ {{$json[\"name\"]}}</h2> <p>ขอแจ้งโปรโมชั่นพิเศษประจำเดือน</p> <ul> <li>ลด 20% ทุกหมวด</li> <li>ซื้อครบ 1,000 บาท ส่งฟรี</li> </ul> <p>หมดเขตสิ้นเดือนนี้</p>",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        -304
+      ],
+      "id": "5f86d65f-3c54-43b5-914e-00626e698982",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "fromEmail": "67010974018@msu.ac.th",
+        "toEmail": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        384,
+        -304
+      ],
+      "id": "ae7d1769-7fe6-42b4-91c9-9a78f2c08db6",
+      "name": "Send an Email",
+      "webhookId": "b83a60ba-b7b2-4eb6-ad3b-809499a50139",
+      "credentials": {
+        "smtp": {
+          "id": "UowHqKwKgvYyBirp",
+          "name": "SMTP account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -903,6 +989,39 @@
           }
         ]
       ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -914,7 +1033,7 @@
     "timezone": "Asia/Bangkok",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "c8ee1c8c-db19-4bbd-961d-eff3d278bdbc",
+  "versionId": "9ba1f9c3-5ee3-4cef-ac8f-7dbdaa165a5d",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "897fa275083eef3a820e0b41d7de24b01122dca0848a5de4d3e67b1846c14d72"
