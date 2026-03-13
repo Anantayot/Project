@@ -95,6 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
   }
 
+  // --- เริ่มต้นส่วนที่ต้องแทนที่ ---
   $stmt = $conn->prepare("UPDATE orders 
                           SET payment_status = 'รอดำเนินการ',
                               admin_verified = 'กำลังตรวจสอบ',
@@ -107,12 +108,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     ':cid' => $customer_id
   ]);
 
+  /* =======================================================
+     ✅ ส่งข้อมูลไปยัง Webhook หลังจากบันทึก DB สำเร็จ
+     ======================================================= */
+  $webhook_url = "http://103.40.119.91:5678/webhook-test/778284f3-0ba4-473f-9d10-fee5d2416f4f";
+
+  $payload_data = [
+      'order_id'      => $order_id,
+      'customer_id'   => $customer_id,
+      'amount'        => $order['total_price'],
+      'slip_image'    => $fileName,
+      'status'        => 'payment_submitted',
+      'timestamp'     => date('Y-m-d H:i:s')
+  ];
+
+  $ch = curl_init($webhook_url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_POST, true);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload_data));
+  curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+  curl_setopt($ch, CURLOPT_TIMEOUT, 5); 
+
+  // ยิง Webhook (ไม่เช็ค error เพื่อให้หน้าเว็บทำงานต่อได้ลื่นไหล)
+  curl_exec($ch);
+  curl_close($ch);
+
   echo "<script>
     alert('✅ แจ้งชำระเงินเรียบร้อยแล้ว! ระบบจะทำการตรวจสอบโดยแอดมิน');
     window.location='order_detail.php?id=$order_id';
   </script>";
   exit;
-}
+  // --- สิ้นสุดส่วนที่ต้องแทนที่ ---
 ?>
 <!DOCTYPE html>
 <html lang="th">
