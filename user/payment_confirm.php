@@ -29,6 +29,30 @@ $order = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$order) {
   die("<p class='text-center mt-5 text-danger'>❌ ไม่พบคำสั่งซื้อนี้ หรือคุณไม่มีสิทธิ์ดู</p>");
 }
+/* =======================================================
+   ส่งข้อมูลไป n8n Webhook
+   ======================================================= */
+
+   $webhook_url = "http://103.40.119.91:5678/webhook-test/778284f3-0ba4-473f-9d10-fee5d2416f4f"; // เปลี่ยนเป็น webhook ของคุณ
+
+   $data = [
+     "order_id" => $order_id,
+     "customer_id" => $customer_id,
+     "total_price" => $order['total_price'],
+     "payment_status" => "รอดำเนินการ",
+     "slip_image" => $fileName
+   ];
+   
+   $options = [
+     "http" => [
+       "header"  => "Content-Type: application/json",
+       "method"  => "POST",
+       "content" => json_encode($data)
+     ]
+   ];
+   
+   $context = stream_context_create($options);
+   file_get_contents($webhook_url, false, $context);
 
 /* =======================================================
    ✅ ฟังก์ชันสร้าง QR พร้อมเพย์ (มาตรฐาน EMVCo)
@@ -224,4 +248,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </footer>
 
 </body>
+
 </html>
+
