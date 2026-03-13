@@ -76,69 +76,76 @@ function crc16($data) {
 }
 
 /* =======================================================
-   ✅ ยืนยันการชำระเงิน (อัปโหลดสลิป + อัปเดตสถานะ)
-   ======================================================= */
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $uploadDir = dirname(__DIR__) . "/admin/uploads/slips/";
-
-  if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-  if (!is_writable($uploadDir)) die("<p class='text-danger text-center mt-5'>❌ ไม่มีสิทธิ์เขียนไฟล์ใน: $uploadDir</p>");
-
-  $fileName = "";
-  if (!empty($_FILES['slip']['name'])) {
-    $ext = pathinfo($_FILES['slip']['name'], PATHINFO_EXTENSION);
-    $fileName = "slip_" . time() . "_" . rand(1000,9999) . "." . $ext;
-    $targetFile = $uploadDir . $fileName;
-
-    if (!move_uploaded_file($_FILES['slip']['tmp_name'], $targetFile)) {
-      die("<p class='text-danger text-center mt-5'>❌ ไม่สามารถอัปโหลดไฟล์ได้</p>");
-    }
+    ✅ ยืนยันการชำระเงิน (อัปโหลดสลิป + อัปเดตสถานะ)
+    ======================================================= */
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+      $uploadDir = dirname(__DIR__) . "/admin/uploads/slips/";
+  
+      if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+      if (!is_writable($uploadDir)) die("<p class='text-danger text-center mt-5'>❌ ไม่มีสิทธิ์เขียนไฟล์ใน: $uploadDir</p>");
+  
+      $fileName = "";
+      if (!empty($_FILES['slip']['name'])) {
+          $ext = pathinfo($_FILES['slip']['name'], PATHINFO_EXTENSION);
+          $fileName = "slip_" . time() . "_" . rand(1000, 9999) . "." . $ext;
+          $targetFile = $uploadDir . $fileName;
+  
+          if (!move_uploaded_file($_FILES['slip']['tmp_name'], $targetFile)) {
+              die("<p class='text-danger text-center mt-5'>❌ ไม่สามารถอัปโหลดไฟล์ได้</p>");
+          }
+      }
+  
+      // ✅ ต้องดึงยอดเงินจาก DB อีกครั้ง เพื่อให้มีค่าส่งไป Webhook
+      $stmt_check = $conn->prepare("SELECT total_price FROM orders WHERE order_id = ? AND customer_id = ?");
+      $stmt_check->execute([$order_id, $customer_id]);
+      $order_data = $stmt_check->fetch(PDO::FETCH_ASSOC);
+      $total_amount = $order_data ? $order_data['total_price'] : 0;
+  
+      // ✅ อัปเดตสถานะการชำระเงิน
+      $stmt = $conn->prepare("UPDATE orders 
+                              SET payment_status = 'รอดำเนินการ',
+                                  admin_verified = 'กำลังตรวจสอบ',
+                                  slip_image = :slip,
+                                  payment_date = NOW()
+                              WHERE order_id = :oid AND customer_id = :cid");
+      $stmt->execute([
+          ':slip' => $fileName,
+          ':oid' => $order_id,
+          ':cid' => $customer_id
+      ]);
+  
+      /* =======================================================
+         ✅ ส่งข้อมูลไปยัง Webhook หลังจากบันทึก DB สำเร็จ
+         ======================================================= */
+      $webhook_url = "http://103.40.119.91:5678/webhook-test/778284f3-0ba4-473f-9d10-fee5d2416f4f";
+  
+      $payload_data = [
+          'order_id'      => $order_id,
+          'customer_id'   => $customer_id,
+          'amount'        => $total_amount, // ใช้ค่าที่ดึงมาใหม่
+          'slip_image'    => $fileName,
+          'status'        => 'payment_submitted',
+          'timestamp'     => date('Y-m-d H:i:s')
+      ];
+  
+      // ตรวจสอบว่ามีฟังก์ชัน curl_init ไหม (กัน Error 500 กรณี Server ไม่รองรับ)
+      if (function_exists('curl_init')) {
+          $ch = curl_init($webhook_url);
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+          curl_setopt($ch, CURLOPT_POST, true);
+          curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload_data));
+          curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+          curl_setopt($ch, CURLOPT_TIMEOUT, 5); 
+          curl_exec($ch);
+          curl_close($ch);
+      }
+  
+      echo "<script>
+          alert('✅ แจ้งชำระเงินเรียบร้อยแล้ว! ระบบจะทำการตรวจสอบโดยแอดมิน');
+          window.location='order_detail.php?id=$order_id';
+      </script>";
+      exit;
   }
-
-  // --- เริ่มต้นส่วนที่ต้องแทนที่ ---
-  $stmt = $conn->prepare("UPDATE orders 
-                          SET payment_status = 'รอดำเนินการ',
-                              admin_verified = 'กำลังตรวจสอบ',
-                              slip_image = :slip,
-                              payment_date = NOW()
-                          WHERE order_id = :oid AND customer_id = :cid");
-  $stmt->execute([
-    ':slip' => $fileName,
-    ':oid' => $order_id,
-    ':cid' => $customer_id
-  ]);
-
-  /* =======================================================
-     ✅ ส่งข้อมูลไปยัง Webhook หลังจากบันทึก DB สำเร็จ
-     ======================================================= */
-  $webhook_url = "http://103.40.119.91:5678/webhook-test/778284f3-0ba4-473f-9d10-fee5d2416f4f";
-
-  $payload_data = [
-      'order_id'      => $order_id,
-      'customer_id'   => $customer_id,
-      'amount'        => $order['total_price'],
-      'slip_image'    => $fileName,
-      'status'        => 'payment_submitted',
-      'timestamp'     => date('Y-m-d H:i:s')
-  ];
-
-  $ch = curl_init($webhook_url);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_POST, true);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload_data));
-  curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-  curl_setopt($ch, CURLOPT_TIMEOUT, 5); 
-
-  // ยิง Webhook (ไม่เช็ค error เพื่อให้หน้าเว็บทำงานต่อได้ลื่นไหล)
-  curl_exec($ch);
-  curl_close($ch);
-
-  echo "<script>
-    alert('✅ แจ้งชำระเงินเรียบร้อยแล้ว! ระบบจะทำการตรวจสอบโดยแอดมิน');
-    window.location='order_detail.php?id=$order_id';
-  </script>";
-  exit;
-  // --- สิ้นสุดส่วนที่ต้องแทนที่ ---
 ?>
 <!DOCTYPE html>
 <html lang="th">
