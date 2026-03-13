@@ -125,6 +125,7 @@ function crc16($data) {
       $payload_data = [
           'order_id'      => $order_id,
           'customer_id'   => $customer_id,
+          'customer_name' => $order['name'],
           'amount'        => $total_amount, // ใช้ค่าที่ดึงมาใหม่
           'slip_image'    => $fileName,
           'status'        => 'payment_submitted',
