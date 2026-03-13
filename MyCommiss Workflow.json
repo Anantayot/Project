@@ -211,7 +211,7 @@
     },
     {
       "parameters": {
-        "jsCode": "let sale_date = null;\nlet paid_total = 0;\nlet unpaid_total = 0;\nlet ordersMap = {};\n\n// เมื่อวานตามเวลาไทย (Asia/Bangkok) แบบนิ่ง ไม่พึ่ง timezone ของเครื่อง\nconst nowBkk = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));\nnowBkk.setDate(nowBkk.getDate() - 1);\nconst yesterdayText = nowBkk.toLocaleDateString('th-TH');\n\nconst sheet_url = \"https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=sharing\";\n\n// items = ข้อมูลจาก node ก่อนหน้าใน n8n (แต่ละ item = 1 row)\nfor (const item of items) {\n  const j = item.json;\n\n  sale_date = sale_date || j.sale_date;\n  const amount = Number(j.subtotal || 0);\n\n  if (j.payment_status === 'ชำระเงินแล้ว') paid_total += amount;\n  else unpaid_total += amount;\n\n  // ===== เพิ่ม: แปลงวิธีชำระเงิน (COD = เงินสด) =====\n  let paymentMethodText = 'ไม่มีข้อมูล';\n  if (j.payment_method === 'COD') paymentMethodText = '💵 เงินสด';\n  else if (j.payment_method === 'QR') paymentMethodText = '📲 โอนผ่านธนาคาร';\n\n  if (!ordersMap[j.order_id]) {\n    ordersMap[j.order_id] = {\n      customer_name: j.customer_name,\n      payment_status: j.payment_status,\n      payment_method: paymentMethodText,     // << เพิ่ม\n      total_amount: 0,\n      categories: {}\n    };\n  }\n\n  const catName = j.cat_name || 'ทั่วไป';\n  if (!ordersMap[j.order_id].categories[catName]) {\n    ordersMap[j.order_id].categories[catName] = [];\n  }\n\n  ordersMap[j.order_id].categories[catName].push(`      ◦ ${j.product_name}\\n(จำนวน ${j.qty} ชิ้น)`);\n  ordersMap[j.order_id].total_amount += amount;\n}\n\n// ทำรายละเอียดรายออเดอร์\nlet detail_lines = [];\nfor (const order_id in ordersMap) {\n  const order = ordersMap[order_id];\n\n  let categorySections = [];\n  for (const cat in order.categories) {\n    categorySections.push(`   📂 หมวดหมู่: ${cat}\\n${order.categories[cat].join('\\n')}`);\n  }\n\n  detail_lines.push(\n`🆔 ออเดอร์: #${order_id}\n👤 ลูกค้า: คุณ ${order.customer_name}\n${categorySections.join('\\n')}\n💰 ยอดรวม: ${order.total_amount.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n📍 สถานะชำระเงิน: ${order.payment_status === 'ชำระเงินแล้ว' ? '✅ จ่ายแล้ว' : '⏳ รอชำระ'}\n💳 วิธีชำระ: ${order.payment_method}`\n  );\n}\n\n// ===== ส่วนที่คุณขอ: unshift สรุปขึ้นก่อน =====\nlet all_messages = [];\n\nall_messages.unshift(\n`┏━━━━━━━━━━━━━┓\n        📊 สรุปยอดขายประจำวัน\n┗━━━━━━━━━━━━━┛\n📅 วันที่: ${yesterdayText}\n\n💰 ยอดรวมทั้งหมด: ${(paid_total + unpaid_total).toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n----------------------------------\n✅ จ่ายแล้ว: ${paid_total.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n❌ ยังไม่จ่าย: ${unpaid_total.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n\n📁 ตรวจสอบรายการทั้งหมด:\n🔗 ${sheet_url}\n\nภาพรวมวันนี้ประมาณนี้ครับ 😎`\n);\n\n// เติมรายละเอียดตามหลัง (ทีละ 5)\nfor (let i = 0; i < detail_lines.length; i += 5) {\n  const chunk = detail_lines.slice(i, i + 5);\n\n  all_messages.push(\n`📝 รายละเอียดรายการ (${i + 1}-${Math.min(i + 5, detail_lines.length)})\n━━━━━━━━━━━━━━\n${chunk.join('\\n------------------------------\\n')}\n━━━━━━━━━━━━━━`\n  );\n}\n\n// คืนค่าเป็นหลาย items เพื่อให้ Split Out ทำงานต่อ\nreturn all_messages.map(msg => ({ json: { line_text: msg } }));\n"
+        "jsCode": "let sale_date = null;\nlet paid_total = 0;\nlet unpaid_total = 0;\nlet ordersMap = {};\n\n// เมื่อวานตามเวลาไทย (Asia/Bangkok) แบบนิ่ง ไม่พึ่ง timezone ของเครื่อง\nconst nowBkk = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));\nnowBkk.setDate(nowBkk.getDate() - 1);\nconst yesterdayText = nowBkk.toLocaleDateString('th-TH');\n\nconst sheet_url = \"https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=sharing\";\nconst looker_url = \"https://lookerstudio.google.com/reporting/11d93bcd-f176-46e8-949a-371801353d2a\";\n\n// items = ข้อมูลจาก node ก่อนหน้าใน n8n (แต่ละ item = 1 row)\nfor (const item of items) {\n  const j = item.json;\n\n  sale_date = sale_date || j.sale_date;\n  const amount = Number(j.subtotal || 0);\n\n  if (j.payment_status === 'ชำระเงินแล้ว') paid_total += amount;\n  else unpaid_total += amount;\n\n  // ===== เพิ่ม: แปลงวิธีชำระเงิน (COD = เงินสด) =====\n  let paymentMethodText = 'ไม่มีข้อมูล';\n  if (j.payment_method === 'COD') paymentMethodText = '💵 เงินสด';\n  else if (j.payment_method === 'QR') paymentMethodText = '📲 โอนผ่านธนาคาร';\n\n  if (!ordersMap[j.order_id]) {\n    ordersMap[j.order_id] = {\n      customer_name: j.customer_name,\n      payment_status: j.payment_status,\n      payment_method: paymentMethodText,     // << เพิ่ม\n      total_amount: 0,\n      categories: {}\n    };\n  }\n\n  const catName = j.cat_name || 'ทั่วไป';\n  if (!ordersMap[j.order_id].categories[catName]) {\n    ordersMap[j.order_id].categories[catName] = [];\n  }\n\n  ordersMap[j.order_id].categories[catName].push(`      ◦ ${j.product_name}\\n(จำนวน ${j.qty} ชิ้น)`);\n  ordersMap[j.order_id].total_amount += amount;\n}\n\n// ทำรายละเอียดรายออเดอร์\nlet detail_lines = [];\nfor (const order_id in ordersMap) {\n  const order = ordersMap[order_id];\n\n  let categorySections = [];\n  for (const cat in order.categories) {\n    categorySections.push(`   📂 หมวดหมู่: ${cat}\\n${order.categories[cat].join('\\n')}`);\n  }\n\n  detail_lines.push(\n`🆔 ออเดอร์: #${order_id}\n👤 ลูกค้า: คุณ ${order.customer_name}\n${categorySections.join('\\n')}\n💰 ยอดรวม: ${order.total_amount.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n📍 สถานะชำระเงิน: ${order.payment_status === 'ชำระเงินแล้ว' ? '✅ จ่ายแล้ว' : '⏳ รอชำระ'}\n💳 วิธีชำระ: ${order.payment_method}`\n  );\n}\n\n// ===== ส่วนที่คุณขอ: unshift สรุปขึ้นก่อน =====\nlet all_messages = [];\n\nall_messages.unshift(\n`┏━━━━━━━━━━━━━┓\n        📊 สรุปยอดขายประจำวัน\n┗━━━━━━━━━━━━━┛\n📅 วันที่: ${yesterdayText}\n\n💰 ยอดรวมทั้งหมด: ${(paid_total + unpaid_total).toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n----------------------------------\n✅ จ่ายแล้ว: ${paid_total.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n❌ ยังไม่จ่าย: ${unpaid_total.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n\n📊 Dashboard วิเคราะห์ยอดขาย :\n🔗 ${looker_url}\n📁 ตรวจสอบรายการทั้งหมด :\n🔗 ${sheet_url}\n\nภาพรวมวันนี้ประมาณนี้ครับ 😎`\n);\n\n// เติมรายละเอียดตามหลัง (ทีละ 5)\nfor (let i = 0; i < detail_lines.length; i += 5) {\n  const chunk = detail_lines.slice(i, i + 5);\n\n  all_messages.push(\n`📝 รายละเอียดรายการ (${i + 1}-${Math.min(i + 5, detail_lines.length)})\n━━━━━━━━━━━━━━\n${chunk.join('\\n------------------------------\\n')}\n━━━━━━━━━━━━━━`\n  );\n}\n\n// คืนค่าเป็นหลาย items เพื่อให้ Split Out ทำงานต่อ\nreturn all_messages.map(msg => ({ json: { line_text: msg } }));\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -236,7 +236,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1136,
+        1104,
         112
       ],
       "id": "73d35bfa-6018-4242-8844-e3395777eaf4",
@@ -257,8 +257,8 @@
       "type": "n8n-nodes-base.mySql",
       "typeVersion": 2.5,
       "position": [
-        1104,
-        432
+        1024,
+        560
       ],
       "id": "13197994-dd10-4693-9e83-04ff7e0081c9",
       "name": "Execute a SQL query1",
@@ -324,7 +324,7 @@
             {
               "id": "f24fb7a4-4a58-40e4-9526-c298b5f36a17",
               "name": "=line_text",
-              "value": "=┏━━━━━━━━━━━━━┓\\n        📊 สรุปยอดขายประจำวัน\\n┗━━━━━━━━━━━━━┛📅 วันที่: {{ \n  (() => {\n    const nowBkk = new Date(\n      new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })\n    );\n    nowBkk.setDate(nowBkk.getDate() - 1);\n    return nowBkk.toLocaleDateString('th-TH');\n  })()\n}}\n \\nวันนี้ไม่มีออเดอร์เข้ามาครับ\\nงานเรียบร้อยดี พักผ่อนได้เลยครับ! ----------------------------------\\n📁 ตรวจสอบรายการย้อนหลังได้ที่นี่ :\\n🔗 https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=sharing",
+              "value": "=┏━━━━━━━━━━━━━┓\\n        📊 สรุปยอดขายประจำวัน\\n┗━━━━━━━━━━━━━┛📅 วันที่: {{ \n  (() => {\n    const nowBkk = new Date(\n      new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })\n    );\n    nowBkk.setDate(nowBkk.getDate() - 1);\n    return nowBkk.toLocaleDateString('th-TH');\n  })()\n}}\n \\nวันนี้ไม่มีออเดอร์เข้ามาครับ\\nงานเรียบร้อยดี พักผ่อนได้เลยครับ! ----------------------------------\\n\n📊 Dashboard วิเคราะห์ยอดขาย :\\n🔗 https://lookerstudio.google.com/reporting/11d93bcd-f176-46e8-949a-371801353d2a\\n\n📁 ตรวจสอบรายการย้อนหลังได้ที่นี่ :\\n🔗 https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=sharing",
               "type": "string"
             }
           ]
@@ -413,8 +413,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1296,
-        432
+        1216,
+        560
       ],
       "id": "4c352d15-ac25-4655-8a2a-d644ca7687ca",
       "name": "If1"
@@ -426,8 +426,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1568,
-        336
+        1488,
+        464
       ],
       "id": "cbb06c12-1699-4e38-b9d7-e87ad8672acd",
       "name": "Code in JavaScript"
@@ -440,8 +440,8 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        1776,
-        336
+        1696,
+        464
       ],
       "id": "5d416dec-70b6-4b86-8747-34bebc832ee6",
       "name": "Split Out1"
@@ -460,8 +460,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        2240,
-        352
+        2160,
+        480
       ],
       "id": "d1ce6d02-7b68-4fbe-8080-06bba5fca62b",
       "name": "HTTP Request2",
@@ -486,8 +486,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1776,
-        512
+        1696,
+        640
       ],
       "id": "e926bcbf-e49f-4e1a-a10e-d95bb21bd895",
       "name": "HTTP Request3",
@@ -515,8 +515,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1568,
-        512
+        1488,
+        640
       ],
       "id": "bb1fd2d4-a4b1-4488-9500-9e1a5bfe5ba6",
       "name": "Edit Fields1"
@@ -545,8 +545,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        2000,
-        336
+        1920,
+        464
       ],
       "id": "02e08abb-db9a-478c-bc21-73a31aef0c3d",
       "name": "Loop Over Items1"
@@ -588,8 +588,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        -256,
-        512
+        1200,
+        -256
       ],
       "id": "8d2250af-1955-4658-ad10-227bda855db2",
       "name": "Schedule Trigger1"
@@ -603,8 +603,8 @@
       "type": "n8n-nodes-base.mySql",
       "typeVersion": 2.5,
       "position": [
-        -48,
-        512
+        1408,
+        -256
       ],
       "id": "38678e98-991a-4516-88d7-7205fcd07328",
       "name": "Execute a SQL query3",
@@ -622,8 +622,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        160,
-        512
+        1616,
+        -256
       ],
       "id": "f2c2222e-ff32-4a7d-91e1-8889feaaea24",
       "name": "Code in JavaScript1"
@@ -642,8 +642,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        368,
-        512
+        1824,
+        -256
       ],
       "id": "6a0e3b9f-531a-4fac-ae75-69ba021b8248",
       "name": "HTTP Request4",
@@ -655,17 +655,6 @@
       }
     },
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        -240,
-        -304
-      ],
-      "id": "e2397b4a-f34a-42c9-97a0-619bdbab81b0",
-      "name": "When clicking ‘Execute workflow’"
-    },
-    {
       "parameters": {
         "operation": "executeQuery",
         "query": "SELECT name, email, subscribe\nFROM customers\nWHERE subscribe = 1;",
@@ -674,8 +663,8 @@
       "type": "n8n-nodes-base.mySql",
       "typeVersion": 2.5,
       "position": [
-        -32,
-        -304
+        240,
+        -320
       ],
       "id": "65f03930-5e57-4294-8585-10b2e9a46e16",
       "name": "Execute a SQL query4",
@@ -699,7 +688,7 @@
             {
               "id": "679ed58a-d2f8-4e95-9d39-66d7d9e56c31",
               "name": "html",
-              "value": "=<h2>สวัสดีคุณ {{$json[\"name\"]}}</h2> <p>ขอแจ้งโปรโมชั่นพิเศษประจำเดือน</p> <ul> <li>ลด 20% ทุกหมวด</li> <li>ซื้อครบ 1,000 บาท ส่งฟรี</li> </ul> <p>หมดเขตสิ้นเดือนนี้</p> http://103.40.119.91/Project/user/index.php",
+              "value": "=<h2>สวัสดีคุณ {{$json[\"name\"]}}</h2>\n{{\n(() => {\n\nconst now = new Date();\n\n// แปลงเป็นเวลาไทย\nconst thaiDate = new Date(\n  now.toLocaleString(\"en-US\",{timeZone:\"Asia/Bangkok\"})\n);\n\nconst day = thaiDate.getDate();\nconst month = thaiDate.getMonth()+1;\n\nconst promos={\n\"3-3\":[\n\"🔥 โปรโมชั่น 3.3 พิเศษสำหรับลูกค้าทุกท่าน รับส่วนลดทันที 30% สำหรับสินค้าที่ร่วมรายการ ช้อปง่าย คุ้มกว่าเดิม พร้อมบริการจัดส่งที่รวดเร็วและปลอดภัย เหมาะสำหรับลูกค้าที่ต้องการสินค้าคุณภาพในราคาประหยัด\",\n\"🔥 โปรโมชั่น 3.3 ซื้อ 1 แถม 1 สำหรับสินค้าที่ร่วมรายการ ให้คุณคุ้มค่ามากยิ่งขึ้น เหมาะสำหรับการซื้อใช้เองหรือซื้อเป็นของฝาก รับสิทธิ์พิเศษเฉพาะช่วงแคมเปญนี้เท่านั้น\",\n\"🔥 โปรโมชั่น 3.3 ส่งฟรีทุกออเดอร์ ไม่มีขั้นต่ำ สั่งซื้อได้สะดวกจากที่บ้าน พร้อมรับบริการจัดส่งถึงหน้าบ้านอย่างรวดเร็วภายในระยะเวลาที่กำหนด\"\n],\n\n\"9-9\":[\n\"🔥 โปรโมชั่น 9.9 ลดสูงสุด 50% สำหรับสินค้าที่ร่วมรายการ คุ้มค่าที่สุดสำหรับลูกค้าที่กำลังมองหาสินค้าคุณภาพในราคาพิเศษ พร้อมบริการจัดส่งที่รวดเร็วและมั่นใจได้\",\n\"🔥 โปรโมชั่น 9.9 ซื้อครบ 900 บาท รับส่วนลดทันที 200 บาท ช่วยให้การช้อปปิ้งของคุณคุ้มค่ามากยิ่งขึ้น สามารถเลือกซื้อสินค้าได้หลากหลายตามต้องการ\",\n\"🔥 โปรโมชั่น 9.9 ส่งฟรี พร้อมรับของแถมพิเศษสำหรับลูกค้าที่สั่งซื้อภายในช่วงโปรโมชั่น เพิ่มความคุ้มค่าและประสบการณ์การช้อปที่ดียิ่งขึ้น\"\n],\n\n\"12-12\":[\n\"🔥 โปรโมชั่น 12.12 ลดแรงสูงสุดถึง 70% สำหรับสินค้าพิเศษในแคมเปญส่งท้ายปี ให้คุณช้อปสินค้าในราคาที่คุ้มค่าที่สุด พร้อมสินค้าคุณภาพและบริการที่เชื่อถือได้\",\n\"🔥 โปรโมชั่น 12.12 ซื้อครบ 1,200 บาท รับส่วนลดทันที 400 บาท สำหรับลูกค้าที่ต้องการความคุ้มค่าในการสั่งซื้อสินค้าในจำนวนมาก\",\n\"🔥 โปรโมชั่น 12.12 ส่งฟรีทุกคำสั่งซื้อ พร้อมสิทธิ์รับของแถมพิเศษเฉพาะลูกค้าที่สั่งซื้อในช่วงแคมเปญนี้เท่านั้น\"\n]\n};\n\nconst key = `${day}-${month}`;\n\nif(!promos[key]) return \"\";\n\nconst randomPromo =\npromos[key][Math.floor(Math.random()*promos[key].length)];\n\nreturn `\n<p>${randomPromo}</p>\n<p><strong>โปรโมชั่นนี้หมดเขตสิ้นเดือนนี้</strong></p>\n`;\n\n})()\n}}\n\n<a href=\"http://103.40.119.91/Project/user/index.php\">คลิกดูรายละเอียด</a>",
               "type": "string"
             }
           ]
@@ -710,8 +699,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        176,
-        -304
+        448,
+        -320
       ],
       "id": "5f86d65f-3c54-43b5-914e-00626e698982",
       "name": "Edit Fields2"
@@ -719,7 +708,7 @@
     {
       "parameters": {
         "fromEmail": "mycommiss.info@gmail.com",
-        "toEmail": "={{ $json.email }}",
+        "toEmail": "={{ $('Execute a SQL query4').item.json.email }}",
         "subject": "={{ $json.subject }}",
         "html": "={{ $json.html }}",
         "options": {
@@ -729,11 +718,144 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        384,
-        -304
+        656,
+        -320
       ],
       "id": "ae7d1769-7fe6-42b4-91c9-9a78f2c08db6",
       "name": "Send an Email",
+      "webhookId": "b83a60ba-b7b2-4eb6-ad3b-809499a50139",
+      "credentials": {
+        "smtp": {
+          "id": "UowHqKwKgvYyBirp",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -448,
+        -256
+      ],
+      "id": "72419e38-dcf4-45f1-9865-62088ff902b4",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\n\n// แปลงเป็นเวลาไทย\nconst thaiDate = new Date(\n  now.toLocaleString(\"en-US\", { timeZone: \"Asia/Bangkok\" })\n);\n\nconst day = thaiDate.getDate();\nconst month = thaiDate.getMonth() + 1;\n\n// วันที่ที่ต้องการเช็ค\nconst targetDates = [\n  { day: 3, month: 3 },\n  { day: 9, month: 9 },\n  { day: 12, month: 12 }\n];\n\n// ตรวจสอบว่าตรงกับวันที่กำหนดหรือไม่\nconst matched = targetDates.some(d => d.day === day && d.month === month);\n\nreturn [\n  {\n    json: {\n      today: `${day}/${month}`,\n      timezone: \"Asia/Bangkok\",\n      isMatched: matched\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -256
+      ],
+      "id": "07147f64-dd6c-4c87-9179-2222473d7e88",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "04e8e598-ea3a-43b3-bafc-867524431473",
+              "leftValue": "={{ $json.isMatched }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -32,
+        -256
+      ],
+      "id": "fc333711-4139-4883-9e62-39edec27a519",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// เปิด/ปิดโหมดทดสอบ\nconst testMode = true;\n\n// วันที่จำลองสำหรับทดสอบ\nconst testDate = { day: 3, month: 3 };\n\n// เวลาปัจจุบัน\nconst now = new Date();\n\n// แปลงเป็นเวลาไทย\nconst thaiDate = new Date(\n  now.toLocaleString(\"en-US\", { timeZone: \"Asia/Bangkok\" })\n);\n\n// เลือกใช้วันจริงหรือวันทดสอบ\nconst day = testMode ? testDate.day : thaiDate.getDate();\nconst month = testMode ? testDate.month : thaiDate.getMonth() + 1;\n\n// วันที่ที่ต้องการเช็ค\nconst targetDates = [\n  { day: 3, month: 3 },\n  { day: 9, month: 9 },\n  { day: 12, month: 12 }\n];\n\n// ตรวจสอบ\nconst matched = targetDates.some(d => d.day === day && d.month === month);\n\nreturn [\n  {\n    json: {\n      today: `${day}/${month}`,\n      testMode: testMode,\n      timezone: \"Asia/Bangkok\",\n      isMatched: matched\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -416
+      ],
+      "id": "e42f5213-0ae7-451d-ad15-a0cd108b19e2",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a9ff0f58-708d-429b-99b4-09b1632f3634",
+              "name": "subject",
+              "value": "โปรโมชั่นพิเศษประจำเดือนนี้ 🎉",
+              "type": "string"
+            },
+            {
+              "id": "5a3dd88e-2441-47ca-afe7-c1d943d273c0",
+              "name": "html",
+              "value": "=<h2>สวัสดีคุณ {{$json[\"name\"]}}</h2>\n{{\n(() => {\n\n// เปิด/ปิดโหมดทดสอบ\nconst testMode = true;\n\n// วันที่ทดสอบ (เปลี่ยนได้ เช่น 9-9 หรือ 12-12)\nconst testDate = \"3-3\";\n\nconst now = new Date();\n\n// เวลาไทย\nconst thaiDate = new Date(\n  now.toLocaleString(\"en-US\",{timeZone:\"Asia/Bangkok\"})\n);\n\nconst day = thaiDate.getDate();\nconst month = thaiDate.getMonth()+1;\n\n// key จากวันที่จริง\nlet key = `${day}-${month}`;\n\n// ถ้าเปิด testMode ให้ใช้ testDate แทน\nif(testMode){\n  key = testDate;\n}\n\nconst promos={\n\"3-3\":[\n\"🔥 โปรโมชั่น 3.3 พิเศษสำหรับลูกค้าทุกท่าน รับส่วนลดทันที 30% สำหรับสินค้าที่ร่วมรายการ ช้อปง่าย คุ้มกว่าเดิม พร้อมบริการจัดส่งที่รวดเร็วและปลอดภัย เหมาะสำหรับลูกค้าที่ต้องการสินค้าคุณภาพในราคาประหยัด\",\n\"🔥 โปรโมชั่น 3.3 ซื้อ 1 แถม 1 สำหรับสินค้าที่ร่วมรายการ ให้คุณคุ้มค่ามากยิ่งขึ้น เหมาะสำหรับการซื้อใช้เองหรือซื้อเป็นของฝาก รับสิทธิ์พิเศษเฉพาะช่วงแคมเปญนี้เท่านั้น\",\n\"🔥 โปรโมชั่น 3.3 ส่งฟรีทุกออเดอร์ ไม่มีขั้นต่ำ สั่งซื้อได้สะดวกจากที่บ้าน พร้อมรับบริการจัดส่งถึงหน้าบ้านอย่างรวดเร็วภายในระยะเวลาที่กำหนด\"\n],\n\n\"9-9\":[\n\"🔥 โปรโมชั่น 9.9 ลดสูงสุด 50% สำหรับสินค้าที่ร่วมรายการ คุ้มค่าที่สุดสำหรับลูกค้าที่กำลังมองหาสินค้าคุณภาพในราคาพิเศษ พร้อมบริการจัดส่งที่รวดเร็วและมั่นใจได้\",\n\"🔥 โปรโมชั่น 9.9 ซื้อครบ 900 บาท รับส่วนลดทันที 200 บาท ช่วยให้การช้อปปิ้งของคุณคุ้มค่ามากยิ่งขึ้น สามารถเลือกซื้อสินค้าได้หลากหลายตามต้องการ\",\n\"🔥 โปรโมชั่น 9.9 ส่งฟรี พร้อมรับของแถมพิเศษสำหรับลูกค้าที่สั่งซื้อภายในช่วงโปรโมชั่น เพิ่มความคุ้มค่าและประสบการณ์การช้อปที่ดียิ่งขึ้น\"\n],\n\n\"12-12\":[\n\"🔥 โปรโมชั่น 12.12 ลดแรงสูงสุดถึง 70% สำหรับสินค้าพิเศษในแคมเปญส่งท้ายปี ให้คุณช้อปสินค้าในราคาที่คุ้มค่าที่สุด พร้อมสินค้าคุณภาพและบริการที่เชื่อถือได้\",\n\"🔥 โปรโมชั่น 12.12 ซื้อครบ 1,200 บาท รับส่วนลดทันที 400 บาท สำหรับลูกค้าที่ต้องการความคุ้มค่าในการสั่งซื้อสินค้าในจำนวนมาก\",\n\"🔥 โปรโมชั่น 12.12 ส่งฟรีทุกคำสั่งซื้อ พร้อมสิทธิ์รับของแถมพิเศษเฉพาะลูกค้าที่สั่งซื้อในช่วงแคมเปญนี้เท่านั้น\"\n]\n};\n\nif(!promos[key]) return \"\";\n\nconst randomPromo =\npromos[key][Math.floor(Math.random()*promos[key].length)];\n\nreturn `\n<p>${randomPromo}</p>\n<p><strong>โปรโมชั่นนี้หมดเขตสิ้นเดือนนี้</strong></p>\n`;\n\n})()\n}}\n\n<a href=\"http://103.40.119.91/Project/user/index.php\">คลิกดูรายละเอียด</a>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -496
+      ],
+      "id": "8c94ae45-9dec-43d6-8111-b3e6d37605dd",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "fromEmail": "mycommiss.info@gmail.com",
+        "toEmail": "={{ $('Execute a SQL query4').item.json.email }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        656,
+        -496
+      ],
+      "id": "8f7eb70b-3c1d-4bc0-90d6-fc2c80899381",
+      "name": "Send an Email1",
       "webhookId": "b83a60ba-b7b2-4eb6-ad3b-809499a50139",
       "credentials": {
         "smtp": {
@@ -992,17 +1114,6 @@
         ]
       ]
     },
-    "When clicking ‘Execute workflow’": {
-      "main": [
-        [
-          {
-            "node": "Execute a SQL query4",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Execute a SQL query4": {
       "main": [
         [
@@ -1024,6 +1135,62 @@
           }
         ]
       ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Send an Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -1035,7 +1202,7 @@
     "timezone": "Asia/Bangkok",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "4bbc0332-4b54-4f25-9c20-45810234a1a4",
+  "versionId": "5e4aec87-1bfe-4041-9f3c-b45bd51b31ab",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "897fa275083eef3a820e0b41d7de24b01122dca0848a5de4d3e67b1846c14d72"
