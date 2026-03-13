@@ -863,6 +863,207 @@
           "name": "SMTP account"
         }
       }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "778284f3-0ba4-473f-9d10-fee5d2416f4f",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        672
+      ],
+      "id": "c4868fee-04f5-401d-9ddd-223173af93f8",
+      "name": "Webhook",
+      "webhookId": "778284f3-0ba4-473f-9d10-fee5d2416f4f"
+    },
+    {
+      "parameters": {
+        "url": "=http://103.40.119.91/Project/admin/uploads/slips/{{ $json.body.slip_image }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -304,
+        672
+      ],
+      "id": "92d74956-62db-4604-9983-5b723fccdb35",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=อ่านข้อมูลจากสลิปโอนเงินที่แนบมา และเปรียบเทียบกับข้อมูลอ้างอิงด้านล่างนี้:\n\nข้อมูลอ้างอิงจากระบบ:\n- ชื่อลูกค้าผู้ซื้อ: {{ $json.body.customer_name }}\n- ยอดเงินที่ต้องโอน: {{ $json.body.amount }}\n\nคำสั่ง:\n1. ตรวจสอบว่า \"ชื่อผู้โอน\" ในสลิป ตรงกับ \"ชื่อลูกค้าผู้ซื้อ\" หรือไม่ (ตัดคำนำหน้า นาย, น.ส., นาง, ด.ช., ด.ญ. ออกก่อนเทียบและนามสกุล)\n2. ตรวจสอบว่า \"จำนวนเงิน\" ในสลิป ตรงกับ \"ยอดเงินที่ต้องโอน\" หรือไม่\n3. ตรวจสอบว่าสลิปมีความชัดเจนและเป็นสลิปจริงหรือไม่\n4. ตรวจสอบ \"ชื่อผู้รับ\" ในสลิปต้องชื่อ \"อนันตยศ อินทราพงษ์\"\n\nสรุปผลเป็น JSON เท่านั้น ห้ามมีข้อความอื่นนอกจาก JSON\n\nโครงสร้าง JSON:\n{\n  \"output\": {\n    \"amount\": number, (ยอดเงินที่อ่านได้จากสลิป)\n    \"valid\": boolean (เป็น true ต่อเมื่อชื่อผู้โอนตรงกับชื่อลูกค้า และยอดเงินถูกต้อง และสลิปชัดเจน และชื่อผู้รับถูกต้อง)\n  }\n}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -48,
+        672
+      ],
+      "id": "eaafea2b-2032-4711-82a4-806aa038c137",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        864
+      ],
+      "id": "f9c302f8-0d7f-4e55-ab9f-6b522aece9ce",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "woBpq8pnvDecpte8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"output\": {\n    \"amount\": 140,\n    \"valid\": true\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        864
+      ],
+      "id": "07070bf1-b7f3-46c3-bae6-9325d1e18bcf",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8c031d62-41c7-445c-bbdf-a3e36e13dfc4",
+              "leftValue": "={{ $json.output.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        320,
+        672
+      ],
+      "id": "a74f7222-e1ed-4173-a4a7-027f7974852c",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "orders",
+          "mode": "list",
+          "cachedResultName": "orders"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "order_id",
+        "valueToMatchOn": "={{ $('Webhook').item.json.body.order_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "payment_status",
+              "value": "ชำระเงินแล้ว"
+            },
+            {
+              "column": "admin_verified",
+              "value": "อนุมัติ"
+            },
+            {
+              "column": "order_status",
+              "value": "กำลังจัดเตรียม"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        640,
+        560
+      ],
+      "id": "8fed6999-5b60-4911-a61e-df1298a65efc",
+      "name": "Update rows in a table",
+      "credentials": {
+        "mySql": {
+          "id": "JBTP6ufZQoCmYc8K",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "orders",
+          "mode": "list",
+          "cachedResultName": "orders"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "order_id",
+        "valueToMatchOn": "={{ $('Webhook').item.json.body.order_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "payment_status",
+              "value": "ยกเลิก"
+            },
+            {
+              "column": "admin_verified",
+              "value": "ปฏิเสธ"
+            },
+            {
+              "column": "order_status",
+              "value": "ยกเลิก"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        640,
+        752
+      ],
+      "id": "11448ed9-cb56-439c-b583-0fa4209f90d8",
+      "name": "Update rows in a table1",
+      "credentials": {
+        "mySql": {
+          "id": "JBTP6ufZQoCmYc8K",
+          "name": "MySQL account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -1191,6 +1392,79 @@
           }
         ]
       ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update rows in a table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -1202,7 +1476,7 @@
     "timezone": "Asia/Bangkok",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "5e4aec87-1bfe-4041-9f3c-b45bd51b31ab",
+  "versionId": "78e49752-ab32-4a03-9634-2af9f0b6d965",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "897fa275083eef3a820e0b41d7de24b01122dca0848a5de4d3e67b1846c14d72"
