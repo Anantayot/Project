@@ -25,34 +25,6 @@ $order_id = intval($_GET['id']);
 $stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ? AND customer_id = ?");
 $stmt->execute([$order_id, $customer_id]);
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
-$stmt->execute([
-  ':slip' => $fileName,
-  ':oid' => $order_id,
-  ':cid' => $customer_id
-]);
-
-/* ===== ส่งข้อมูลไป n8n ===== */
-
-$webhook_url = "http://103.40.119.91:5678/webhook/778284f3-0ba4-473f-9d10-fee5d2416f4f";
-
-$data = [
- "order_id" => $order_id,
- "customer_id" => $customer_id,
- "total_price" => $order['total_price'],
- "payment_status" => "รอดำเนินการ",
- "slip_image" => $fileName
-];
-
-$options = [
- "http" => [
-  "header" => "Content-Type: application/json",
-  "method" => "POST",
-  "content" => json_encode($data)
- ]
-];
-
-$context = stream_context_create($options);
-file_get_contents($webhook_url, false, $context);
 
 if (!$order) {
   die("<p class='text-center mt-5 text-danger'>❌ ไม่พบคำสั่งซื้อนี้ หรือคุณไม่มีสิทธิ์ดู</p>");
