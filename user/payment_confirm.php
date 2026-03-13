@@ -93,10 +93,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!move_uploaded_file($_FILES['slip']['tmp_name'], $targetFile)) {
       die("<p class='text-danger text-center mt-5'>❌ ไม่สามารถอัปโหลดไฟล์ได้</p>");
     }
-  } else {
-    // กันพลาดอีกชั้นในฝั่ง Server
-    echo "<script>alert('❌ กรุณาแนบรูปภาพสลิปด้วยครับ'); window.history.back();</script>";
-    exit;
   }
 
   $stmt = $conn->prepare("UPDATE orders 
@@ -207,7 +203,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </script>
       <?php endif; ?>
 
-      <form method="post" enctype="multipart/form-data" class="mt-4 text-start" onsubmit="return validateForm()">
+      <form method="post" enctype="multipart/form-data" class="mt-4 text-start">
         <div class="mb-3">
           <label for="slip" class="form-label">แนบสลิปการชำระเงิน</label>
           <input type="file" name="slip" id="slip" class="form-control" accept="image/*" required>
@@ -226,18 +222,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <footer>
   © <?= date('Y') ?> MyCommiss | แจ้งชำระเงิน
 </footer>
-
-<script>
-// ฟังก์ชันสำหรับแจ้งเตือนเมื่อลืมแนบไฟล์
-function validateForm() {
-    const slip = document.getElementById('slip');
-    if (slip.files.length === 0) {
-        alert("❌ กรุณาแนบรูปภาพสลิปการชำระเงินก่อนกดยืนยันครับ");
-        return false;
-    }
-    return true;
-}
-</script>
 
 </body>
 </html>
