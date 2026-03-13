@@ -21,8 +21,11 @@ if (!isset($_GET['id'])) {
 
 $order_id = intval($_GET['id']);
 
-// ✅ ดึงข้อมูลคำสั่งซื้อของลูกค้าคนนั้น
-$stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ? AND customer_id = ?");
+// ดึงข้อมูลคำสั่งซื้อพร้อมชื่อลูกค้า
+$stmt = $conn->prepare("SELECT o.*, c.name 
+                        FROM orders o 
+                        JOIN customers c ON o.customer_id = c.customer_id 
+                        WHERE o.order_id = ? AND o.customer_id = ?");
 $stmt->execute([$order_id, $customer_id]);
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
