@@ -33,26 +33,16 @@ if (empty($search) && empty($cat_id)) {
     ORDER BY RAND() LIMIT 10
   ")->fetchAll(PDO::FETCH_ASSOC);
 } else {
-  // 🔍 ดึงข้อมูลตามการค้นหา + หมวดหมู่
-  $sql = "
-    SELECT p.*, c.cat_name 
-    FROM product p
-    LEFT JOIN category c ON p.cat_id = c.cat_id
-    WHERE 1
-  ";
+  $sql = "SELECT p.*, c.cat_name FROM product p LEFT JOIN category c ON p.cat_id = c.cat_id WHERE 1";
   $params = [];
-
   if (!empty($search)) {
     $sql .= " AND (p.p_name LIKE :kw OR c.cat_name LIKE :kw)";
     $params['kw'] = "%$search%";
   }
-
-  // ✅ เงื่อนไขหมวดหมู่ (เพิ่มสินค้าทั้งหมด)
   if (!empty($cat_id) && $cat_id !== 'all') {
     $sql .= " AND p.cat_id = :cat";
     $params['cat'] = $cat_id;
   }
-
   $sql .= " ORDER BY c.cat_name ASC, p.p_name ASC";
   $stmt = $conn->prepare($sql);
   $stmt->execute($params);
@@ -63,61 +53,95 @@ if (empty($search) && empty($cat_id)) {
 <html lang="th">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>หน้าร้าน | MyCommiss</title>
   <link rel="icon" type="image/png" href="icon_mycommiss.png">
 
-  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-  <!-- Swiper -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
 
   <style>
-    body { background: #fff; font-family: "Prompt", sans-serif; }
+    body { background: #fff; font-family: "Prompt", sans-serif; overflow-x: hidden; }
 
     .navbar { background: #fff; border-bottom: 3px solid #D10024; }
-    .navbar-brand { color: #D10024 !important; font-weight: 700; font-size: 1.6rem; }
-    .nav-link:hover, .nav-link.active { color: #D10024 !important; }
+    .navbar-brand { color: #D10024 !important; font-weight: 700; font-size: 1.4rem; }
 
+    /* 🔍 Responsive Search Bar */
+    .search-container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
     .search-bar {
       background: #fff;
       border: 2px solid #D10024;
       border-radius: 50px;
-      padding: 15px 25px;
-      margin: 30px auto;
-      max-width: 900px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .search-bar input, .search-bar select {
-      border: none;
-      outline: none;
-      background: none;
-      font-size: 1rem;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .search-bar select {
-      color: #333;
-      width: 25%;
-      cursor: pointer;
+      border: none;
+      background: none;
+      width: 30%;
+      min-width: 100px;
+      padding: 10px;
+      border-right: 1px solid #eee;
+      outline: none;
     }
-    .search-bar input { width: 55%; }
+    .search-bar input {
+      border: none;
+      background: none;
+      flex-grow: 1;
+      padding: 10px 15px;
+      outline: none;
+    }
     .search-bar button {
       background: #D10024;
       border: none;
       color: #fff;
-      border-radius: 50px;
-      padding: 10px 18px;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s;
     }
     .search-bar button:hover { background: #a5001b; }
 
+    /* ปรับแต่งบนมือถือ */
+    @media (max-width: 576px) {
+      .search-bar {
+        flex-direction: column;
+        border-radius: 15px;
+        padding: 10px;
+      }
+      .search-bar select, .search-bar input {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 5px;
+      }
+      .search-bar button {
+        width: 100%;
+        border-radius: 10px;
+        height: 40px;
+      }
+      .section-title { font-size: 1.3rem; }
+    }
+
     .section-title { font-weight: 700; color: #D10024; margin: 30px 0 20px; text-align:center; }
 
+    /* 📦 Product Card */
     .product-card {
       border: 1px solid #eee;
       border-radius: 12px;
       transition: all 0.3s ease;
-      overflow: hidden;
       background: #fff;
+      height: 100%;
     }
     .product-card:hover {
       transform: translateY(-4px);
@@ -125,73 +149,57 @@ if (empty($search) && empty($cat_id)) {
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
     .product-card img {
-      height: 300px;
+      height: 220px;
       object-fit: cover;
       width: 100%;
-      border-radius: 8px;
+      border-top-left-radius: 11px;
+      border-top-right-radius: 11px;
     }
-    .product-card .card-body { text-align: center; }
-    .product-card .btn {
-      background-color: #D10024;
-      border: none;
-      border-radius: 8px;
+    /* ปรับรูปบนมือถือให้เล็กลง */
+    @media (max-width: 768px) {
+      .product-card img { height: 160px; }
+      .product-card .card-body { padding: 10px; }
+      .product-card h6 { font-size: 0.9rem; }
     }
-    .product-card .btn:hover { background-color: #a5001b; }
 
-    .swiper {
-      width: 100%;
-      padding-bottom: 40px;
-    }
-    .swiper-slide { 
-      width: 310px;
-      height: auto;
-    }
-    .swiper-button-next, .swiper-button-prev { color: #D10024; }
-
-    footer {
-      background: #f8f9fa;
-      color: #666;
-      border-top: 3px solid #D10024;
-      padding: 20px;
-      margin-top: 50px;
-    }
+    .swiper { width: 100%; padding-bottom: 40px; }
+    .swiper-button-next, .swiper-button-prev { color: #D10024; transform: scale(0.7); }
 
     .category-header {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: 600;
       color: #D10024;
-      margin-top: 40px;
-      border-bottom: 2px solid #D10024;
-      padding-bottom: 8px;
+      margin-top: 30px;
+      border-left: 4px solid #D10024;
+      padding-left: 10px;
     }
+    footer { padding: 30px; border-top: 3px solid #D10024; margin-top: 50px; background: #f8f9fa; }
   </style>
 </head>
 <body>
 
 <?php include("navbar_user.php"); ?>
 
-<div class="container mt-4">
+<div class="container-fluid container-md">
 
-  <!-- 🔍 กล่องค้นหา -->
-  <form method="get" class="search-bar d-flex justify-content-between align-items-center flex-wrap">
-    <select name="cat" class="form-select me-2" style="border:none;width:25%;">
-      <option value="">-- ประเภทสินค้า --</option>
-      <option value="all" <?= $cat_id == 'all' ? 'selected' : '' ?>>สินค้าทั้งหมด</option>
-      <?php foreach ($cats as $c): ?>
-        <option value="<?= $c['cat_id'] ?>" <?= $cat_id == $c['cat_id'] ? 'selected' : '' ?>>
-          <?= htmlspecialchars($c['cat_name']) ?>
-        </option>
-      <?php endforeach; ?>
-    </select>
-
-    <input type="text" name="search" placeholder="🔍 ค้นหาสินค้า..." value="<?= htmlspecialchars($search) ?>" class="flex-grow-1 me-2">
-    <button type="submit"><i class="bi bi-search"></i></button>
-  </form>
+  <div class="search-container">
+    <form method="get" class="search-bar">
+      <select name="cat">
+        <option value="">-- ประเภท --</option>
+        <option value="all" <?= $cat_id == 'all' ? 'selected' : '' ?>>ทั้งหมด</option>
+        <?php foreach ($cats as $c): ?>
+          <option value="<?= $c['cat_id'] ?>" <?= $cat_id == $c['cat_id'] ? 'selected' : '' ?>>
+            <?= htmlspecialchars($c['cat_name']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+      <input type="text" name="search" placeholder="ค้นหาชื่อสินค้า..." value="<?= htmlspecialchars($search) ?>">
+      <button type="submit"><i class="bi bi-search"></i></button>
+    </form>
+  </div>
 
   <?php if (!empty($search) || !empty($cat_id)): ?>
-    <h3 class="section-title">
-      <?= ($cat_id === 'all') ? 'สินค้าทั้งหมด' : 'ผลการค้นหา' ?>
-    </h3>
+    <h3 class="section-title"><?= ($cat_id === 'all') ? 'สินค้าทั้งหมด' : 'ผลการค้นหา' ?></h3>
 
     <?php if (count($searchResults) > 0): ?>
       <?php if ($cat_id === 'all'): ?>
@@ -202,21 +210,20 @@ if (empty($search) && empty($cat_id)) {
             $grouped[$cat][] = $p;
           }
           foreach ($grouped as $catName => $products):
-            $count = count($products);
         ?>
           <h5 class="category-header"><?= htmlspecialchars($catName) ?></h5>
-          <div class="row row-cols-1 row-cols-md-4 g-4">
+          <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mt-1">
             <?php foreach ($products as $p):
               $img = "../admin/uploads/" . $p['p_image'];
               if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
             ?>
               <div class="col">
-                <div class="product-card card h-100">
+                <div class="product-card card">
                   <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
-                  <div class="card-body">
-                    <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
-                    <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
-                    <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
+                  <div class="card-body text-center d-flex flex-column">
+                    <h6 class="text-truncate mb-2"><?= htmlspecialchars($p['p_name']) ?></h6>
+                    <p class="fw-bold text-danger mb-2 mt-auto"><?= number_format($p['p_price'], 2) ?>.-</p>
+                    <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm btn-danger w-100 mt-auto">ดูรายละเอียด</a>
                   </div>
                 </div>
               </div>
@@ -224,18 +231,18 @@ if (empty($search) && empty($cat_id)) {
           </div>
         <?php endforeach; ?>
       <?php else: ?>
-        <div class="row row-cols-1 row-cols-md-4 g-4">
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
           <?php foreach ($searchResults as $p):
             $img = "../admin/uploads/" . $p['p_image'];
             if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
           ?>
             <div class="col">
-              <div class="product-card card h-100">
+              <div class="product-card card">
                 <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
-                <div class="card-body">
-                  <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
-                  <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
-                  <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
+                <div class="card-body text-center d-flex flex-column">
+                  <h6 class="text-truncate mb-2"><?= htmlspecialchars($p['p_name']) ?></h6>
+                  <p class="fw-bold text-danger mb-2 mt-auto"><?= number_format($p['p_price'], 2) ?>.-</p>
+                  <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm btn-danger w-100">ดูรายละเอียด</a>
                 </div>
               </div>
             </div>
@@ -243,85 +250,49 @@ if (empty($search) && empty($cat_id)) {
         </div>
       <?php endif; ?>
     <?php else: ?>
-      <p class="text-center text-muted mt-4">😢 ไม่พบสินค้าที่ค้นหา</p>
+      <p class="text-center text-muted mt-5">😢 ไม่พบสินค้าที่คุณกำลังมองหา</p>
     <?php endif; ?>
 
   <?php else: ?>
-    <!-- 🆕 แสดงสินค้าสามหมวดตามเดิม -->
-    <h3 class="section-title">สินค้าใหม่ล่าสุด</h3>
+    <?php 
+      $sections = [
+        ['title' => 'สินค้าใหม่ล่าสุด', 'data' => $newProducts],
+        ['title' => 'สินค้าขายดีที่สุด', 'data' => $bestSellers],
+        ['title' => 'สินค้าแนะนำ', 'data' => $randomProducts]
+      ];
+      foreach ($sections as $sec):
+    ?>
+    <h3 class="section-title"><?= $sec['title'] ?></h3>
     <div class="swiper mySwiper">
       <div class="swiper-wrapper">
-        <?php foreach ($newProducts as $p):
+        <?php foreach ($sec['data'] as $p):
           $img = "../admin/uploads/" . $p['p_image'];
           if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
         ?>
-          <div class="swiper-slide">
-            <div class="product-card card h-100">
+          <div class="swiper-slide h-auto">
+            <div class="product-card card">
               <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
-              <div class="card-body">
-                <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
-                <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
-                <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
+              <div class="card-body text-center d-flex flex-column">
+                <h6 class="text-truncate mb-2"><?= htmlspecialchars($p['p_name']) ?></h6>
+                <?php if(isset($p['total_sold'])): ?>
+                    <span class="badge bg-warning text-dark mb-2 mx-auto">ขายแล้ว <?= $p['total_sold'] ?></span>
+                <?php endif; ?>
+                <p class="fw-bold text-danger mt-auto mb-2"><?= number_format($p['p_price'], 2) ?>.-</p>
+                <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm btn-danger w-100">ดูรายละเอียด</a>
               </div>
             </div>
           </div>
         <?php endforeach; ?>
       </div>
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next d-none d-md-flex"></div>
+      <div class="swiper-button-prev d-none d-md-flex"></div>
     </div>
-
-    <h3 class="section-title">สินค้าขายดีที่สุด</h3>
-    <div class="swiper mySwiper">
-      <div class="swiper-wrapper">
-        <?php foreach ($bestSellers as $p):
-          $img = "../admin/uploads/" . $p['p_image'];
-          if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
-        ?>
-          <div class="swiper-slide">
-            <div class="product-card card h-100 border-warning">
-              <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
-              <div class="card-body">
-                <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
-                <span class="badge bg-warning text-dark mb-2">ขายแล้ว <?= $p['total_sold'] ?> ชิ้น</span>
-                <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
-                <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
-              </div>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
-    </div>
-
-    <h3 class="section-title">สินค้าแนะนำ</h3>
-    <div class="swiper mySwiper">
-      <div class="swiper-wrapper">
-        <?php foreach ($randomProducts as $p):
-          $img = "../admin/uploads/" . $p['p_image'];
-          if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
-        ?>
-          <div class="swiper-slide">
-            <div class="product-card card h-100">
-              <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
-              <div class="card-body">
-                <h6 class="text-truncate"><?= htmlspecialchars($p['p_name']) ?></h6>
-                <p class="fw-bold text-danger"><?= number_format($p['p_price'], 2) ?> บาท</p>
-                <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm w-100 text-white">ดูรายละเอียด</a>
-              </div>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
-    </div>
+    <?php endforeach; ?>
   <?php endif; ?>
 </div>
 
-<footer class="text-center mt-5">
-  <p>© <?= date('Y') ?> MyCommiss | ระบบร้านค้าออนไลน์คอมพิวเตอร์</p>
+<footer class="text-center">
+  <p class="small text-muted mb-0">© <?= date('Y') ?> MyCommiss | ระบบร้านค้าออนไลน์คอมพิวเตอร์</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -329,23 +300,21 @@ if (empty($search) && empty($cat_id)) {
 <script>
   document.querySelectorAll('.mySwiper').forEach(swiperEl => {
     new Swiper(swiperEl, {
-      slidesPerView: 4,   // จาก 5 เหลือ 4
-      spaceBetween: 20,
-      autoplay: { delay: 3000, disableOnInteraction: false },
+      slidesPerView: 2, // เริ่มต้นที่ 2 รูปสำหรับมือถือ
+      spaceBetween: 15,
+      autoplay: { delay: 4000 },
       navigation: {
         nextEl: swiperEl.querySelector('.swiper-button-next'),
         prevEl: swiperEl.querySelector('.swiper-button-prev'),
       },
       breakpoints: {
-        320: { slidesPerView: 1 },
-        768: { slidesPerView: 2 },
-        992: { slidesPerView: 3 },
-        1200: { slidesPerView: 4 },  // จาก 5 เหลือ 4
+        640: { slidesPerView: 2 },
+        768: { slidesPerView: 3 },
+        1024: { slidesPerView: 4 },
+        1400: { slidesPerView: 5 },
       },
     });
   });
 </script>
-
-
 </body>
 </html>
