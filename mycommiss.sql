@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 28, 2026 at 01:27 PM
+-- Generation Time: Mar 24, 2026 at 11:41 AM
 -- Server version: 10.5.29-MariaDB-0+deb11u1
 -- PHP Version: 7.4.33
 
@@ -105,11 +105,31 @@ CREATE TABLE `customers` (
 
 INSERT INTO `customers` (`customer_id`, `name`, `email`, `password`, `phone`, `address`, `created_at`, `subscribe`) VALUES
 (1, 'อนันตยศ อินทราพงษ์', '67010974018@msu.ac.th', '$2y$10$g2TOwNeq8WS/qknez/Dml.eHW.AdPRzysgMa7RcKhqjHCaeDQkUYi', '0903262100', 'ประจวบ', '2025-10-16 09:11:21', 1),
-(2, 'นายวีรภัทร สุพร', '67010974016@msu.ac.th', '$2y$10$0BEEyQ050EjANd8vHl2Qju.15EijEZGyb2BT6zSf9xAuW9r9hDRHe', '0933705611', '57/4', '2025-10-18 01:53:15', 0),
-(3, 'Ronaldo', '67010974003@msu.ac.th', '$2y$10$333UZ7MH5uDB/Jle9GNxVeTPdZpNA7zbuGMqu6S3SWnxTU58wWE5i', '0622301236', 'โปรตุเกต', '2025-10-18 06:10:54', 0),
-(4, 'ฟหกฟหกฟห', 'nicolas.note.th@gmail.com', '$2y$10$eLOcVFss4Zc9V83ebKcIgut/1NsuLIIPR/Ly6cPHd8vXaCXbnVopu', '4894984894', '84894', '2025-10-18 06:28:08', 1),
+(2, 'วีรภัทร สุพร', '67010974016@msu.ac.th', '$2y$10$g2TOwNeq8WS/qknez/Dml.eHW.AdPRzysgMa7RcKhqjHCaeDQkUYi', '0933705611', '57/4', '2025-10-18 01:53:15', 0),
+(3, 'คณาธิป ขวากุดแข้', '67010974003@msu.ac.th', '$2y$10$333UZ7MH5uDB/Jle9GNxVeTPdZpNA7zbuGMqu6S3SWnxTU58wWE5i', '0622301236', 'โปรตุเกต', '2025-10-18 06:10:54', 0),
+(4, 'สวัสดี มีชัย', 'nicolas.note.th@gmail.com', '$2y$10$eLOcVFss4Zc9V83ebKcIgut/1NsuLIIPR/Ly6cPHd8vXaCXbnVopu', '4894984894', 'สารคาม', '2025-10-18 06:28:08', 1),
 (5, 'รัฐศาสตร์ บรรจงกุล', '67010974013@msu.ac.th', '$2y$10$XeqiNnPnqjtg2zre/VEZGeqI9CDy0rGDEsEUrvOiKj3NPU43UXTkK', '0826968780', 'ปารีส', '2025-10-18 06:46:38', 0),
-(6, 'อภิญญา ประสม', '66010916079@msu.ac.th', '$2y$10$q3NBvoXZWfYoOYdPSzdbReB.Ak0xty/PREwf5vmcGPEZCooG1.F5C', '0900000000', 'พิษณุโลก', '2026-02-28 04:35:08', 0);
+(6, 'อภิญญา ประสม', '66010916079@msu.ac.th', '$2y$10$q3NBvoXZWfYoOYdPSzdbReB.Ak0xty/PREwf5vmcGPEZCooG1.F5C', '0900000000', 'พิษณุโลก', '2025-11-02 04:35:08', 0),
+(7, 'สมชาย สายลม', 'somchai.s@gmail.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0812345678', 'มหาสารคาม', '2025-11-10 02:15:22', 0),
+(8, 'วิภาดา รักดี', 'vipada_r22@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0823456789', 'ขอนแก่น', '2025-11-25 07:30:10', 0),
+(9, 'มานะ ขยันเรียน', 'mana_work@outlook.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0834567890', 'กรุงเทพฯ', '2025-12-05 03:00:45', 0),
+(10, 'อารีรัตน์ สวยงาม', 'areerat.s@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0845678901', 'ร้อยเอ็ด', '2025-12-18 09:45:30', 0),
+(11, 'กิตติพงษ์ มั่นคง', 'kittipong_67@gmail.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0856789012', 'ชลบุรี', '2025-12-29 01:20:15', 0),
+(12, 'ปิยะนันท์ ใจดี', 'piyanan.j@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0867890123', 'เชียงใหม่', '2026-01-05 04:12:00', 0),
+(13, 'ธนพล ยิ้มสู้', 'tanapol_y@yahoo.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0878901234', 'นครราชสีมา', '2026-01-12 06:40:55', 0),
+(14, 'ณัฐธิดา พรสวรรค์', 'nutthida.p@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0889012345', 'อุดรธานี', '2026-01-20 02:05:10', 0),
+(15, 'ประเสริฐ เลิศล้ำ', 'prasert_lert@gmail.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0890123456', 'นนทบุรี', '2026-01-28 10:55:40', 0),
+(16, 'ศิริพร อ่อนหวาน', 'siriporn.o@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0901234567', 'ปทุมธานี', '2026-02-02 03:20:33', 0),
+(17, 'เกรียงไกร กล้าหาญ', 'kreangkrai_k@hotmail.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0912345678', 'สกลนคร', '2026-02-08 08:30:12', 0),
+(18, 'เบญจมาศ ชูชื่น', 'benjamas.c@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0923456789', 'ระยอง', '2026-02-14 01:45:50', 0),
+(19, 'วีระศักดิ์ ส่องแสง', 'veerasak_s@gmail.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0934567890', 'บุรีรัมย์', '2026-02-20 05:10:05', 0),
+(20, 'พรทิพย์ พูนผล', 'porntip.p@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0945678901', 'พิษณุโลก', '2026-02-25 07:22:18', 0),
+(21, 'อดิเรก แซ่ตั้ง', 'adirek_setang@outlook.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0956789012', 'ภูเก็ต', '2026-03-02 04:30:44', 0),
+(22, 'นารีรัตน์ มั่งมี', 'nareerat.m@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0967890123', 'สุราษฎร์ธานี', '2026-03-08 09:50:21', 0),
+(23, 'ชาติชาย แข็งแรง', 'chartchai.k@gmail.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0978901234', 'สงขลา', '2026-03-12 02:15:33', 0),
+(24, 'สุพรรษา บานเย็น', 'supansa.b@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0989012345', 'นครสวรรค์', '2026-03-18 06:40:09', 0),
+(25, 'ไพโรจน์ สมบูรณ์', 'pairoj_s@yahoo.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0990123456', 'สมุทรปราการ', '2026-03-22 03:05:55', 0),
+(26, 'กมลวรรณ ดวงดี', 'kamolwan.d@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0801234567', 'สุรินทร์', '2026-03-24 01:30:15', 0);
 
 -- --------------------------------------------------------
 
@@ -152,7 +172,24 @@ INSERT INTO `orders` (`order_id`, `customer_id`, `total_price`, `shipping_addres
 (11, 1, '1290.00', 'ประจวบ', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'จัดส่งแล้ว', '2026-02-20 08:16:52', NULL, NULL, NULL),
 (12, 1, '1090.00', 'ประจวบ', 'QR', NULL, NULL, 'ยกเลิก', 'รอตรวจสอบ', 'ยกเลิก', '2026-02-20 08:18:48', NULL, NULL, NULL),
 (13, 6, '18190.00', 'พิษณุโลก', 'QR', NULL, NULL, 'รอดำเนินการ', NULL, 'รอดำเนินการ', '2026-02-28 04:36:42', NULL, NULL, NULL),
-(14, 6, '15390.00', 'พิษณุโลก', 'COD', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-02-28 05:53:52', NULL, NULL, NULL);
+(14, 6, '15390.00', 'พิษณุโลก', 'COD', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-02-28 05:53:52', NULL, NULL, NULL),
+(15, 2, '37670.00', '57/4', 'QR', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-03-01 03:12:40', NULL, NULL, NULL),
+(16, 2, '3890.00', '57/4', 'QR', 'slip_1772334867_2874.jpg', '2026-03-01 10:14:27', 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-03-01 03:13:40', NULL, NULL, NULL),
+(17, 2, '990.00', '57/4', 'QR', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-03-01 03:14:05', NULL, NULL, NULL),
+(18, 1, '1690.00', 'ประจวบ', 'QR', 'slip_1773393540_7867.jpg', '2026-03-13 16:19:00', 'รอดำเนินการ', 'กำลังตรวจสอบ', 'รอดำเนินการ', '2026-03-02 08:43:25', NULL, NULL, NULL),
+(19, 1, '21200.00', 'ประจวบ', 'QR', 'slip_1773393137_3535.jpg', '2026-03-13 16:12:17', 'รอดำเนินการ', 'กำลังตรวจสอบ', 'รอดำเนินการ', '2026-03-12 08:35:52', NULL, NULL, NULL),
+(20, 1, '4290.00', 'ประจวบ', 'QR', 'slip_1773392698_7884.jpg', '2026-03-13 16:04:58', 'รอดำเนินการ', 'กำลังตรวจสอบ', 'รอดำเนินการ', '2026-03-13 08:56:06', NULL, NULL, NULL),
+(21, 1, '19990.00', 'ประจวบ', 'QR', 'slip_1773393606_8473.jpg', '2026-03-13 16:20:06', 'รอดำเนินการ', 'กำลังตรวจสอบ', 'รอดำเนินการ', '2026-03-13 09:19:58', NULL, NULL, NULL),
+(22, 1, '3860.00', 'ประจวบ', 'QR', 'slip_1773394692_6018.jpeg', '2026-03-13 16:38:12', 'รอดำเนินการ', 'กำลังตรวจสอบ', 'รอดำเนินการ', '2026-03-13 09:37:07', NULL, NULL, NULL),
+(23, 1, '3990.00', 'ประจวบ', 'QR', 'slip_1773394821_7429.jpeg', '2026-03-13 16:40:21', 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-03-13 09:40:08', NULL, NULL, NULL),
+(24, 1, '1390.00', 'ประจวบ', 'QR', 'slip_1773396121_5944.jpeg', '2026-03-13 17:02:01', 'ยกเลิก', 'ปฏิเสธ', 'ยกเลิก', '2026-03-13 10:01:50', NULL, NULL, NULL),
+(25, 1, '90.00', 'ประจวบ', 'QR', 'slip_1773396431_2989.jpeg', '2026-03-13 17:07:11', 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-03-13 10:06:02', NULL, NULL, NULL),
+(26, 1, '50.00', 'ประจวบ', 'QR', 'slip_1773404195_8586.jpeg', '2026-03-13 19:16:35', 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-03-13 12:14:59', NULL, NULL, NULL),
+(27, 1, '2190.00', 'ประจวบ', 'QR', 'slip_1773404253_1080.jpeg', '2026-03-13 19:17:33', 'ยกเลิก', 'ปฏิเสธ', 'ยกเลิก', '2026-03-13 12:17:07', NULL, NULL, NULL),
+(28, 1, '990.00', 'ประจวบ', 'QR', 'slip_1773498444_9504.png', '2026-03-14 21:27:24', 'ยกเลิก', 'ปฏิเสธ', 'ยกเลิก', '2026-03-14 14:26:26', NULL, NULL, NULL),
+(29, 1, '120.00', 'ประจวบ', 'QR', 'slip_1773498579_3560.jpeg', '2026-03-14 21:29:39', 'ยกเลิก', 'ปฏิเสธ', 'ยกเลิก', '2026-03-14 14:28:56', NULL, NULL, NULL),
+(30, 1, '50.00', 'ประจวบ', 'QR', 'slip_1773498696_5388.jpeg', '2026-03-14 21:31:36', 'ยกเลิก', 'ปฏิเสธ', 'ยกเลิก', '2026-03-14 14:31:07', NULL, NULL, NULL),
+(31, 1, '50.00', 'ประจวบ', 'QR', 'slip_1773498942_2165.jpeg', '2026-03-14 21:35:42', 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-03-14 14:34:56', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -200,7 +237,27 @@ INSERT INTO `order_details` (`id`, `order_id`, `p_id`, `quantity`, `price`) VALU
 (24, 13, 19, 1, '1290.00'),
 (25, 13, 24, 1, '16900.00'),
 (26, 14, 135, 1, '12400.00'),
-(27, 14, 192, 1, '2990.00');
+(27, 14, 192, 1, '2990.00'),
+(28, 15, 199, 1, '1690.00'),
+(29, 15, 66, 2, '17990.00'),
+(30, 16, 198, 1, '990.00'),
+(31, 16, 33, 1, '2900.00'),
+(32, 17, 198, 1, '990.00'),
+(33, 18, 199, 1, '1690.00'),
+(34, 19, 24, 1, '16900.00'),
+(35, 19, 37, 1, '4300.00'),
+(36, 20, 148, 1, '4290.00'),
+(37, 21, 9, 1, '19990.00'),
+(38, 22, 154, 1, '3860.00'),
+(39, 23, 52, 1, '3990.00'),
+(40, 24, 164, 1, '1390.00'),
+(41, 25, 125, 1, '490.00'),
+(42, 26, 175, 1, '50.00'),
+(43, 27, 200, 1, '2190.00'),
+(44, 28, 49, 1, '990.00'),
+(45, 29, 178, 1, '120.00'),
+(46, 30, 175, 1, '50.00'),
+(47, 31, 175, 1, '50.00');
 
 -- --------------------------------------------------------
 
@@ -232,7 +289,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (6, 'ACER ASPIRE 7 A715-59G-54H5 - BLACK', '20990.00', 5, '• ซีพียู : Intel Core i5-12450H\r\n• แรม : 16GB DDR4\r\n• เอสเอสดี : 512GB PCIe/NVMe M.2 SSD\r\n• จอแสดงผล : 15.6\" FHD (1920x1080) 144Hz IPS\r\n• กราฟิก : Nvidia GeForce RTX3050 6GB GDDR6\r\n• ซอฟต์แวร์ : Windows 11 Home', '1770968763_1.jpg', 1, '2026-02-13 07:46:03'),
 (7, 'ASUS VIVOBOOK 15 X1504VA-NJ348WA (QUIET BLUE)', '12990.00', 5, '• Intel Core i3-1315U\r\n• 8GB DDR4 (On Board)\r\n• 512GB PCIe 3/NVMe M.2 SSD\r\n• 15.6\" FHD (1920 x 1080) 60Hz 250nits 45% NTSC\r\n• Intel UHD Graphics (Integrated)\r\n• Windows 11 Home / Office Home 2024 / Microsoft 365 Basic', '1770968801_1.jpg', 1, '2026-02-13 07:46:29'),
 (8, 'ASUS VIVOBOOK 16 X1607CA-MB535WA - QUIET BLUE', '24990.00', 5, '• ซีพียู : Intel Core Ultra 5 225H\r\n• แรม : 16GB DDR5 (On Board)\r\n• เอสเอสดี : 512GB PCIe 4/NVMe M.2 SSD\r\n• จอแสดงผล : 16\" WUXGA (1920 x 1200) IPS-level Panel 60Hz 45% NTSC 300nits\r\n• กราฟิก : Intel Graphics (Integrated)\r\n• ซอฟต์แวร์ : Windows 11 Home / Office Home 2024 / Microsoft 365 Basic', '1770968839_1.jpg', 1, '2026-02-13 07:47:19'),
-(9, 'ACER X BUTTERBEAR ASPIRE LITE 15 LIMITED EDITION AL15-42P-R6N3', '19990.00', 6, '• ซีพียู : AMD Ryzen 5 7430U\r\n• แรม : 32GB DDR4\r\n• เอสเอสดี : 512GB PCIe/NVMe M.2 SSD\r\n• จอแสดงผล : 15.6\" FHD (1920x1080)\r\n• กราฟิก : AMD Radeon Graphics (Integrated)\r\n• ซอฟต์แวร์ : Windows 11 Home / Office Home 2024 / Microsoft 365 Basic', '1770968868_1.jpg', 1, '2026-02-13 07:47:48'),
+(9, 'ACER X BUTTERBEAR ASPIRE LITE 15 LIMITED EDITION AL15-42P-R6N3', '19990.00', 5, '• ซีพียู : AMD Ryzen 5 7430U\r\n• แรม : 32GB DDR4\r\n• เอสเอสดี : 512GB PCIe/NVMe M.2 SSD\r\n• จอแสดงผล : 15.6\" FHD (1920x1080)\r\n• กราฟิก : AMD Radeon Graphics (Integrated)\r\n• ซอฟต์แวร์ : Windows 11 Home / Office Home 2024 / Microsoft 365 Basic', '1770968868_1.jpg', 1, '2026-02-13 07:47:48'),
 (10, 'DELL XPS13-SNSX739001 (SILVER)', '71900.00', 7, 'i7-10510U/16GB/512GB SSD/Integrated Graphics/13.3\"UHD Touch/Win10Pro/Silver\r\nWarranty : 3Y. (1Y. On-site + 2Y. Carry-in)', '1770968893_1.jpg', 1, '2026-02-13 07:48:13'),
 (11, 'SIGNO KB-725W EXODIA RUBBER DOME SWITCH RGB EN/TH - WHITE', '390.00', 8, '• สวิตช์ : Rubber Dome Switch\r\n• ขนาด : 96%\r\n• แสงไฟ : RGB\r\n• คีย์แคป : ภาษาอังกฤษ / ภาษาไทย\r\n• เลย์เอาต์ : ANSI\r\n• การเชื่อมต่อ : แบบใช้สาย\r\n• สายเคเบิล : สาย USB-C เป็น USB-A', '1770969084_1.jpg', 2, '2026-02-13 07:51:24'),
 (12, 'NUBWO NK44 - WHITE', '199.00', 18, 'คีย์บอร์ดแบบ Rubber Dome\r\nเชื่อมต่อใช้งานด้วย USB 2.0\r\nรองรับระบบ Windows / Android / Mac / Smart TV', '1770969133_1.jpg', 2, '2026-02-13 07:52:13'),
@@ -247,7 +304,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (21, 'SIGNO E-SPORT BAROCCO (GC-203BW) (BLACK-WHITE)', '4490.00', 5, 'Gaming Chair', '1770969464_1.jpg', 3, '2026-02-13 07:57:33'),
 (22, 'ONEX GX3 (BLACK)', '5890.00', 12, 'Gaming Chair', '1770969493_1.jpg', 3, '2026-02-13 07:58:13'),
 (23, 'ANDA SEAT DARK SERIES (AD4XL-WIZARD-B-PV/C) (BLACK)', '12900.00', 18, 'Gaming Chair', '1770969521_1.jpg', 3, '2026-02-13 07:58:41'),
-(24, 'THERMALTAKE CYBERCHAIR E500 (GGC-EG5-BBLFDM-01) (BLACK)', '16900.00', 18, 'Gaming Chair', '1770969563_1.jpg', 3, '2026-02-13 07:59:23'),
+(24, 'THERMALTAKE CYBERCHAIR E500 (GGC-EG5-BBLFDM-01) (BLACK)', '16900.00', 17, 'Gaming Chair', '1770969563_1.jpg', 3, '2026-02-13 07:59:23'),
 (25, 'ONEX GX3 (BLACK-RED)', '5890.00', 19, 'Gaming Chair', '1770969590_1.jpg', 3, '2026-02-13 07:59:50'),
 (26, 'OCPC SATAN SERIES (OC-GC-SAT-BW) (BLUE-WHITE)', '6990.00', 15, 'Gaming Chair', '1770969617_1.jpg', 3, '2026-02-13 08:00:17'),
 (27, 'ANDA SEAT JIB SERIES (AD12XL-02-S-PV-JIB) (BLUE)', '15990.00', 12, 'Gaming Chair', '1770969666_1.jpg', 3, '2026-02-13 08:01:06'),
@@ -256,11 +313,11 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (30, 'NOBLECHAIRS EPIC (JAVA EDITION) PU HYBRID LEATHER (GC-NBC-EPIC-JE)', '13900.00', 18, 'Gaming Chair', '1770969764_1.jpg', 3, '2026-02-13 08:02:44'),
 (31, 'ACER VG240YBMIIX 23.8 INCH IPS 75Hz', '3600.00', 14, '• Panel Size : 23.8\"\r\n• Panel Type : IPS\r\n• Maximum Resolution : 1920 x 1080\r\n• Refresh Rate : 75 Hz\r\n• Response Time : 1 ms\r\n• Variable Refresh Rate : AMD FreeSync', '1770969942_1.jpg', 4, '2026-02-13 08:05:42'),
 (32, 'Asus Proart PA24ACRV - 23.8 Inch IPS 2K 75Hz', '9900.00', 19, '• ขนาดจอ : 23.8 นิ้ว\r\n• ประเภทจอ : IPS ไม่สะท้อนแสง\r\n• ความละเอียด : 2560 x 1440\r\n• รีเฟรชเรท : 75Hz\r\n• การตอบสนอง : 5ms\r\n• การรองรับสี : 16.7 ล้านสี\r\n• การเชื่อมต่อ : 1 x HDMI, 2 x DP, 1 x USB-C (DP Alt Mode + PD 96W)\r\n• เทคโนโลยีการซิงค์ : Adaptive Sync\r\n• การปรับตั้ง : ปรับได้ทั้งความสูง, หมุนแนวตั้ง, หมุนซ้าย-ขวา, และเอียง\r\n• การติดตั้งบนผนัง : VESA ขนาด 100 x 100 มม.', '1770969972_1.jpg', 4, '2026-02-13 08:06:12'),
-(33, 'ASUS VA24EHF - 23.8 INCH IPS FHD 100Hz', '2900.00', 12, '• 23.8\"\r\n• IPS panel Anti-glare\r\n• 1920 x 1080 100Hz 1ms\r\n• 16.7 million colors\r\n• 1 x HDMI\r\n• Tilt Adjustable\r\n• VESA mount 100 x 100 mm', '1770970002_1.jpg', 4, '2026-02-13 08:06:42'),
+(33, 'ASUS VA24EHF - 23.8 INCH IPS FHD 100Hz', '2900.00', 11, '• 23.8\"\r\n• IPS panel Anti-glare\r\n• 1920 x 1080 100Hz 1ms\r\n• 16.7 million colors\r\n• 1 x HDMI\r\n• Tilt Adjustable\r\n• VESA mount 100 x 100 mm', '1770970002_1.jpg', 4, '2026-02-13 08:06:42'),
 (34, 'ASUS ROG STRIX XG27ACS - 27 INCH FAST IPS 2K 180Hz', '10900.00', 15, '• 27\"\r\n• Fast IPS panel Non-glare\r\n• 2560 x 1440 180Hz (DP) 144Hz (HDMI) 1ms\r\n• 16.7 million colors\r\n• 1 x HDMI\r\n• 1 x DP\r\n• 1 x USB-C (DP Alt Mode + PD 7.5W)\r\n• AMD FreeSync\r\n• Nvidia G-Sync Compatible\r\n• Height, Pivot, Swivel, Tilt adjustable\r\n• VESA mount 100 x 100 mm', '1770970034_1.jpg', 4, '2026-02-13 08:07:14'),
 (35, 'SAMSUNG ODYSSEY G5 LS27CG510EEXXT - 27 INCH VA 2K 165Hz', '7500.00', 16, '• 27\"\r\n• VA panel Anti-glare\r\n• 2560 x 1440 165Hz 1ms\r\n• 16.7 million colors\r\n• 2 x HDMI\r\n• 1 x DP\r\n• AMD FreeSync Premium\r\n• Height, Pivot, Swivel, Tilt adjustable\r\n• VESA mount 100 x 100 mm', '1770970068_1.jpg', 4, '2026-02-13 08:07:48'),
 (36, 'Asus Proart Pa248Qv - 24.1 Inch Ips Fhd 75Hz', '7350.00', 14, '• 24.1\"\r\n• IPS panel Non-glare\r\n• 1920 x 1200 75Hz 5ms\r\n• 16.7 million colors\r\n• 1 x HDMI\r\n• 1 x DP\r\n• Height, Pivot, Swivel, Tilt adjustable\r\n• VESA mount 100 x 100 mm', '1770970094_1.jpg', 4, '2026-02-13 08:08:14'),
-(37, 'ASUS TUF GAMING VG249Q3A - 23.8 INCH IPS FHD 180Hz', '4300.00', 13, '• 23.8\"\r\n• IPS panel Non-glare\r\n• 1920 x 1080 180Hz 1ms\r\n• 16.7 million color\r\n• 2 x HDMI\r\n• 1 x DisplayPort\r\n• AMD FreeSync Premium\r\n• VESA mount 100 x 100 mm', '1770970122_1.jpg', 4, '2026-02-13 08:08:42'),
+(37, 'ASUS TUF GAMING VG249Q3A - 23.8 INCH IPS FHD 180Hz', '4300.00', 12, '• 23.8\"\r\n• IPS panel Non-glare\r\n• 1920 x 1080 180Hz 1ms\r\n• 16.7 million color\r\n• 2 x HDMI\r\n• 1 x DisplayPort\r\n• AMD FreeSync Premium\r\n• VESA mount 100 x 100 mm', '1770970122_1.jpg', 4, '2026-02-13 08:08:42'),
 (38, 'MONITOR (จอมอนิเตอร์) DELL U2723QE - 27 INCH IPS 4K 60Hz', '17900.00', 16, '• Color gamut : 100% sRGB, 98% DCI-P3\r\n• Color Support : 1.07 Billion\r\n• Response Time : 5 ms(GTG)\r\n• Brightness : 400 Nits\r\n• Aspect Ratio : 16:9\r\n• KVM support\r\n• DisplayHDR 400', '1770970150_1.jpg', 4, '2026-02-13 08:09:10'),
 (39, 'MSI G32C4X - 31.5 Inch VA FHD 250Hz', '7950.00', 14, '• Color gamut : 114% sRGB, 91% DCI-P3\r\n• Color Support : 1.07 Billion\r\n• Response Time : 1 ms(MPRT)\r\n• Brightness : 300 Nits\r\n• Aspect Ratio : 16:9', '1770970173_1.jpg', 4, '2026-02-13 08:09:33'),
 (40, 'Lg Ultragear 27Gs85Q-B - 27 Inch Nano Ips 2K 180Hz-200Hz', '10900.00', 14, '• 27\"\r\n• Nano IPS panel\r\n• 2560 x 1440 180Hz-200Hz (OC) 1ms\r\n• 1.07 billion colors\r\n• 2 x HDMI\r\n• 1 x DP\r\n• AMD FreeSync\r\n• Nvidia G-Sync Compatible\r\n• Height, Pivot, Tilt adjustable\r\n• VESA mount 100 x 100 mm', '1770970205_1.jpg', 4, '2026-02-13 08:10:05'),
@@ -272,10 +329,10 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (46, 'RAZER WOLVERINE V2 PRO PS (BLACK)', '8990.00', 15, '• Razer™ HyperSpeed Wireless\r\n• Razer™ Mecha-Tactile Action Buttons\r\n• 8-Way Microswitch D-Pad', '1770970621_1.jpg', 5, '2026-02-13 08:17:01'),
 (47, 'RAZER WOLVERINE V2 PRO PS (WHITE)', '9990.00', 14, '• Razer™ HyperSpeed Wireless\r\n• Razer™ Mecha-Tactile Action Buttons\r\n• 8-Way Microswitch D-Pad', '1770970649_1.jpg', 5, '2026-02-13 08:17:29'),
 (48, 'FANTECH EOS PRO MULTI-PLATFORM GAMEPAD (WHITE) (WGP-15)', '1390.00', 14, '• รองรับ PC, PS, Android, IOS, MacOS, TvOS, SWITCH, CLOUD GAMING/GAMEPASS, TESLA VEHICLES\r\n• อุปกรณ์รองรับถึงแค่ ps3', '1770970673_1.jpg', 5, '2026-02-13 08:17:53'),
-(49, 'REDRAGON HARROW PRO G808', '990.00', 14, '• PC with Windows XP or higher and Android\r\n• Compatible with Xinput and Dinput for enhanced gaming compatibility', '1770970698_1.jpg', 5, '2026-02-13 08:18:13'),
+(49, 'REDRAGON HARROW PRO G808', '990.00', 13, '• PC with Windows XP or higher and Android\r\n• Compatible with Xinput and Dinput for enhanced gaming compatibility', '1770970698_1.jpg', 5, '2026-02-13 08:18:13'),
 (50, 'ONIKUMA IRUKA TRI-MODE GAMING WIRELESS (WHITE)', '690.00', 20, '• รองรับ 2.4 GHz / Bluetooth / Type-C Cable\r\n• ปุ่ม Full Hall Trigger ควบคุมแม่นยำยิ่งขึ้น\r\n• มีปุ่ม Macro ด้านหลัง 2 ปุ่ม MR / ML สามารถปรับแต่งได้\r\n• มีระบบสั่นในด้ามจับจอยทั้ง 2 ข้าง ปรับความแรงได้\r\n• รองรับ 6-Axis Gyroscope\r\n• มีเอฟเฟกต์แสงไฟ RGB ปรับได้\r\n• แบบเตอรี่ 800 mAh เล่นได้ประมาณ 16 ชั่วโมง\r\n• มีฟังก์ชัน Turbo Rapid Fire\r\n• รองรับการใช้งาน Switch / iOS / Android / PC Steam', '1770970722_1.jpg', 5, '2026-02-13 08:18:42'),
 (51, 'HYTE THICC Q60 (WHITE)', '9990.00', 14, '• Intel Socket LGA 1700, 1200, 115x, 1151, 1150, 1155, 1156, 2011, 2066\r\n• AMD Socket AM5, AM4, TR4\r\n• 5” 720 x 1280 60Hz Ultraslim IPS Display', '1770970785_1.jpg', 6, '2026-02-13 08:19:45'),
-(52, 'THERMALRIGHT FROZEN WARFRAME 240 BLACK ARGB', '3990.00', 14, '• Intel Socket LGA 1700, 1200, 115x, 2011, 2066\r\n• AMD Socket AM5, AM4', '1770970810_1.jpg', 6, '2026-02-13 08:20:10'),
+(52, 'THERMALRIGHT FROZEN WARFRAME 240 BLACK ARGB', '3990.00', 13, '• Intel Socket LGA 1700, 1200, 115x, 2011, 2066\r\n• AMD Socket AM5, AM4', '1770970810_1.jpg', 6, '2026-02-13 08:20:10'),
 (53, 'CORSAIR NAUTILUS 360 RS ARGB (BLACK)', '3890.00', 15, '• Intel Socket LGA 1851, 1700\r\n• AMD Socket AM5, AM4\r\n• Asus Aura Sync, MSI Mystic Light RGB, Asrock Polychrome RGB, Gigabyte RGB Fusion', '1770970843_1.jpg', 6, '2026-02-13 08:20:43'),
 (54, 'ASUS PRIME LC 360 ARGB (BLACK)', '3290.00', 13, '• Intel Socket LGA 1851, 1700, 1200, 115x\r\n• AMD Socket AM5, AM4', '1770970874_1.jpg', 6, '2026-02-13 08:21:14'),
 (55, 'MSI MAG CORELIQUID A13 240 (BLACK)', '2290.00', 14, '• Intel Socket LGA 1851, 1700\r\n• AMD Socket AM5, AM4\r\n• MSI Mystic Light RGB', '1770970925_1.jpg', 6, '2026-02-13 08:22:05'),
@@ -289,7 +346,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (63, 'INTEL CORE I5-12400F 2.5 GHz', '5290.00', 14, '• 6 (6P) Cores\r\n• 12 Threads\r\n• Discrete Graphics Required, No Integrated Graphics\r\n• PCIe 5.0 and 4.0', '1770971336_1.jpg', 7, '2026-02-13 08:28:56'),
 (64, 'INTEL CORE I5-14400F - 10C 16T 1.8-4.7GHz', '5790.00', 15, '• 10 (6P+4E) Cores\r\n• 16 Threads\r\n• No integrated graphics, discrete graphics required\r\n• PCIe 5.0 and 4.0\r\n• Compatible with H610, B660, B760, H670, H770, Z690, Z790 chipset', '1770971365_1.jpg', 7, '2026-02-13 08:29:25'),
 (65, 'INTEL CORE I9-14900K - 24C 32T 2.4-6.0GHz', '17400.00', 15, '• 24 (8P+16E) Cores\r\n• 32 Threads\r\n• CPU cooler NOT included\r\n• Intel UHD graphics 770\r\n• PCIe 5.0 and 4.0\r\n• Compatible with H610, B660, B760, H670, H770, Z690, Z790 chipset', '1770971393_1.webp', 7, '2026-02-13 08:29:53'),
-(66, 'AMD RYZEN 7 9800X3D - 8C 16T 4.7-5.2GHz', '17990.00', 13, '• 8 Cores\r\n• 16 Threads\r\n• CPU cooler NOT included\r\n• AMD Radeon Graphics\r\n• PCIe 5.0\r\n• Compatible with A620, B650, B650E, B840, B850, X670, X670E, X870, X870E chipset', '1770971442_1.jpg', 7, '2026-02-13 08:30:30'),
+(66, 'AMD RYZEN 7 9800X3D - 8C 16T 4.7-5.2GHz', '17990.00', 11, '• 8 Cores\r\n• 16 Threads\r\n• CPU cooler NOT included\r\n• AMD Radeon Graphics\r\n• PCIe 5.0\r\n• Compatible with A620, B650, B650E, B840, B850, X670, X670E, X870, X870E chipset', '1770971442_1.jpg', 7, '2026-02-13 08:30:30'),
 (67, 'AMD RYZEN 5 5600X 3.7 GHz', '4190.00', 21, '• 6 Cores\r\n• 12 Threads\r\n• Discrete Graphics Required, No Integrated Graphics\r\n• PCIe 4.0', '1770971469_1.jpg', 7, '2026-02-13 08:31:09'),
 (68, 'AMD RYZEN 7 7800X3D 4.2 GHz', '15190.00', 14, '• 8 Cores\r\n• 16 Threads\r\n• CPU Cooler NOT Included\r\n• AMD Radeon Graphics\r\n• PCIe 5.0\r\n• Compatible with B650, B650E, X670, X670E Chipset', '1770971515_1.jpg', 7, '2026-02-13 08:31:55'),
 (69, 'AMD RYZEN 5 5600G 3.9 GHz', '3990.00', 14, '• 6 Cores\r\n• 12 Threads\r\n• AMD Radeon Graphics\r\n• PCIe 3.0', '1770971541_1.jpg', 7, '2026-02-13 08:32:21'),
@@ -348,7 +405,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (122, 'LOGITECH BRIO 4K HD RIGHT LIGHT', '6900.00', 12, '4K Ultra HD 1080p Full HD', '1771242997_1.jpg', 13, '2026-02-16 11:56:37'),
 (123, 'LOGITECH QCAM & MONO C270', '650.00', 12, '3 MP HD', '1771243080_1.jpg', 13, '2026-02-16 11:58:00'),
 (124, 'AVERMEDIA PW313 LIVE STREAMER CAM', '1690.00', 12, '1080p FHD video recording', '1771243164_1.jpg', 13, '2026-02-16 11:59:24'),
-(125, 'NUBWO NWC-500 (2K)', '490.00', 16, '• 5 Megapixel\r\n• 2K (2560 x 1440) AF 30F/S\r\n• Auto focus\r\n• Dual microphone\r\n• Privacy cover\r\n• Micro USB 2.0 Connection\r\n• Support Android / Xbox one / Windows / Linux / MacOS / Ubuntu', '1771243222_1.jpg', 13, '2026-02-16 12:00:22'),
+(125, 'NUBWO NWC-500 (2K)', '490.00', 15, '• 5 Megapixel\r\n• 2K (2560 x 1440) AF 30F/S\r\n• Auto focus\r\n• Dual microphone\r\n• Privacy cover\r\n• Micro USB 2.0 Connection\r\n• Support Android / Xbox one / Windows / Linux / MacOS / Ubuntu', '1771243222_1.jpg', 13, '2026-02-16 12:00:22'),
 (126, 'LOGITECH C930E BUSINESS WEBCAM', '4190.00', 16, 'Designed for business, a 1080p webcam with wide field of view and digital zoom.', '1771243363_1.jpg', 13, '2026-02-16 12:02:43'),
 (127, 'RAPOO C260 FULL HD', '990.00', 17, 'Full HD 1080P', '1771243436_1.jpg', 13, '2026-02-16 12:03:56'),
 (128, 'LOGITECH BRIO100', '990.00', 12, 'เว็บแคม Full HD 1080p พร้อมระบบปรับสมดุลแสงอัตโนมัติ, ฉากปิดเลนส์ในตัวเพื่อความเป็นส่วนตัว และไมค์ในตัว', '1771243527_1.jpg', 13, '2026-02-16 12:05:27'),
@@ -371,13 +428,13 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (145, 'SSD KINGSTON FURY RENEGADE 1 TB  PCIe 4x4/NVMe M.2 2280 (SFYRS/1000G)', '3990.00', 14, '• 1 TB\r\n• Sequential Read (up to) 7,300 MB/s\r\n• Sequential Write (up to) 6,000 MB/s\r\n• PCIe Gen 4 x 4', '1771246155_1.jpg', 15, '2026-02-16 12:49:15'),
 (146, 'SSD WD BLUE SA510 1 TB 2.5 INCH SATA3', '4150.00', 16, '• 1 TB\r\n• Up to 560 MB/s Read Speed\r\n• Up to 520 MB/s Write Speed\r\n• SATA 3 (6Gb/s)', '1771246217_1.jpg', 15, '2026-02-16 12:50:17'),
 (147, 'SSD SAMSUNG 870 EVO 2 TB 2.5 INCH SATA3', '8490.00', 7, '• 2 TB\r\n• Up to 560 MB/s Sequential Read Speed\r\n• Up to 530 MB/s Sequential Write Speed', '1771246405_1.jpg', 15, '2026-02-16 12:53:25'),
-(148, 'HDD WD BLUE 4 TB 5400RPM SATA3', '4290.00', 7, '• 4 TB\r\n• 256 MB Cache\r\n• 5400 RPM\r\n• SATA 3\r\n• Desktop Hard Drive\r\n• CMR Technology', '1771246545_1.jpg', 15, '2026-02-16 12:55:45'),
+(148, 'HDD WD BLUE 4 TB 5400RPM SATA3', '4290.00', 6, '• 4 TB\r\n• 256 MB Cache\r\n• 5400 RPM\r\n• SATA 3\r\n• Desktop Hard Drive\r\n• CMR Technology', '1771246545_1.jpg', 15, '2026-02-16 12:55:45'),
 (149, 'HDD SEAGATE IRONWOLF 12 TB 7200RPM SATA3', '12100.00', 14, '• 12 TB\r\n• 256 MB Cache\r\n• 7200 RPM\r\n• SATA 3\r\n• NAS Hard Drive', '1771246650_1.jpg', 15, '2026-02-16 12:57:30'),
 (150, 'HDD SEAGATE IRONWOLF 4 TB 5400RPM SATA3', '3890.00', 7, '• 4 TB\r\n• 256 MB Cache\r\n• 5400 RPM\r\n• SATA 3\r\n• NAS Hard Drive\r\n• CMR Technology', '1771246793_1.jpg', 15, '2026-02-16 12:59:53'),
 (151, 'ASROCK B450M STEEL LEGEND - AMD SOCKET AM4 DDR4 MICRO-ATX', '2790.00', 14, '• Socket AM4 for AMD Ryzen 2000, 3000, 4000 G, 5000 & 5000 G-Series Processors\r\n• AMD B450\r\n• DDR4, 4 x DIMM\r\n• 1 x DP\r\n• 1 x HDMI\r\n• 2 x M.2 Sockets\r\n• 4 x SATA3 Connectors\r\n• 1 x USB 3.2 Gen1 Type-A Header (front)\r\n• 1 x USB 3.2 Gen2 Type-C (rear)\r\n• 1 x USB 3.2 Gen2 Type-A (rear)\r\n• 1 x PS/2\r\n• 1 Gigabit LAN', '1771255671_1.jpg', 16, '2026-02-16 15:27:51'),
 (152, 'MSI PRO B760M-P - INTEL SOCKET 1700 DDR5 MICRO-ATX', '2390.00', 8, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• 4 DIMMs, DDR 5\r\n• 1 x PCIe 4.0 x 16 slot\r\n• 1 x HDMI, 1 x DisplayPort, 1 x D-Sub (VGA)\r\n• 2 x M.2 Gen 4 x 4 slots & 4 x SATA 3\r\n• 1 x USB 3.2 Gen 1 Type-A front panel connector\r\n• 1 x USB 3.2 Gen 2 Type-C\r\n• 1 Gigabit LAN', '1771255813_1.jpg', 16, '2026-02-16 15:30:13'),
 (153, 'ASUS PRIME B760M-A WIFI (DDR5) (SOCKET LGA 1700) (MICRO-ATX)', '4090.00', 9, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• CPU with base power greater than 125W is not supported\r\n• 4 x DIMM, DDR5\r\n• 1 x DisplayPort\r\n• 2 x HDMI\r\n• 2 x M.2 slots & 4x SATA 3\r\n• 1 x USB 3.2 Gen 1 Type-C front panel connector\r\n• 2 x USB 3.2 Gen 2 Type-A\r\n• 1 x PS/2\r\n• 2.5Gb Ethernet, Wi-Fi 6, Bluetooth v5.2\r\n• Aura Sync RGB header', '1771255891_1.jpg', 16, '2026-02-16 15:31:31'),
-(154, 'MSI B760M GAMING PLUS WIFI - INTEL SOCKET 1700 DDR5 MICRO-ATX', '3860.00', 5, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• Intel B760\r\n• DDR5, 4 x DIMM\r\n• 2 x DP\r\n• 2 x HDMI\r\n• 2 x M.2 slots\r\n• 4 x SATA 6Gb/s ports\r\n• 1 x USB 3.2 Gen 1 Type-C connector (front)\r\n• 2 x USB 3.2 Gen 2 Type-A (rear)\r\n• 2 x USB 3.2 Gen 1 Type-A (rear)\r\n• 1 x PS/2\r\n• 2.5Gbps LAN\r\n• Intel Wi-Fi 6E\r\n• Bluetooth 5.3', '1771255950_1.jpg', 16, '2026-02-16 15:32:30'),
+(154, 'MSI B760M GAMING PLUS WIFI - INTEL SOCKET 1700 DDR5 MICRO-ATX', '3860.00', 4, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• Intel B760\r\n• DDR5, 4 x DIMM\r\n• 2 x DP\r\n• 2 x HDMI\r\n• 2 x M.2 slots\r\n• 4 x SATA 6Gb/s ports\r\n• 1 x USB 3.2 Gen 1 Type-C connector (front)\r\n• 2 x USB 3.2 Gen 2 Type-A (rear)\r\n• 2 x USB 3.2 Gen 1 Type-A (rear)\r\n• 1 x PS/2\r\n• 2.5Gbps LAN\r\n• Intel Wi-Fi 6E\r\n• Bluetooth 5.3', '1771255950_1.jpg', 16, '2026-02-16 15:32:30'),
 (155, 'ASUS TUF GAMING B760M-PLUS WIFI II - INTEL SOCKET 1700 DDR5 MICRO-ATX', '4950.00', 16, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• Intel B760\r\n• DDR5, 4 x DIMM\r\n• 1 x DP\r\n• 1 x HDMI\r\n• 3 x M.2 slots\r\n• 4 x SATA 6Gb/s ports\r\n• 1 x USB Type-C 10Gbps connector (front)\r\n• 1 x USB Type-C 20Gbps (rear)\r\n• 1 x USB Type-A 10Gbps (rear)\r\n• 2.5Gb Ethernet\r\n• Wi-Fi 6E\r\n• Bluetooth v5.3', '1771256131_1.jpg', 16, '2026-02-16 15:35:31'),
 (156, 'GIGABYTE B760M GAMING X DDR4 (REV. 1.0) (SOCKET LGA 1700) (MICRO-ATX)', '4190.00', 15, '• Socket LGA1700 for Intel 12th, 13th & 14th Gen Processors\r\n• DDR4 4 DIMMs\r\n• 2 PCIe 4.0 x4 M.2 Connectors\r\n• 2.5GbE LAN\r\n• Front USB-C 10Gb/s, DP, HDMI', '1771256270_1.jpg', 16, '2026-02-16 15:37:50'),
 (157, 'ASROCK B550M STEEL LEGEND - SOCKET AM4 DDR4 MICRO-ATX', '3890.00', 14, '• Supports AMD AM4 Socket Ryzen 3000, 3000 G, 4000 G, 5000 & 5000 G-Series Processors*\r\n• AMD B550\r\n• DDR4, 4 x DIMM\r\n• 1 x DisplayPort\r\n• 1 x HDMI\r\n• 2 x M.2 socket\r\n• 6 x SATA 3 connectors\r\n• 2 x USB 3.2 Gen2 (Rear Type A+C)\r\n• 8 x USB 3.2 Gen1 (4 Front, 4 Rear)\r\n• AMD CrossFireX\r\n• Dragon 2.5G LAN\r\n• *Not compatible with AMD Athlon Processors.', '1771256465_1.jpg', 16, '2026-02-16 15:41:05'),
@@ -387,7 +444,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (161, 'ANTEC ATOM V550 - 550W BLACK ATX', '990.00', 15, '• 550 Watt\r\n• NON Modular\r\n• ATX', '1771257519_1.jpg', 17, '2026-02-16 15:58:39'),
 (162, 'AEROCOOL AE-650W - 650W 80 PLUS BLACK ATX', '1390.00', 25, '• 650 Watt\r\n• 80 Plus\r\n• NON Modular\r\n• ATX', '1771257651_1.jpg', 17, '2026-02-16 16:00:51'),
 (163, 'THERMALTAKE SMART BX1 750W - 750W 80 PLUS BRONZE (BLACK) (ATX)', '1990.00', 12, '• 750 Watt\r\n• 80 Plus Bronze', '1771257716_1.jpg', 17, '2026-02-16 16:01:56'),
-(164, 'SILVERSTONE STRIDER ESSENTIAL 500W 80 PLUS BLACK ATX (SST-ST50F-ES230)', '1390.00', 17, '• 500 Watt\r\n• 80 Plus', '1771257786_1.jpg', 17, '2026-02-16 16:03:06'),
+(164, 'SILVERSTONE STRIDER ESSENTIAL 500W 80 PLUS BLACK ATX (SST-ST50F-ES230)', '1390.00', 16, '• 500 Watt\r\n• 80 Plus', '1771257786_1.jpg', 17, '2026-02-16 16:03:06'),
 (165, 'ASUS TUF GAMING 650B - 650W 80 PLUS BRONZE (BLACK) (ATX)', '2490.00', 12, '• Capacitors and chokes pass demanding tests to achieve Military-grade Certification.\r\n• Dual ball fan bearings can last up to twice as long as sleeve bearing designs.\r\n• A protective PCB coating protects against moisture, dust, and extreme temperatures.\r\n• An 80 Plus Bronze Certification is earned with high-quality components that pass rigorous testing.\r\n• Axial-tech fan design features a smaller fan hub that facilitates longer blades and a barrier ring that increases downward air pressure.\r\n• 0dB technology lets you enjoy light gaming in relative silence.\r\n• Sleeved cables leave your rig looking tactically clean.\r\n• 80cm 8-pin CPU connector (EPS 12V)', '1771257924_1.jpg', 17, '2026-02-16 16:05:24'),
 (166, 'ASUS ROG-THOR-1600T-GAMING - 1600W 80 PLUS TITANIUM BLACK-SILVER ATX', '21900.00', 12, '• 1600 Watt\r\n• 80 Plus Titanium\r\n• Fully Modular\r\n• ATX\r\n• Aura Sync RGB\r\n• OLED Display\r\n• PCIe 5.0 12VHPWR (16 Pin) Connector', '1771258044_1.jpg', 17, '2026-02-16 16:07:24'),
 (167, 'GAMDIAS AURA GP550 - 550W BLACK ATX', '990.00', 12, '• 550 Watt\r\n• NON Modular\r\n• ATX', '1771258231_1.jpg', 17, '2026-02-16 16:10:31'),
@@ -398,10 +455,10 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (172, 'RAZER GOLIATHUS CHROMA', '1290.00', 15, 'DIMENSION 355 X 255 X 3 MM', '1771261365_1.jpg', 18, '2026-02-16 17:02:45'),
 (173, 'SIGNO MT-310 CORVUS', '100.00', 11, '• Speed Edition\r\n• Medium Size 320 x 240 x 4 mm', '1771261558_1.jpg', 18, '2026-02-16 17:05:58'),
 (174, 'RAZER GIGANTUS V2 LARGE', '590.00', 17, 'Dimension 450 x 400 x 3 mm', '1771261648_1.jpg', 18, '2026-02-16 17:07:28'),
-(175, 'SIGNO MT-300', '50.00', 16, 'Dimension 270 x 230 x 3 mm', '1771261763_1.jpg', 18, '2026-02-16 17:08:59'),
+(175, 'SIGNO MT-300', '50.00', 13, 'Dimension 270 x 230 x 3 mm', '1771261763_1.jpg', 18, '2026-02-16 17:08:59'),
 (176, 'SIGNO MT-309', '170.00', 21, 'Dimension 770 x 295 x 3 mm', '1771261846_1.jpg', 18, '2026-02-16 17:10:46'),
 (177, 'NUBWO NP021', '120.00', 12, 'Dimension 780 x 300 x 3 mm', '1771261942_1.jpg', 18, '2026-02-16 17:12:22'),
-(178, 'NUBWO NP020', '120.00', 9, 'Dimension 780 x 300 x 3 mm', '1771262046_1.jpg', 18, '2026-02-16 17:14:06'),
+(178, 'NUBWO NP020', '120.00', 8, 'Dimension 780 x 300 x 3 mm', '1771262046_1.jpg', 18, '2026-02-16 17:14:06'),
 (179, 'NUBWO GALAXY X93 RGB', '350.00', 15, 'Dimension 800 x 300 x 4 mm', '1771262108_1.jpg', 18, '2026-02-16 17:15:08'),
 (180, 'ONIKUMA G6 RGB', '490.00', 16, '• 800 x 300 x 4 mm\r\n• Speed Surafce\r\n• RGB', '1771262211_1.jpg', 18, '2026-02-16 17:16:51'),
 (181, 'UGREEN USB 2.0 TO EXTERNAL SOUND ADAPTER 0.3 METER', '310.00', 12, 'USB Type A to Audio ports', '1771263280_1.jpg', 19, '2026-02-16 17:34:40'),
@@ -421,9 +478,9 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (195, 'MONTECH X2 MESH (WHITE) (ATX)', '1350.00', 7, '• MB Support : ATX, Micro-ATX, Mini-DTX, Mini-ITX\r\n• Max. CPU cooler height : 165 mm\r\n• Max. GPU length : 305 mm\r\n• Compatible PSU : ATX\r\n• Expansion slots : 7\r\n• 3.5\" / 2.5\" combo bay x 1\r\n• 3.5\" bay x 1\r\n• 2.5\" bay x 2', '1771264111_1.jpg', 20, '2026-02-16 17:48:31'),
 (196, 'ASUS ROG HYPERION GR701 (BLACK) (E-ATX)', '15900.00', 12, '• Maximum CPU Cooler Height : 190 mm\r\n• 3.5\" / 2.5\" Combo Bay x 2\r\n• 2.5\" Bay x 5\r\n• Aura Sync ARGB', '1771264164_1.jpg', 20, '2026-02-16 17:49:24'),
 (197, 'DEEPCOOL MACUBE 110 (BLACK)', '1590.00', 15, '• Dimension : 400 x 225 x 431 mm\r\n• Maximum CPU Cooler Height : 165 mm\r\n• 3.5\" Bay x 2\r\n• 2.5\" Bay x 2\r\n• 5.25\" Bay x -', '1771264203_1.jpg', 20, '2026-02-16 17:50:03'),
-(198, 'AEROCOOL CS-107 (BLACK) (MICRO-ATX)', '990.00', 11, '• Mainboard Support : Micro-ATX, Mini-DTX, Mini-ITX\r\n• Max. CPU Cooler Height : 157 mm\r\n• Max. GPU Length : 286 mm\r\n• Max. PSU Length : 159 mm\r\n• Compatible PSU : ATX\r\n• Expansion Slots : 4\r\n• 3.5\" Bay x 1\r\n• 2.5\" Bay x 2', '1771264247_1.jpg', 20, '2026-02-16 17:50:14'),
-(199, 'MONTECH X3 MESH (BLACK)', '1690.00', 16, '• Dimension : 370 x 210 x 480 mm\r\n• Maximum CPU Cooler Height : 160 mm\r\n• 3.5\" Bay x 2\r\n• 2.5\" Bay x 2', '1771264291_1.jpg', 20, '2026-02-16 17:51:31'),
-(200, 'COOLER MASTER TD300 MESH (BLACK) (MICRO-ATX)', '2190.00', 15, '• Dimension : 367 x 210 x 410 mm\r\n• Maximum CPU Cooler Height : 166 mm\r\n• 3.5\" & 2.5\" Combo Bay x 2\r\n• 2.5\" Bay x 2\r\n• 2 Years warranty for electrical components, e.g. USB port / audio port / switch\r\n• 1 Year warranty for case fan\r\n• รับประกัน 2 ปีสำหรับอุปกรณ์ไฟฟ้า เช่น พอร์ต USB / พอร์ตเสียง / สวิตช์\r\n• รับประกัน 1 ปีสำหรับพัดลมเคส', '1771264456_1.jpg', 20, '2026-02-16 17:52:11');
+(198, 'AEROCOOL CS-107 (BLACK) (MICRO-ATX)', '990.00', 9, '• Mainboard Support : Micro-ATX, Mini-DTX, Mini-ITX\r\n• Max. CPU Cooler Height : 157 mm\r\n• Max. GPU Length : 286 mm\r\n• Max. PSU Length : 159 mm\r\n• Compatible PSU : ATX\r\n• Expansion Slots : 4\r\n• 3.5\" Bay x 1\r\n• 2.5\" Bay x 2', '1771264247_1.jpg', 20, '2026-02-16 17:50:14'),
+(199, 'MONTECH X3 MESH (BLACK)', '1690.00', 14, '• Dimension : 370 x 210 x 480 mm\r\n• Maximum CPU Cooler Height : 160 mm\r\n• 3.5\" Bay x 2\r\n• 2.5\" Bay x 2', '1771264291_1.jpg', 20, '2026-02-16 17:51:31'),
+(200, 'COOLER MASTER TD300 MESH (BLACK) (MICRO-ATX)', '2190.00', 14, '• Dimension : 367 x 210 x 410 mm\r\n• Maximum CPU Cooler Height : 166 mm\r\n• 3.5\" & 2.5\" Combo Bay x 2\r\n• 2.5\" Bay x 2\r\n• 2 Years warranty for electrical components, e.g. USB port / audio port / switch\r\n• 1 Year warranty for case fan\r\n• รับประกัน 2 ปีสำหรับอุปกรณ์ไฟฟ้า เช่น พอร์ต USB / พอร์ตเสียง / สวิตช์\r\n• รับประกัน 1 ปีสำหรับพัดลมเคส', '1771264456_1.jpg', 20, '2026-02-16 17:52:11');
 
 --
 -- Indexes for dumped tables
@@ -490,19 +547,19 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `product`
