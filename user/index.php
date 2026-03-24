@@ -212,23 +212,23 @@ if (empty($search) && empty($cat_id)) {
           foreach ($grouped as $catName => $products):
         ?>
           <h5 class="category-header"><?= htmlspecialchars($catName) ?></h5>
-          <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-  <?php foreach ($searchResults as $p): 
-    $img = "../admin/uploads/" . $p['p_image'];
-    if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
-  ?>
-    <div class="col mb-3">
-      <div class="product-card card h-100 shadow-sm">
-        <img src="<?= $img ?>" class="card-img-top" alt="<?= htmlspecialchars($p['p_name']) ?>">
-        <div class="card-body p-2 p-md-3 text-center d-flex flex-column">
-          <h6 class="text-truncate" style="max-width: 100%;"><?= htmlspecialchars($p['p_name']) ?></h6>
-          <p class="fw-bold text-danger mb-2 mt-auto"><?= number_format($p['p_price'], 2) ?> บาท</p>
-          <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-danger btn-sm w-100">รายละเอียด</a>
-        </div>
-      </div>
-    </div>
-  <?php endforeach; ?>
-</div>
+          <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mt-1">
+            <?php foreach ($products as $p):
+              $img = "../admin/uploads/" . $p['p_image'];
+              if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
+            ?>
+              <div class="col">
+                <div class="product-card card">
+                  <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
+                  <div class="card-body text-center d-flex flex-column">
+                    <h6 class="text-truncate mb-2"><?= htmlspecialchars($p['p_name']) ?></h6>
+                    <p class="fw-bold text-danger mb-2 mt-auto"><?= number_format($p['p_price'], 2) ?>.-</p>
+                    <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-sm btn-danger w-100 mt-auto">ดูรายละเอียด</a>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
         <?php endforeach; ?>
       <?php else: ?>
         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
