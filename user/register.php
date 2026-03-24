@@ -61,166 +61,230 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html lang="th">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>สมัครสมาชิก | MyCommiss</title>
   <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  
   <style>
     body {
-      background-color: #ffffff;
-      font-family: "Prompt", sans-serif;
-      color: #212529;
+        background-color: #f8f9fa;
+        font-family: "Prompt", sans-serif;
+        color: #333;
     }
 
-    /* 🔹 Card */
-    .card {
-      border: none;
-      border-radius: 12px;
-    }
-    .card-header {
-      background-color: #D10024;
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.2rem;
-      letter-spacing: 0.5px;
+    /* 🔹 การจัดวางให้กล่องอยู่กึ่งกลาง */
+    .register-wrapper {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
 
-    /* 🔹 Buttons */
+    .register-container {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+
+    /* 🔹 การ์ดสมัครสมาชิก */
+    .card-register {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        width: 100%;
+        max-width: 600px;
+        background: #fff;
+        padding: 40px 30px;
+    }
+
+    .brand-logo {
+        height: 60px;
+        margin-bottom: 15px;
+    }
+
+    /* 🔹 Input Field */
+    .form-control {
+        border-radius: 0 10px 10px 0;
+        padding: 10px 15px;
+        background-color: #fcfcfc;
+        border: 1px solid #e0e0e0;
+    }
+    .form-control:focus {
+        border-color: #D10024;
+        box-shadow: 0 0 0 0.2rem rgba(209, 0, 36, 0.15);
+        background-color: #fff;
+        z-index: 1;
+    }
+    .input-group-text {
+        border-radius: 10px 0 0 10px;
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-right: none;
+    }
+
+    /* 🔹 ปุ่ม */
     .btn-primary {
-      background-color: #D10024;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
+        background-color: #D10024;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 12px;
+        transition: 0.3s;
     }
     .btn-primary:hover {
-      background-color: #a5001b;
-    }
-    .btn-secondary {
-      border-radius: 8px;
-    }
-
-    /* 🔹 Toast */
-    .toast-success {
-      background-color: #28a745 !important;
-    }
-    .toast-danger {
-      background-color: #dc3545 !important;
+        background-color: #a5001b;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(209, 0, 36, 0.2);
     }
 
-    /* 🔹 Links */
-    a {
-      color: #D10024;
-      text-decoration: none;
-    }
-    a:hover {
-      color: #a5001b;
-      text-decoration: underline;
+    /* 🔹 ลิงก์ */
+    a { color: #D10024; text-decoration: none; font-weight: 500; transition: 0.2s; }
+    a:hover { color: #a5001b; text-decoration: underline; }
+
+    .btn-outline-secondary {
+        border-radius: 50px;
+        padding: 8px 20px;
+        font-weight: 500;
     }
 
+    /* 🔹 Checkbox Style */
+    .form-check-input:checked {
+        background-color: #D10024;
+        border-color: #D10024;
+    }
+
+    /* 🔹 Footer */
     footer {
-      background-color: #D10024;
-      color: #fff;
-      margin-top: 60px;
-      padding: 15px;
-      font-size: 0.9rem;
+        background-color: #fff;
+        color: #6c757d;
+        padding: 20px;
+        font-size: 0.9rem;
+        border-top: 1px solid #eee;
     }
   </style>
 </head>
 <body>
 
-<!-- 🔔 Toast แจ้งเตือน -->
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:3000;">
-  <?php if (isset($_SESSION['toast_success'])): ?>
-    <div class="toast align-items-center text-bg-success border-0 show" role="alert">
-      <div class="d-flex">
-        <div class="toast-body"><?= $_SESSION['toast_success'] ?></div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+<div class="register-wrapper">
+  <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 3000;">
+    <?php if (isset($_SESSION['toast_success'])): ?>
+      <div class="toast align-items-center text-bg-success border-0 show shadow-lg" role="alert">
+        <div class="d-flex">
+          <div class="toast-body fs-6 fw-medium px-3 py-2"><?= $_SESSION['toast_success'] ?></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
       </div>
-    </div>
-    <?php unset($_SESSION['toast_success']); ?>
-  <?php endif; ?>
+      <?php unset($_SESSION['toast_success']); ?>
+    <?php endif; ?>
 
-  <?php if (isset($_SESSION['toast_error'])): ?>
-    <div class="toast align-items-center text-bg-danger border-0 show" role="alert">
-      <div class="d-flex">
-        <div class="toast-body"><?= $_SESSION['toast_error'] ?></div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    <?php if (isset($_SESSION['toast_error'])): ?>
+      <div class="toast align-items-center text-bg-danger border-0 show shadow-lg" role="alert">
+        <div class="d-flex">
+          <div class="toast-body fs-6 fw-medium px-3 py-2"><?= $_SESSION['toast_error'] ?></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
       </div>
-    </div>
-    <?php unset($_SESSION['toast_error']); ?>
-  <?php endif; ?>
-</div>
+      <?php unset($_SESSION['toast_error']); ?>
+    <?php endif; ?>
+  </div>
 
-<!-- 🔹 Register Form -->
-<div class="container mt-5" style="max-width:600px;">
-  <div class="card shadow">
-    <div class="card-header text-center">สมัครสมาชิก</div>
-    <div class="card-body p-4">
+  <div class="register-container">
+    <div class="card-register">
+      <div class="text-center mb-4">
+        <img src="icon_mycommiss.png" alt="MyCommiss Logo" class="brand-logo">
+        <h4 class="fw-bold" style="color: #D10024;">สมัครสมาชิก</h4>
+        <p class="text-muted small">สร้างบัญชีเพื่อเริ่มต้นช้อปปิ้งกับเรา</p>
+      </div>
+
       <form method="post">
         <div class="mb-3">
-          <label class="form-label fw-semibold">ชื่อ-นามสกุล</label>
-          <input type="text" name="name" class="form-control" required>
+          <label class="form-label fw-semibold text-secondary">ชื่อ-นามสกุล</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person text-muted"></i></span>
+            <input type="text" name="name" class="form-control" placeholder="ชื่อ นามสกุล" required>
+          </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label fw-semibold">อีเมล</label>
-          <input type="email" name="email" class="form-control" required>
+          <label class="form-label fw-semibold text-secondary">อีเมล</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-envelope text-muted"></i></span>
+            <input type="email" name="email" class="form-control" placeholder="example@email.com" required>
+          </div>
         </div>
 
         <div class="row">
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-semibold">รหัสผ่าน</label>
-            <input type="password" name="password" class="form-control" required>
+            <label class="form-label fw-semibold text-secondary">รหัสผ่าน</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock text-muted"></i></span>
+              <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
           </div>
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-semibold">ยืนยันรหัสผ่าน</label>
-            <input type="password" name="confirm" class="form-control" required>
+            <label class="form-label fw-semibold text-secondary">ยืนยันรหัสผ่าน</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-shield-lock text-muted"></i></span>
+              <input type="password" name="confirm" class="form-control" placeholder="••••••••" required>
+            </div>
           </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label fw-semibold">เบอร์โทรศัพท์</label>
-          <input type="text" name="phone" class="form-control" maxlength="10"
-                 pattern="^[0-9]{10}$" title="กรุณากรอกเฉพาะตัวเลข 10 หลัก" required
-                 oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+          <label class="form-label fw-semibold text-secondary">เบอร์โทรศัพท์</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-telephone text-muted"></i></span>
+            <input type="text" name="phone" class="form-control" placeholder="08XXXXXXXX" maxlength="10"
+                   pattern="^[0-9]{10}$" title="กรุณากรอกเฉพาะตัวเลข 10 หลัก" required
+                   oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+          </div>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-semibold">ที่อยู่</label>
-          <textarea name="address" class="form-control" rows="3"></textarea>
+        <div class="mb-4">
+          <label class="form-label fw-semibold text-secondary">ที่อยู่จัดส่ง</label>
+          <div class="input-group">
+            <span class="input-group-text align-items-start pt-2"><i class="bi bi-house text-muted"></i></span>
+            <textarea name="address" class="form-control" rows="3" placeholder="บ้านเลขที่, ถนน, ตำบล, อำเภอ, จังหวัด, รหัสไปรษณีย์"></textarea>
+          </div>
         </div>
 
-        <!-- ✅ ช่องติกรับข่าวสาร -->
-        <div class="form-check mb-3">
+        <div class="form-check mb-4">
           <input class="form-check-input" type="checkbox" name="subscribe" id="subscribe" value="1">
-          <label class="form-check-label" for="subscribe">
+          <label class="form-check-label text-muted small" for="subscribe">
             ต้องการรับข่าวสารและโปรโมชั่นจากร้านผ่านทางอีเมล
           </label>
         </div>
 
-        <div class="d-grid">
-          <button type="submit" class="btn btn-primary">✅ สมัครสมาชิก</button>
+        <div class="d-grid mb-4">
+          <button type="submit" class="btn btn-primary fs-5">สมัครสมาชิก</button>
         </div>
       </form>
+
+      <div class="text-center">
+        <p class="mb-3 text-muted">มีบัญชีผู้ใช้งานอยู่แล้ว? <a href="login.php">เข้าสู่ระบบ</a></p>
+        <a href="index.php" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left"></i> กลับหน้าร้าน
+        </a>
+      </div>
     </div>
   </div>
 
-  <div class="text-center mt-3">
-    <a href="login.php">มีบัญชีอยู่แล้ว? เข้าสู่ระบบ</a><br>
-    <a href="index.php" class="btn btn-secondary btn-sm mt-2">⬅️ กลับหน้าหลัก</a>
-  </div>
+  <footer class="text-center">
+    © <?= date('Y') ?> MyCommiss | ระบบร้านค้าออนไลน์คอมพิวเตอร์
+  </footer>
 </div>
-
-<!-- 🔹 Footer -->
-<footer class="text-center">
-  © <?= date('Y') ?> MyCommiss | สมัครสมาชิก
-</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  // ซ่อน Toast อัตโนมัติ
   const toastElList = [].slice.call(document.querySelectorAll('.toast'));
   toastElList.forEach(toastEl => {
-    const toast = new bootstrap.Toast(toastEl, { delay: 5000, autohide: true });
+    const toast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
     toast.show();
   });
 });
