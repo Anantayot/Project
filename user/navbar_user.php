@@ -1,145 +1,146 @@
 <?php
 // ✅ ตรวจสอบ Session (ป้องกันการเรียกซ้ำ)
 if (session_status() === PHP_SESSION_NONE) {
-  session_start();
+    session_start();
 }
 ?>
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom sticky-top">
-  <div class="container">
-    <!-- 🔹 โลโก้ร้าน -->
-    <a class="navbar-brand fw-bold d-flex align-items-center" 
-   href="index.php" 
-   style="color:#D10024;">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom sticky-top" style="z-index: 1050;">
+    <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="index.php">
+            <img src="icon_mycommiss.png" alt="MyCommiss Logo" height="40" class="me-2 logo-img">
+            <span class="brand-text">MyCommiss</span>
+        </a>
 
-   <img src="icon_mycommiss.png" 
-     alt="MyCommiss Logo"
-     height="48"
-     class="me-2">
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-  <span>MyCommiss</span>
-</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center py-2 py-lg-0">
+                <li class="nav-item w-100 w-lg-auto text-center">
+                    <a href="index.php" class="nav-link px-3 <?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
+                        🏠 หน้าร้าน
+                    </a>
+                </li>
 
+                <li class="nav-item w-100 w-lg-auto text-center">
+                    <a href="cart.php" class="nav-link px-3 <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
+                        🛒 ตะกร้า
+                    </a>
+                </li>
 
-    <!-- 🔹 ปุ่มแสดงเมนูในมือถือ -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+                <?php if (isset($_SESSION['customer_id'])): ?>
+                    <li class="nav-item w-100 w-lg-auto text-center">
+                        <a href="orders.php" class="nav-link px-3 <?= basename($_SERVER['PHP_SELF']) == 'orders.php' ? 'active' : '' ?>">
+                            📦 คำสั่งซื้อ
+                        </a>
+                    </li>
 
-    <!-- 🔹 เมนูด้านขวา -->
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item">
-          <a href="index.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active fw-semibold' : '' ?>">
-            🏠 หน้าร้าน
-          </a>
-        </li>
+                    <li class="nav-item w-100 w-lg-auto text-center">
+                        <a href="profile.php" class="nav-link user-link px-3 <?= basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : '' ?>">
+                            👤 <?= htmlspecialchars($_SESSION['customer_name']) ?>
+                        </a>
+                    </li>
 
-        <li class="nav-item">
-          <a href="cart.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active fw-semibold' : '' ?>">
-            🛒 ตะกร้า
-          </a>
-        </li>
+                    <li class="nav-item w-100 w-lg-auto text-center ms-lg-2">
+                        <a href="#" class="nav-link btn-logout text-danger fw-bold px-3" onclick="confirmLogout(event)">
+                            🚪 ออกจากระบบ
+                        </a>
+                    </li>
 
-        <?php if (isset($_SESSION['customer_id'])): ?>
-          <li class="nav-item">
-            <a href="orders.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'orders.php' ? 'active fw-semibold' : '' ?>">
-              📦 คำสั่งซื้อของฉัน
-            </a>
-          </li>
-
-          <!-- 🔹 ชื่อผู้ใช้ -->
-          <li class="nav-item">
-            <a href="profile.php" 
-               class="nav-link user-link <?= basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : '' ?>">
-              👤 <?= htmlspecialchars($_SESSION['customer_name']) ?>
-            </a>
-          </li>
-
-          <!-- 🔹 ปุ่มออกจากระบบ -->
-          <li class="nav-item">
-            <a href="#" class="nav-link text-danger fw-semibold" onclick="confirmLogout(event)">
-              🚪 ออกจากระบบ
-            </a>
-          </li>
-
-        <?php else: ?>
-          <!-- 🔹 ยังไม่ล็อกอิน -->
-          <li class="nav-item">
-            <a href="login.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'login.php' ? 'active fw-semibold' : '' ?>">
-              🔑 เข้าสู่ระบบ
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="register.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'register.php' ? 'active fw-semibold' : '' ?>">
-              📝 สมัครสมาชิก
-            </a>
-          </li>
-        <?php endif; ?>
-      </ul>
+                <?php else: ?>
+                    <li class="nav-item w-100 w-lg-auto text-center">
+                        <a href="login.php" class="nav-link px-3 <?= basename($_SERVER['PHP_SELF']) == 'login.php' ? 'active' : '' ?>">
+                            🔑 เข้าสู่ระบบ
+                        </a>
+                    </li>
+                    <li class="nav-item w-100 w-lg-auto text-center ms-lg-2">
+                        <a href="register.php" class="nav-link btn-register px-4 py-1 py-lg-2 mt-2 mt-lg-0 text-white rounded-pill shadow-sm">
+                            สมัครสมาชิก
+                        </a>
+                    </li>
+                <?php endif; ?>
+            </ul>
+        </div>
     </div>
-  </div>
 </nav>
 
-<!-- ✅ Confirm Logout -->
 <script>
 function confirmLogout(e) {
-  e.preventDefault();
-  if (confirm("คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?")) {
-    window.location = "logout.php";
-  }
+    e.preventDefault();
+    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?")) {
+        window.location = "logout.php";
+    }
 }
 </script>
 
-<!-- ✅ สไตล์ Navbar (สีแดง #D10024) -->
 <style>
-.navbar-brand {
-  letter-spacing: 0.5px;
-  font-size: 1.5rem;
-  color: #D10024 !important;
-}
-.nav-link {
-  color: #333 !important;
-  font-weight: 500;
-  transition: 0.2s ease-in-out;
-}
-.nav-link:hover {
-  color: #D10024 !important;
-}
-.nav-link.active {
-  color: #D10024 !important;
-  border-bottom: 2px solid #D10024;
-}
+    /* 💎 Brand Style */
+    .brand-text {
+        color: #D10024;
+        font-size: 1.4rem;
+        letter-spacing: -0.5px;
+    }
 
-/* 💎 สีชื่อผู้ใช้ */
-.user-link {
-  color: #D10024 !important;
-  transition: 0.2s ease;
-  text-decoration: none !important;
-}
-.user-link:hover {
-  color: #a5001b !important;
-}
-.user-link.active {
-  color: #D10024 !important;
-  text-shadow: 0 0 6px rgba(209, 0, 36, 0.4);
-}
+    /* 💎 Link Style */
+    .nav-link {
+        color: #444 !important;
+        font-size: 0.95rem;
+        font-weight: 500;
+        position: relative;
+        padding: 10px 15px;
+    }
+    
+    .nav-link:hover { color: #D10024 !important; }
 
-/* 💡 เพิ่ม hover effect สวยๆ สำหรับ Navbar */
-.navbar-nav .nav-link {
-  position: relative;
-}
-.navbar-nav .nav-link::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0%;
-  height: 2px;
-  background-color: #D10024;
-  transition: 0.3s;
-}
-.navbar-nav .nav-link:hover::after,
-.navbar-nav .nav-link.active::after {
-  width: 100%;
-}
+    /* เส้นใต้ Active (เฉพาะบนจอใหญ่) */
+    @media (min-width: 992px) {
+        .nav-link::after {
+            content: "";
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            width: 0%;
+            height: 2px;
+            background-color: #D10024;
+            transition: 0.3s;
+            transform: translateX(-50%);
+        }
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 70%;
+        }
+    }
+
+    /* 💎 ปุ่มสมัครสมาชิก */
+    .btn-register {
+        background-color: #D10024 !important;
+        color: #fff !important;
+        transition: 0.3s;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .btn-register:hover {
+        background-color: #a5001b !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(209, 0, 36, 0.2) !important;
+    }
+
+    /* 📱 Mobile UI ปรับปรุงให้เมนูไม่ติดกันเกินไป */
+    @media (max-width: 991px) {
+        .navbar-nav {
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .nav-item {
+            padding: 5px 0;
+        }
+        .nav-link.active {
+            background-color: #fcfcfc;
+            color: #D10024 !important;
+            border-radius: 8px;
+        }
+        .logo-img { height: 32px; }
+        .brand-text { font-size: 1.2rem; }
+    }
 </style>
