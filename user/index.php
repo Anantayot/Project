@@ -118,11 +118,12 @@ if (empty($search) && empty($cat_id)) {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             border-color: #D10024;
+            transform: scale(1.08);
         }
 
         /* โซนรูปภาพ - ล็อคความสูง */
         .product-card .img-wrapper {
-            height: 200px;
+            height: 240px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -134,6 +135,7 @@ if (empty($search) && empty($cat_id)) {
             max-height: 100%;
             max-width: 100%;
             object-fit: contain;
+            transition: transform 0.4s ease;
         }
 
         /* เนื้อหาภายใน - ใช้ Flex ดันปุ่มลงล่าง */
@@ -186,7 +188,7 @@ if (empty($search) && empty($cat_id)) {
 
         @media (max-width: 768px) {
             .product-card .img-wrapper {
-                height: 160px;
+                height: 180px
             }
 
             .card-title {
