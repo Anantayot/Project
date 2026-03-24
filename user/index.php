@@ -102,12 +102,41 @@ if (empty($search) && empty($cat_id)) {
             transform: scale(1.05);
         }
 
-        /* 📦 Product Card - ปรับปรุงให้ปุ่มเท่ากัน */
+        @media (max-width: 576px) {
+            .search-bar {
+                flex-direction: column;
+                border-radius: 20px;
+                padding: 10px;
+            }
+
+            .search-bar select,
+            .search-bar input {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+
+            .search-bar button {
+                width: 100%;
+                border-radius: 12px;
+                margin-top: 10px;
+                height: 45px;
+            }
+        }
+
+        /* 🔧 Swiper Fix - ป้องกันการ์ดล้นขอบและให้ความสูงเท่ากัน */
+        .swiper-slide {
+            height: auto;
+            display: flex;
+        }
+
+        /* 📦 Product Card - ปรับปรุงให้ปุ่มเท่ากัน และพอดีกรอบ */
         .product-card {
             border: 1px solid #f0f0f0;
             border-radius: 15px;
             transition: all 0.3s ease;
             background: #fff;
+            width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -118,16 +147,15 @@ if (empty($search) && empty($cat_id)) {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             border-color: #D10024;
-            transform: scale(1.08);
         }
 
-        /* โซนรูปภาพ - ล็อคความสูง */
+        /* โซนรูปภาพ - ล็อคความสูงไว้ที่ 200px ให้รูปใหญ่กำลังดีและไม่ล้น */
         .product-card .img-wrapper {
-            height: 240px;
+            height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
             background: #fff;
         }
 
@@ -138,7 +166,12 @@ if (empty($search) && empty($cat_id)) {
             transition: transform 0.4s ease;
         }
 
-        /* เนื้อหาภายใน - ใช้ Flex ดันปุ่มลงล่าง */
+        /* เอฟเฟกต์ซูมรูปเบาๆ */
+        .product-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* เนื้อหาภายใน - ใช้ Flex ดันราคาและปุ่มลงล่างสุด */
         .product-card .card-body {
             display: flex;
             flex-direction: column;
@@ -165,7 +198,7 @@ if (empty($search) && empty($cat_id)) {
             font-size: 1.25rem;
             font-weight: 700;
             color: #D10024;
-            margin-top: auto;
+            margin-top: auto; /* พระเอกที่ทำให้ปุ่มตรงกัน */
             margin-bottom: 12px;
         }
 
@@ -188,7 +221,7 @@ if (empty($search) && empty($cat_id)) {
 
         @media (max-width: 768px) {
             .product-card .img-wrapper {
-                height: 180px
+                height: 160px;
             }
 
             .card-title {
@@ -215,6 +248,15 @@ if (empty($search) && empty($cat_id)) {
             height: 3px;
             background: #D10024;
             margin: 8px auto;
+        }
+
+        .category-header {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-top: 40px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
         }
     </style>
 </head>
