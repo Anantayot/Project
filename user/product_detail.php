@@ -157,15 +157,7 @@ $soldQty = (int)$soldStmt->fetchColumn();
   <?php endif; ?>
 </div>
 
-<div class="container mt-4 mb-5">
-  
-  <nav aria-label="breadcrumb" class="mb-4">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="index.php" class="text-decoration-none text-muted"><i class="bi bi-house-door"></i> หน้าร้าน</a></li>
-      <li class="breadcrumb-item text-muted" aria-current="page"><?= htmlspecialchars($product['cat_name'] ?? 'สินค้า') ?></li>
-      <li class="breadcrumb-item active" aria-current="page" style="color: #D10024; font-weight: 500;">รายละเอียดสินค้า</li>
-    </ol>
-  </nav>
+<div class="container mt-5 mb-5">
 
   <div class="card card-product shadow-sm">
     <div class="card-body p-4 p-md-5">
@@ -184,12 +176,7 @@ $soldQty = (int)$soldStmt->fetchColumn();
           
           <h1 class="product-title mb-3"><?= htmlspecialchars($product['p_name']) ?></h1>
           
-          <div class="d-flex align-items-center gap-4 mb-4">
-            <h2 class="product-price mb-0"><?= number_format($product['p_price'], 2) ?> ฿</h2>
-            <div class="border-start ps-4">
-              <span class="text-warning fs-5"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i></span>
-            </div>
-          </div>
+          <h2 class="product-price mb-4"><?= number_format($product['p_price'], 2) ?> ฿</h2>
 
           <div class="bg-light rounded p-3 mb-4">
             <p class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>ขายแล้ว:</strong> <?= $soldQty ?> ชิ้น</p>
