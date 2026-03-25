@@ -28,40 +28,39 @@ ob_start();
 <style>
   /* แอนิเมชันตอนโหลดหน้า */
   .fade-up {
-    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(15px);
   }
   .delay-1 { animation-delay: 0.1s; }
   .delay-2 { animation-delay: 0.2s; }
   .delay-3 { animation-delay: 0.3s; }
   .delay-4 { animation-delay: 0.4s; }
 
-  /* แต่งกล่องสถิติ */
+  /* แต่งกล่องสถิติให้พอดีและสวยงาม */
   .stat-card {
     background: var(--bg-card);
-    border-radius: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 15px; /* ปรับมุมให้โค้งพอดี */
+    border: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease;
-    height: 100%;
   }
   .stat-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4) !important;
-    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.15);
   }
 
-  /* กล่องใส่ไอคอน */
+  /* กล่องใส่ไอคอนปรับให้เล็กลงสมส่วน */
   .icon-box {
-    width: 65px;
-    height: 65px;
+    width: 55px;
+    height: 55px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 16px;
-    font-size: 1.8rem;
+    border-radius: 14px;
+    font-size: 1.5rem;
     color: #fff;
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.2);
   }
   .bg-gradient-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
   .bg-gradient-info { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
@@ -71,33 +70,20 @@ ob_start();
   /* กล่องต้อนรับ */
   .welcome-banner {
     background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
-    border-radius: 18px;
+    border-radius: 15px;
     border: 1px solid rgba(34, 197, 94, 0.2);
-    border-left: 6px solid var(--primary);
+    border-left: 5px solid var(--primary);
     position: relative;
     overflow: hidden;
   }
-  .welcome-bg-icon {
-    position: absolute;
-    right: -20px;
-    bottom: -30px;
-    font-size: 10rem;
-    color: rgba(34, 197, 94, 0.05);
-    transform: rotate(-15deg);
-    pointer-events: none;
-  }
 </style>
 
-<div class="row g-4 mb-4">
-  
-  <div class="col-12 col-sm-6 col-xl-3 fade-up delay-1">
+<div class="row g-3 mb-4"> <div class="col-12 col-sm-6 col-xl-3 fade-up delay-1">
     <div class="card stat-card shadow-sm">
-      <div class="card-body p-4 d-flex align-items-center justify-content-between">
-        <div>
-          <h6 class="text-muted mb-2 fw-normal">ยอดขายรวม (บาท)</h6>
-          <h3 class="fw-bold text-white mb-0">฿ <?= number_format($total_income, 2) ?></h3>
+      <div class="card-body p-3 d-flex align-items-center justify-content-between"> <div>
+          <h6 class="text-light mb-1 fw-normal">ยอดขายรวม (บาท)</h6> <h3 class="fw-bold text-white mb-0">฿ <?= number_format($total_income, 2) ?></h3>
         </div>
-        <div class="icon-box bg-gradient-success shadow-success">
+        <div class="icon-box bg-gradient-success">
           <i class="bi bi-wallet2"></i>
         </div>
       </div>
@@ -106,10 +92,10 @@ ob_start();
 
   <div class="col-12 col-sm-6 col-xl-3 fade-up delay-2">
     <div class="card stat-card shadow-sm">
-      <div class="card-body p-4 d-flex align-items-center justify-content-between">
+      <div class="card-body p-3 d-flex align-items-center justify-content-between">
         <div>
-          <h6 class="text-muted mb-2 fw-normal">คำสั่งซื้อทั้งหมด</h6>
-          <h3 class="fw-bold text-white mb-0"><?= number_format($total_orders) ?> <span class="fs-6 text-muted fw-normal">รายการ</span></h3>
+          <h6 class="text-light mb-1 fw-normal">คำสั่งซื้อทั้งหมด</h6>
+          <h3 class="fw-bold text-white mb-0"><?= number_format($total_orders) ?> <span class="fs-6 text-light fw-normal">รายการ</span></h3>
         </div>
         <div class="icon-box bg-gradient-info">
           <i class="bi bi-cart-check"></i>
@@ -120,10 +106,10 @@ ob_start();
 
   <div class="col-12 col-sm-6 col-xl-3 fade-up delay-3">
     <div class="card stat-card shadow-sm">
-      <div class="card-body p-4 d-flex align-items-center justify-content-between">
+      <div class="card-body p-3 d-flex align-items-center justify-content-between">
         <div>
-          <h6 class="text-muted mb-2 fw-normal">สินค้าในระบบ</h6>
-          <h3 class="fw-bold text-white mb-0"><?= number_format($total_products) ?> <span class="fs-6 text-muted fw-normal">ชิ้น</span></h3>
+          <h6 class="text-light mb-1 fw-normal">สินค้าในระบบ</h6>
+          <h3 class="fw-bold text-white mb-0"><?= number_format($total_products) ?> <span class="fs-6 text-light fw-normal">ชิ้น</span></h3>
         </div>
         <div class="icon-box bg-gradient-warning">
           <i class="bi bi-box-seam"></i>
@@ -134,10 +120,10 @@ ob_start();
 
   <div class="col-12 col-sm-6 col-xl-3 fade-up delay-4">
     <div class="card stat-card shadow-sm">
-      <div class="card-body p-4 d-flex align-items-center justify-content-between">
+      <div class="card-body p-3 d-flex align-items-center justify-content-between">
         <div>
-          <h6 class="text-muted mb-2 fw-normal">สมาชิกลูกค้า</h6>
-          <h3 class="fw-bold text-white mb-0"><?= number_format($total_customers) ?> <span class="fs-6 text-muted fw-normal">คน</span></h3>
+          <h6 class="text-light mb-1 fw-normal">สมาชิกลูกค้า</h6>
+          <h3 class="fw-bold text-white mb-0"><?= number_format($total_customers) ?> <span class="fs-6 text-light fw-normal">คน</span></h3>
         </div>
         <div class="icon-box bg-gradient-primary">
           <i class="bi bi-people"></i>
@@ -149,17 +135,12 @@ ob_start();
 </div>
 
 <div class="card welcome-banner shadow-sm fade-up delay-4">
-  <div class="card-body p-4 p-md-5">
-    <i class="bi bi-rocket-takeoff welcome-bg-icon"></i>
-    
-    <div class="position-relative z-index-1">
-      <h3 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
-        ยินดีต้อนรับสู่ MyCommiss Admin Panel <i class="bi bi-stars text-warning fs-4"></i>
-      </h3>
-      <p class="text-muted mb-0 fs-6" style="max-width: 600px;">
-        คุณสามารถใช้แผงควบคุมนี้ในการจัดการสินค้า ตรวจสอบและอัปเดตสถานะคำสั่งซื้อ รวมถึงดูแลสมาชิกลูกค้าทั้งหมดได้อย่างง่ายดายผ่านเมนูด้านซ้ายมือครับ
-      </p>
-    </div>
+  <div class="card-body p-4">
+    <h4 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">
+      ยินดีต้อนรับสู่ MyCommiss Admin Panel <i class="bi bi-stars text-warning fs-5"></i>
+    </h4>
+    <p class="text-light mb-0 fs-6" style="max-width: 650px;"> คุณสามารถใช้แผงควบคุมนี้ในการจัดการสินค้า ตรวจสอบและอัปเดตสถานะคำสั่งซื้อ รวมถึงดูแลสมาชิกลูกค้าทั้งหมดได้อย่างง่ายดายผ่านเมนูด้านซ้ายมือครับ
+    </p>
   </div>
 </div>
 
