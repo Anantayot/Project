@@ -1,6 +1,6 @@
 <?php
 session_start();
-include __DIR__ . "/partials/connectdb.php";
+include __DIR__ . "partials/connectdb.php";
 
 // ✅ บังคับให้ต้องล็อกอินก่อนถึงจะเข้า Dashboard ได้
 if (!isset($_SESSION['admin_id'])) {
