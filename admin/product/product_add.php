@@ -1,21 +1,41 @@
 <?php
+session_start();
+// เปิดโหมดโชว์ Error
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// บังคับให้ต้องล็อกอิน
+if (!isset($_SESSION['admin_id'])) {
+  header("Location: ../login.php");
+  exit;
+}
+
+$pageTitle = "เพิ่มสินค้าใหม่";
 include __DIR__ . "/../partials/connectdb.php";
 
-$cats = $conn->query("SELECT * FROM category")->fetchAll();
+$error = "";
+
+// 🔹 ดึงข้อมูลหมวดหมู่มาแสดงใน Dropdown
+try {
+  $cats = $conn->query("SELECT * FROM category ORDER BY cat_name ASC")->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  die("Error: " . $e->getMessage());
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $name   = $_POST['name'];
+  $name   = trim($_POST['name']);
   $price  = $_POST['price'];
   $stock  = $_POST['stock'];
   $cat_id = $_POST['cat_id'];
-  $desc   = $_POST['description'];
+  $desc   = trim($_POST['description']);
 
   $image = "";
   if (!empty($_FILES['image']['name'])) {
-    // 🔹 สร้างชื่อไฟล์ใหม่ ป้องกันชื่อซ้ำ
-    $image = time() . "_" . basename($_FILES['image']['name']);
+    // 🔹 สร้างชื่อไฟล์ใหม่ ป้องกันชื่อซ้ำ (ใช้เวลา + ชื่อไฟล์เดิม)
+    $image = time() . "_" . preg_replace("/[^a-zA-Z0-9.]/", "", basename($_FILES['image']['name']));
 
-    // 🔹 โฟลเดอร์เก็บรูป (อยู่นอก /product/)
+    // 🔹 โฟลเดอร์เก็บรูป (อยู่นอก /product/ แต่อยู่ใน /admin/uploads/)
     $targetDir = __DIR__ . "/../uploads/";
 
     // 🔹 ถ้าโฟลเดอร์ยังไม่มี ให้สร้าง
@@ -25,75 +45,184 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // 🔹 ย้ายไฟล์จาก temp ไปยัง uploads/
     if (!move_uploaded_file($_FILES['image']['tmp_name'], $targetDir . $image)) {
-      die("❌ ไม่สามารถอัปโหลดรูปภาพได้");
+      $error = "❌ ไม่สามารถอัปโหลดรูปภาพได้ กรุณาลองใหม่อีกครั้ง";
     }
   }
 
-  // 🔹 เพิ่มข้อมูลลงฐานข้อมูล
-  $stmt = $conn->prepare("
-    INSERT INTO product (p_name, p_price, p_stock, p_description, p_image, cat_id)
-    VALUES (?, ?, ?, ?, ?, ?)
-  ");
-  $stmt->execute([$name, $price, $stock, $desc, $image, $cat_id]);
+  // ถ้าไม่มี Error เรื่องรูปภาพ ให้บันทึกลงฐานข้อมูล
+  if (empty($error)) {
+    try {
+      $stmt = $conn->prepare("
+        INSERT INTO product (p_name, p_price, p_stock, p_description, p_image, cat_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+      ");
+      $stmt->execute([$name, $price, $stock, $desc, $image, $cat_id]);
 
-  header("Location: products.php");
-  exit;
+      echo "<script>alert('✅ เพิ่มสินค้าสำเร็จ!'); window.location='products.php';</script>";
+      exit;
+    } catch (PDOException $e) {
+      $error = "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " . $e->getMessage();
+    }
+  }
 }
+
+// ✅ เริ่มเก็บเนื้อหาเข้า Layout
+ob_start();
 ?>
 
-<h3 class="mb-4 text-center fw-bold text-white">
-  <i class="bi bi-plus-circle"></i> เพิ่มสินค้าใหม่
-</h3>
+<style>
+  .custom-card {
+    background: var(--bg-card, #1e293b);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+  }
+  .form-label {
+    color: #94a3b8;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .form-control-custom, .form-select-custom {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+    border-radius: 10px;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+  }
+  .form-control-custom:focus, .form-select-custom:focus {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: #22c55e;
+    box-shadow: 0 0 0 0.25rem rgba(34, 197, 94, 0.25);
+    color: #fff;
+  }
+  .form-control-custom::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+  .form-select-custom option {
+    background-color: #1e293b;
+    color: #fff;
+  }
+  /* แต่งช่องอัปโหลดไฟล์ */
+  input[type="file"].form-control-custom::file-selector-button {
+    background: #2c313a;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    margin-right: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  input[type="file"].form-control-custom::file-selector-button:hover {
+    background: #22c55e;
+  }
+</style>
 
-<form method="post" enctype="multipart/form-data" 
-      class="card p-4 shadow-lg border-0"
-      style="background:linear-gradient(145deg,#161b22,#0e1116);border:1px solid #2c313a;color:#fff;">
+<div class="d-flex justify-content-start mb-4">
+  <a href="products.php" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2 shadow-sm transition-all hover-scale">
+    <i class="bi bi-arrow-left me-1"></i> ย้อนกลับไปหน้าจัดการสินค้า
+  </a>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    
+    <div class="card custom-card shadow-lg mb-5">
+      <div class="card-header border-bottom border-secondary p-4" style="border-color: rgba(255,255,255,0.05) !important;">
+        <h4 class="fw-bold text-white mb-0 text-center">
+          <i class="bi bi-plus-circle text-success me-2"></i> เพิ่มสินค้าใหม่
+        </h4>
+      </div>
+      
+      <div class="card-body p-4 p-md-5">
+
+        <?php if(!empty($error)): ?>
+          <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 text-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= $error ?>
+          </div>
+        <?php endif; ?>
+
+        <form method="post" enctype="multipart/form-data">
+          <div class="row g-4">
+            
+            <div class="col-md-12">
+              <label class="form-label">ชื่อสินค้า <span class="text-danger">*</span></label>
+              <input type="text" name="name" class="form-control form-control-custom" placeholder="กรอกชื่อสินค้า" required>
+            </div>
+
+            <div class="col-md-12">
+              <label class="form-label">หมวดหมู่สินค้า <span class="text-danger">*</span></label>
+              <select name="cat_id" class="form-select form-select-custom" required>
+                <option value="">-- กรุณาเลือกหมวดหมู่ --</option>
+                <?php foreach($cats as $c): ?>
+                  <option value="<?= $c['cat_id'] ?>"><?= htmlspecialchars($c['cat_name']) ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">ราคา (บาท) <span class="text-danger">*</span></label>
+              <input type="number" name="price" class="form-control form-control-custom" step="0.01" min="0" placeholder="0.00" required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">จำนวนสต็อก <span class="text-danger">*</span></label>
+              <input type="number" name="stock" class="form-control form-control-custom" min="0" placeholder="จำนวนสินค้าที่มี" required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">รายละเอียดสินค้า (ไม่บังคับ)</label>
+              <textarea name="description" rows="4" class="form-control form-control-custom" placeholder="กรอกข้อมูลเพิ่มเติมเกี่ยวกับสินค้า..."></textarea>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">รูปภาพสินค้า</label>
+              <input type="file" name="image" class="form-control form-control-custom" accept="image/*" onchange="previewImage(this)">
+              <small class="text-muted d-block mt-2"><i class="bi bi-info-circle"></i> รองรับไฟล์ภาพ (JPG, PNG, GIF) ขนาดไม่ควรเกิน 2MB</small>
+            </div>
+
+            <div class="col-12 text-center d-none" id="preview-container">
+              <img id="image-preview" src="" alt="Preview" class="img-thumbnail bg-dark border-secondary mt-2 shadow" style="max-height: 250px; object-fit: cover; border-radius: 10px;">
+            </div>
+
+          </div>
+
+          <hr class="border-secondary my-4" style="opacity: 0.2;">
+
+          <div class="d-flex flex-column flex-sm-row justify-content-end gap-3">
+            <a href="products.php" class="btn btn-outline-secondary rounded-pill px-4 py-2 w-100 w-sm-auto">
+              <i class="bi bi-x-circle me-1"></i> ยกเลิก
+            </a>
+            <button type="submit" class="btn btn-success rounded-pill px-5 py-2 w-100 w-sm-auto fw-bold shadow-sm hover-scale">
+              <i class="bi bi-check-circle me-1"></i> บันทึกข้อมูลสินค้า
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function previewImage(input) {
+  const container = document.getElementById('preview-container');
+  const preview = document.getElementById('image-preview');
   
-  <div class="mb-3">
-    <label class="form-label">ชื่อสินค้า</label>
-    <input type="text" name="name" class="form-control" required>
-  </div>
-
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <label class="form-label">ราคา (฿)</label>
-      <input type="number" name="price" class="form-control" step="0.01" required>
-    </div>
-    <div class="col-md-6 mb-3">
-      <label class="form-label">สต็อก</label>
-      <input type="number" name="stock" class="form-control" required>
-    </div>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">หมวดหมู่</label>
-    <select name="cat_id" class="form-select" required>
-      <option value="">-- เลือกหมวดหมู่ --</option>
-      <?php foreach($cats as $c): ?>
-        <option value="<?= $c['cat_id'] ?>"><?= htmlspecialchars($c['cat_name']) ?></option>
-      <?php endforeach; ?>
-    </select>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">รายละเอียด</label>
-    <textarea name="description" rows="3" class="form-control"></textarea>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">รูปภาพ</label>
-    <input type="file" name="image" class="form-control">
-  </div>
-
-  <div class="text-end">
-    <button type="submit" class="btn btn-success">
-      <i class="bi bi-check-circle"></i> บันทึก
-    </button>
-    <a href="products.php" class="btn btn-secondary">
-      <i class="bi bi-x-circle"></i> ยกเลิก
-    </a>
-  </div>
-</form>
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      container.classList.remove('d-none'); // แสดงกล่องรูป
+    }
+    reader.readAsDataURL(input.files[0]);
+  } else {
+    preview.src = "";
+    container.classList.add('d-none'); // ซ่อนกล่องถ้ายกเลิกการเลือกรูป
+  }
+}
+</script>
 
 <?php
 $pageContent = ob_get_clean();
