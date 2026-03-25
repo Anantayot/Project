@@ -353,7 +353,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <label class="form-label text-dark fw-semibold mb-2">ช่องทางการชำระเงิน <span class="text-danger">*</span></label>
                 <select name="payment" class="form-select form-select-lg fs-6" required>
                   <option value="" disabled selected>-- เลือกวิธีชำระเงิน --</option>
-                  <option value="COD">💵 ชำระเงินปลายทาง (COD)</option>
+                  <option value="COD">💵 ชำระเงินปลายทาง</option>
                   <option value="QR">📱 สแกนชำระผ่าน QR Code</option>
                 </select>
               </div>
