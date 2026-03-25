@@ -8,7 +8,6 @@ error_reporting(E_ALL);
 // ✅ ดึงไฟล์เชื่อมต่อฐานข้อมูลจากโฟลเดอร์ partials
 include __DIR__ . "/../partials/connectdb.php";
 
-// 👇 เปลี่ยนชื่อ Title ตรงนี้ ซึ่งจะไปแสดงที่ Topbar
 $pageTitle = "รายการคำสั่งซื้อ";
 
 // บังคับให้ต้องล็อกอิน
@@ -51,98 +50,175 @@ ob_start();
 ?>
 
 <style>
-  .table-card { background: var(--bg-card, #1e1e2d); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.05); }
-  .table-custom-header { background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important; color: #ffffff !important; }
-  .table-dark { --bs-table-bg: transparent; --bs-table-color: #ffffff; border-color: rgba(255, 255, 255, 0.05); }
-  #dataTable tbody tr:hover { background-color: rgba(255, 255, 255, 0.05) !important; transition: all 0.3s ease-in-out; }
+  .table-card {
+    background: var(--bg-card);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+  }
+  .table-custom-header {
+    background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important;
+    color: #fff !important;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .table-custom-header th {
+    border-bottom: none;
+    padding: 15px 10px;
+  }
+  .table-dark {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  .table-dark td {
+    padding: 15px 10px;
+    vertical-align: middle;
+  }
 
-  .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate { color: #ffffff !important; }
-  .dataTables_length select { background-color: #161b22; color: #ffffff; border: 1px solid #334155; border-radius: 8px; padding: 3px 10px; outline: none; }
-  .page-item.active .page-link { background-color: #16a34a !important; border-color: #16a34a !important; color: #ffffff !important; box-shadow: 0 0 10px rgba(22, 163, 74, 0.4); }
-  .page-link { background-color: rgba(255, 255, 255, 0.05) !important; border-color: rgba(255, 255, 255, 0.1) !important; color: #e2e8f0 !important; }
-  .page-link:hover { background-color: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; }
+  /* ✅ เปลี่ยนสีข้อความ DataTables เป็นสีขาวทั้งหมด */
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_processing,
+  .dataTables_wrapper .dataTables_paginate {
+    color: #ffffff !important;
+  }
+  .dataTables_wrapper label {
+    color: #ffffff !important; 
+    font-weight: 500;
+  }
+  
+  /* 🔸 Pagination เข้าธีม */
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #fff !important;
+    border-radius: 6px;
+    margin: 0 3px;
+    border: 1px solid transparent !important;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: rgba(34, 197, 94, 0.2) !important;
+    border: 1px solid #22c55e !important;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: linear-gradient(145deg, #22c55e, #16a34a) !important;
+    color: #fff !important;
+    border: none !important;
+  }
 
+  /* 🎨 สี Custom Badges */
   .bg-purple { background-color: #8b5cf6 !important; color: #fff; }
   .bg-custom-blue { background-color: #3b82f6 !important; color: #fff; } 
   .bg-custom-success { background-color: #22c55e !important; color: #fff; } 
   .bg-custom-yellow { background-color: #facc15 !important; color: #0f172a !important; } 
 
-  /* 👉 เพิ่ม Class กำหนดขนาดป้ายสถานะให้เท่ากันทั้งหมด */
   .badge-fixed {
-    width: 125px; /* กำหนดความกว้างคงที่ ปรับลดเพิ่มได้ตามต้องการ */
+    width: 120px;
     display: inline-block;
     text-align: center;
+    font-weight: 600;
+    padding: 6px 12px;
   }
 
-  @media (max-width: 767px) {
+  /* 📱 ปรับแต่งสำหรับมือถือ (Mobile Card View) */
+  @media (max-width: 768px) {
     #dataTable thead { display: none; }
-    #dataTable tbody tr { display: block; background: rgba(255, 255, 255, 0.04); border-radius: 12px; margin-bottom: 15px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.08); position: relative; }
-    #dataTable tbody td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 8px 0; text-align: right; color: #ffffff !important; }
-    #dataTable tbody td:before { content: attr(data-label); float: left; font-weight: 500; color: #94a3b8; }
-    #dataTable td[data-label="ID"] { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px; font-size: 1.1rem; }
-    #dataTable td[data-label="จัดการ"] { width: 100%; justify-content: center; padding-top: 15px; }
-    #dataTable td[data-label="จัดการ"] a { width: 100%; font-weight: 600; }
-    .dataTables_wrapper .dataTables_filter { text-align: left !important; margin-bottom: 15px; }
-    .dataTables_wrapper .dataTables_filter input { width: 100%; margin-left: 0 !important; margin-top: 5px; }
+    #dataTable tbody tr {
+      display: flex; flex-direction: column;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 15px; margin-bottom: 20px;
+      padding: 15px 20px; border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    #dataTable tbody td {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border: none !important;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important;
+      font-size: 0.95rem;
+    }
+    #dataTable tbody td:last-child {
+      border-bottom: none !important; padding-top: 18px; padding-bottom: 5px;
+    }
+    #dataTable tbody td::before {
+      content: attr(data-label); font-weight: 500; color: #94a3b8;
+      text-align: left; min-width: 90px; margin-right: 15px; flex-shrink: 0;
+    }
+    .mobile-value { text-align: right !important; word-break: break-word; flex-grow: 1; }
+    .mobile-actions { display: flex; justify-content: flex-end; width: 100%; gap: 10px; }
   }
 </style>
 
-<div class="card table-card shadow-lg border-0 mt-2">
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <h4 class="fw-bold text-white mb-0 d-none d-md-block">
+    <i class="bi bi-bag-check me-2 text-success"></i> รายการคำสั่งซื้อ
+  </h4>
+</div>
+
+<div class="card table-card shadow-lg mt-2">
   <div class="card-body p-3 p-md-4">
 
     <?php if (empty($orders)): ?>
       <div class="text-center py-5">
-        <i class="bi bi-inbox" style="font-size: 3rem; color: #64748b;"></i>
-        <h5 class="text-white mt-3">ยังไม่มีคำสั่งซื้อ</h5>
+        <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+        <h5 class="text-muted mt-3">ยังไม่มีคำสั่งซื้อ</h5>
       </div>
     <?php else: ?>
-      <div class="table-responsive" style="overflow-x: hidden;">
-        <table id="dataTable" class="table table-dark align-middle w-100 mb-0">
+      <div>
+        <table id="dataTable" class="table table-dark table-striped table-hover text-center align-middle w-100 mb-0">
           <thead>
             <tr class="table-custom-header text-center">
-              <th>ID</th>
-              <th>ลูกค้า</th>
+              <th style="width: 80px;">ID</th>
+              <th class="text-start">ลูกค้า</th>
               <th>วันที่</th>
               <th>ยอดรวม</th>
-              <th>พัสดุ</th>
-              <th>การโอน</th>
-              <th>จัดการ</th>
+              <th>สถานะพัสดุ</th>
+              <th>การชำระเงิน</th>
+              <th style="width: 120px;">จัดการ</th>
             </tr>
           </thead>
           <tbody>
             <?php foreach ($orders as $o): ?>
               <tr>
-                <td data-label="ID" data-sort="<?= $o['order_id'] ?>" class="fw-bold text-success">
+                <td data-label="ID" data-sort="<?= $o['order_id'] ?>" class="fw-bold text-success mobile-value">
                     #<?= htmlspecialchars($o['order_id']) ?>
                 </td>
-                <td data-label="ลูกค้า" class="text-white fw-medium"><?= htmlspecialchars($o['customer_name'] ?? 'ไม่ระบุ') ?></td>
-                <td data-label="วันที่" class="text-light"><?= date("d/m/y H:i", strtotime($o['order_date'])) ?></td>
-                <td data-label="ยอดรวม" class="fw-bold text-info">฿<?= number_format($o['total_price'], 2) ?></td>
+                <td data-label="ลูกค้า" class="text-md-start text-white fw-medium mobile-value">
+                  <?= htmlspecialchars($o['customer_name'] ?? 'ไม่ระบุ') ?>
+                </td>
+                <td data-label="วันที่" class="text-light mobile-value">
+                  <?= date("d/m/y H:i", strtotime($o['order_date'])) ?>
+                </td>
+                <td data-label="ยอดรวม" class="fw-bold text-info mobile-value">
+                  ฿<?= number_format($o['total_price'], 2) ?>
+                </td>
 
-                <td data-label="พัสดุ" class="text-center text-md-start">
+                <td data-label="พัสดุ" class="mobile-value">
                   <?php 
                     $status = $o['order_status'] ?? 'รอดำเนินการ';
                     $badgeClass = $statusColors[$status] ?? 'secondary'; 
                   ?>
-                  <span class="badge bg-<?= $badgeClass ?> rounded-pill px-3 py-2 fw-bold badge-fixed">
+                  <span class="badge bg-<?= $badgeClass ?> rounded-pill badge-fixed">
                     <?= htmlspecialchars($status) ?>
                   </span>
                 </td>
 
-                <td data-label="การโอน" class="text-center text-md-start">
+                <td data-label="การโอน" class="mobile-value">
                   <?php 
                     $verify = $o['admin_verified'] ?? 'รอตรวจสอบ';
                     $vBadgeClass = $verifyColors[$verify] ?? 'secondary'; 
                   ?>
-                  <span class="badge bg-<?= $vBadgeClass ?> rounded-pill px-3 py-2 fw-bold badge-fixed">
+                  <span class="badge bg-<?= $vBadgeClass ?> rounded-pill badge-fixed">
                     <?= htmlspecialchars($verify) ?>
                   </span>
                 </td>
 
-                <td data-label="จัดการ" class="text-center">
-                  <a href="order_view.php?id=<?= $o['order_id'] ?>" class="btn btn-outline-success rounded-pill btn-sm py-1 px-3">
-                    <i class="bi bi-search me-1"></i> ตรวจสอบ
-                  </a>
+                <td data-label="จัดการ" class="mobile-value">
+                  <div class="d-flex justify-content-center mobile-actions">
+                    <a href="order_view.php?id=<?= $o['order_id'] ?>" class="btn btn-sm btn-outline-success rounded-pill px-3 transition-all hover-scale" data-bs-toggle="tooltip" title="ตรวจสอบคำสั่งซื้อ">
+                      <i class="bi bi-search me-1"></i> ตรวจสอบ
+                    </a>
+                  </div>
                 </td>
               </tr>
             <?php endforeach; ?>
@@ -170,18 +246,34 @@ ob_start();
         $('#dataTable').DataTable({
           language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
           pageLength: 10,
-          responsive: false,
-          order: [[0, "desc"]], 
-          dom: '<"d-flex flex-wrap justify-content-between align-items-center mb-3"lf>rt<"d-flex flex-wrap justify-content-between align-items-center mt-3"ip><"clear">',
+          responsive: false, // ปิดไว้เพราะเราใช้ CSS Card View บนมือถือ
+          order: [[0, "desc"]], // ✅ เรียงจากคำสั่งซื้อใหม่ล่าสุด (ID มากไปน้อย)
+          columnDefs: [
+            { orderable: false, targets: [6] } // ปิด sort จัดการ
+          ],
+          dom: '<"d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3"lf>rt<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3"ip>'
         });
 
+        // ✅ แต่งกล่องค้นหาและช่อง Dropdown ให้ข้อความเป็นสีขาวแบบเดียวกับหน้าสินค้า
         $(".dataTables_filter input")
-            .addClass("form-control d-inline-block")
-            .css({ "background": "#161b22", "color": "#ffffff", "border": "1px solid #334155", "border-radius": "8px", "padding": "5px 15px", "width": "auto" })
-            .on("focus", function() { $(this).css({"border-color": "#22c55e", "box-shadow": "0 0 0 0.2rem rgba(34, 197, 94, 0.25)", "outline": "none"}); })
-            .on("blur", function() { $(this).css({"border-color": "#334155", "box-shadow": "none"}); });
-            
-        $(".dataTables_info").addClass("text-light small mt-2 mt-md-0");
+          .addClass("form-control form-control-sm text-white")
+          .css({
+            "background": "rgba(255,255,255,0.05)", "color": "#ffffff",
+            "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px",
+            "padding": "8px 15px", "min-width": "250px"
+          });
+
+        $(".dataTables_length select")
+          .addClass("form-select form-select-sm text-white")
+          .css({
+            "background": "rgba(255,255,255,0.05)", "color": "#ffffff",
+            "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px",
+            "padding": "6px 30px 6px 15px"
+          });
+          
+        // เปิด Tooltip
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
       };
     };
   });
