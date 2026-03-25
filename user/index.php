@@ -129,6 +129,12 @@ if (empty($search) && empty($cat_id)) {
             height: auto;
             display: flex;
         }
+        
+        /* ✅ แก้ปัญหาขอบถูกตัดเวลา Hover: เพิ่มพื้นที่ว่างบน-ล่างให้ตัว Swiper Container */
+        .swiper {
+            padding: 15px 5px !important; 
+            margin: -15px -5px !important; 
+        }
 
         /* 📦 Product Card */
         .product-card {
@@ -141,6 +147,8 @@ if (empty($search) && empty($cat_id)) {
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            /* เพิ่มระยะขอบนิดนึงให้เส้น border สีแดงไม่โดนตัด */
+            box-sizing: border-box;
         }
 
         .product-card:hover {
@@ -300,7 +308,7 @@ if (empty($search) && empty($cat_id)) {
                 foreach ($grouped as $catName => $products):
                 ?>
                     <?php if ($catName): ?><h5 class="category-header"><?= htmlspecialchars($catName) ?></h5><?php endif; ?>
-                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-3 mt-1 mb-4">
+                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-3 mt-1 mb-4" style="padding: 10px;">
                         <?php foreach ($products as $p):
                             $img = "../admin/uploads/" . $p['p_image'];
                             if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
