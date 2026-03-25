@@ -102,10 +102,11 @@ ob_start();
     background-color: #1e293b;
     color: #fff;
   }
-  /* แต่งช่องอัปโหลดไฟล์ */
+  
+  /* ✅ แก้ไข CSS สำหรับปุ่มเลือกไฟล์ ให้สีไม่กลืน */
   input[type="file"].form-control-custom::file-selector-button {
-    background: #2c313a;
-    color: #fff;
+    background-color: #2c313a; /* สีเทาเข้ม เข้าตีม */
+    color: #fff; /* ข้อความสีขาว */
     border: none;
     padding: 8px 15px;
     margin-right: 15px;
@@ -114,7 +115,13 @@ ob_start();
     transition: 0.3s;
   }
   input[type="file"].form-control-custom::file-selector-button:hover {
-    background: #22c55e;
+    background-color: #22c55e; /* เปลี่ยนเป็นสีเขียวเมื่อ hover */
+  }
+
+  /* ✅ แก้ไข CSS สำหรับข้อความแนะนำ ให้เป็นสีขาว */
+  .text-info-white {
+    color: rgba(255, 255, 255, 0.7) !important; /* สีขาวโปร่งใสเล็กน้อย */
+    font-size: 0.85rem;
   }
 </style>
 
@@ -178,7 +185,7 @@ ob_start();
             <div class="col-12">
               <label class="form-label">รูปภาพสินค้า</label>
               <input type="file" name="image" class="form-control form-control-custom" accept="image/*" onchange="previewImage(this)">
-              <small class="text-muted d-block mt-2"><i class="bi bi-info-circle"></i> รองรับไฟล์ภาพ (JPG, PNG, GIF) ขนาดไม่ควรเกิน 2MB</small>
+              <small class="text-info-white d-block mt-2"><i class="bi bi-info-circle"></i> รองรับไฟล์ภาพ (JPG, PNG, GIF) ขนาดไม่ควรเกิน 2MB</small>
             </div>
 
             <div class="col-12 text-center d-none" id="preview-container">
