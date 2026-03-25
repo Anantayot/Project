@@ -268,123 +268,78 @@ $paymentColors = [
     .mobile-total-label { font-size: 1.1rem !important; }
     .mobile-total-value { font-size: 1.4rem !important; text-align: right; }
   }
+<style>
+  .custom-card { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 15px; }
+  .table-custom-header { background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important; color: #fff !important; }
+  .table-dark { --bs-table-bg: transparent; border-color: rgba(255, 255, 255, 0.05); }
+
+  /* 📱 ปรับปรุงพิเศษสำหรับ Mobile (แก้ปัญหาชื่อสินค้าโดนบีบ) */
+  @media (max-width: 767px) {
+    #productTable thead { display: none; }
+    #productTable tbody tr {
+      display: block;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      margin-bottom: 15px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    #productTable tbody td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: none !important;
+      padding: 6px 0;
+    }
+
+    /* 🖼️ ปรับส่วนรูปภาพบนมือถือ */
+    #productTable tbody td:nth-child(1) {
+      justify-content: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+      padding-bottom: 15px;
+      margin-bottom: 10px;
+    }
+    #productTable tbody td:nth-child(1) img { width: 100px !important; height: 100px !important; }
+
+    /* 🏷️ ใส่หัวข้อกำกับด้านซ้าย */
+    #productTable tbody td:nth-child(2):before { content: "สินค้า"; color: #94a3b8; font-size: 0.85rem; }
+    #productTable tbody td:nth-child(3):before { content: "จำนวน"; color: #94a3b8; font-size: 0.85rem; }
+    #productTable tbody td:nth-child(4):before { content: "ราคา/ชิ้น"; color: #94a3b8; font-size: 0.85rem; }
+    #productTable tbody td:nth-child(5):before { content: "ยอดรวม"; color: #94a3b8; font-size: 0.85rem; }
+
+    /* ✍️ ปรับตัวหนังสือ */
+    .mobile-product-name { 
+      text-align: right; 
+      max-width: 70%; 
+      font-weight: 600; 
+      color: #fff !important; 
+      word-wrap: break-word; 
+    }
+    .text-price-white { color: #fff !important; font-weight: 500; }
+    .text-subtotal-cyan { color: #22d3ee !important; font-weight: 700; font-size: 1.1rem; }
+
+    /* 💰 ส่วนยอดรวมสุทธิด้านล่าง */
+    #productTable tfoot tr {
+      display: block;
+      background: rgba(22, 163, 74, 0.15);
+      border-radius: 12px;
+      padding: 15px;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    #productTable tfoot td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      border: none !important;
+      padding: 0 !important;
+    }
+    #productTable tfoot td:first-child { display: none; }
+    .total-label { font-size: 1.1rem !important; }
+    .total-value { font-size: 1.5rem !important; color: #4ade80 !important; }
+  }
 </style>
-
-<div class="d-flex justify-content-end mb-4 mt-2">
-  <a href="orders.php" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2 shadow-sm w-100 w-md-auto text-center hover-scale transition-all">
-    <i class="bi bi-arrow-left me-1"></i> ย้อนกลับไปหน้าคำสั่งซื้อ
-  </a>
-</div>
-
-<div class="row g-4 mb-4">
-  <div class="col-xl-5 col-lg-6">
-    <div class="card custom-card shadow-lg h-100">
-      <div class="card-body p-4">
-        <h5 class="fw-bold text-white mb-4 border-bottom border-secondary pb-2">
-          <i class="bi bi-person-vcard text-info me-2"></i> ข้อมูลลูกค้า
-        </h5>
-        
-        <div class="mb-3 d-flex flex-column flex-sm-row">
-          <span class="info-label">ชื่อลูกค้า:</span>
-          <span class="info-value"><?= htmlspecialchars($order['customer_name'] ?? 'ไม่ระบุ') ?></span>
-        </div>
-        <div class="mb-3 d-flex flex-column flex-sm-row">
-          <span class="info-label">เบอร์โทรติดต่อ:</span>
-          <span class="info-value"><?= htmlspecialchars($order['phone'] ?? '-') ?></span>
-        </div>
-        <div class="mb-3 d-flex flex-column flex-sm-row">
-          <span class="info-label">ที่อยู่จัดส่ง:</span>
-          <span class="info-value" style="line-height: 1.6; flex: 1;"><?= htmlspecialchars($order['address'] ?? '-') ?></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-xl-7 col-lg-6">
-    <div class="card custom-card shadow-lg h-100">
-      <div class="card-body p-4">
-        <h5 class="fw-bold text-white mb-4 border-bottom border-secondary pb-2">
-          <i class="bi bi-box-seam text-success me-2"></i> ข้อมูลและการจัดการคำสั่งซื้อ
-        </h5>
-
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <span class="info-label">วันที่สั่งซื้อ:</span>
-            <span class="info-value"><?= date("d/m/Y H:i", strtotime($order['order_date'])) ?></span>
-          </div>
-          <div class="col-md-6 mb-3">
-            <?php 
-              $method = $order['payment_method'];
-              $methodText = ($method === 'QR') ? 'ชำระด้วย QR Code' : (($method === 'COD') ? 'เก็บเงินปลายทาง' : htmlspecialchars($method));
-            ?>
-            <span class="info-label">ช่องทางชำระเงิน:</span>
-            <span class="badge bg-secondary rounded-pill px-3"><?= $methodText ?></span>
-          </div>
-        </div>
-
-        <hr class="border-secondary my-3" style="opacity: 0.3;">
-
-        <div class="form-wrapper d-flex flex-column flex-md-row align-items-md-center mb-3 gap-2">
-          <span class="info-label mb-1 mb-md-0">สถานะชำระเงิน:</span>
-          <?php 
-            $payStatus = $order['payment_status'] ?? 'รอดำเนินการ';
-            $payClass = $paymentColors[$payStatus] ?? 'secondary';
-          ?>
-          <span class="badge bg-<?= $payClass ?> rounded-pill badge-fixed me-md-3 mb-2 mb-md-0"><?= htmlspecialchars($payStatus) ?></span>
-          
-          <form method="post" class="d-flex gap-2 w-100" style="max-width: 300px;">
-            <input type="hidden" name="action" value="update_payment_status">
-            <select name="payment_status" class="form-select form-select-sm form-select-custom">
-              <option value="รอดำเนินการ" <?= $payStatus=='รอดำเนินการ'?'selected':'' ?>>รอดำเนินการ</option>
-              <option value="ชำระเงินแล้ว" <?= $payStatus=='ชำระเงินแล้ว'?'selected':'' ?>>ชำระเงินแล้ว</option>
-              <option value="ยกเลิก" <?= $payStatus=='ยกเลิก'?'selected':'' ?>>ยกเลิก</option>
-            </select>
-            <button type="submit" class="btn btn-outline-success btn-sm px-3 rounded-3">บันทึก</button>
-          </form>
-        </div>
-
-        <?php if ($order['payment_method'] !== 'COD'): ?>
-        <div class="d-flex flex-column flex-md-row align-items-md-center mb-3">
-          <span class="info-label mb-2 mb-md-0">ตรวจสอบสลิป:</span>
-          <?php 
-            $adminStatus = $order['admin_verified'] ?? 'รอตรวจสอบ';
-            $adminClass = $verifyColors[$adminStatus] ?? 'secondary';
-          ?>
-          <span class="badge bg-<?= $adminClass ?> rounded-pill badge-fixed"><?= htmlspecialchars($adminStatus) ?></span>
-          
-          <?php if (!empty($order['slip_image'])): ?>
-            <a href="/Project/uploads/slips/<?= htmlspecialchars($order['slip_image']) ?>" target="_blank" class="btn btn-sm btn-outline-info ms-md-3 mt-2 mt-md-0 rounded-pill px-3 w-100 w-md-auto">
-              <i class="bi bi-image me-1"></i> ดูสลิป
-            </a>
-          <?php endif; ?>
-        </div>
-        <?php endif; ?>
-
-        <div class="form-wrapper d-flex flex-column flex-md-row align-items-md-center mb-2 gap-2">
-          <span class="info-label mb-1 mb-md-0">สถานะจัดส่ง:</span>
-          <?php 
-            $orderStatus = $order['order_status'] ?? 'รอดำเนินการ';
-            $orderClass = $statusColors[$orderStatus] ?? 'secondary';
-          ?>
-          <span class="badge bg-<?= $orderClass ?> rounded-pill badge-fixed me-md-3 mb-2 mb-md-0"><?= htmlspecialchars($orderStatus) ?></span>
-          
-          <form method="post" class="d-flex gap-2 w-100" style="max-width: 300px;">
-            <input type="hidden" name="action" value="update_order_status">
-            <select name="order_status" class="form-select form-select-sm form-select-custom">
-              <option value="รอดำเนินการ" <?= $orderStatus=='รอดำเนินการ'?'selected':'' ?>>รอดำเนินการ</option>
-              <option value="กำลังจัดเตรียม" <?= $orderStatus=='กำลังจัดเตรียม'?'selected':'' ?>>กำลังจัดเตรียม</option>
-              <option value="จัดส่งแล้ว" <?= $orderStatus=='จัดส่งแล้ว'?'selected':'' ?>>จัดส่งแล้ว</option>
-              <option value="สำเร็จ" <?= $orderStatus=='สำเร็จ'?'selected':'' ?>>สำเร็จ</option>
-              <option value="ยกเลิก" <?= $orderStatus=='ยกเลิก'?'selected':'' ?>>ยกเลิก</option>
-            </select>
-            <button type="submit" class="btn btn-outline-info btn-sm px-3 rounded-3">บันทึก</button>
-          </form>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="card custom-card shadow-lg mb-4">
   <div class="card-body p-0">
@@ -392,7 +347,7 @@ $paymentColors = [
       <h5 class="fw-bold text-white mb-0"><i class="bi bi-basket2 me-2 text-warning"></i> รายการสินค้าที่สั่งซื้อ</h5>
     </div>
     
-    <div class="table-responsive" style="overflow-x: hidden;">
+    <div class="table-responsive">
       <table id="productTable" class="table table-dark align-middle text-center mb-0 border-0 w-100">
         <thead>
           <tr class="table-custom-header">
@@ -409,22 +364,22 @@ $paymentColors = [
           foreach ($items as $it): 
             $totalSum += $it['subtotal'];
           ?>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <tr>
             <td class="text-start py-3 ps-md-4">
               <img src="/Project/admin/uploads/<?= htmlspecialchars($it['p_image'] ?? 'noimg.png') ?>" width="60" class="rounded shadow-sm border border-secondary" style="object-fit: cover; aspect-ratio: 1/1;">
             </td>
             <td class="text-start fw-medium text-white mobile-product-name"><?= htmlspecialchars($it['p_name']) ?></td>
             <td><span class="badge bg-secondary rounded-pill px-3"><?= (int)$it['quantity'] ?></span></td>
-            <td class="text-end text-white">฿<?= number_format($it['price'], 2) ?></td>
-            <td class="text-end text-info fw-bold pe-md-4">฿<?= number_format($it['subtotal'], 2) ?></td>
+            <td class="text-end text-white text-price-white">฿<?= number_format($it['price'], 2) ?></td>
+            <td class="text-end text-subtotal-cyan pe-md-4">฿<?= number_format($it['subtotal'], 2) ?></td>
           </tr>
           <?php endforeach; ?>
         </tbody>
         <tfoot>
           <tr>
             <td colspan="3" class="border-0 d-none d-md-table-cell"></td>
-            <td class="text-end fw-bold text-white border-0 pt-4 pb-4 mobile-total-label">ยอดรวมทั้งหมด:</td>
-            <td class="text-end fw-bold text-success fs-4 border-0 pe-md-4 pt-4 pb-4 mobile-total-value">฿<?= number_format($totalSum, 2) ?></td>
+            <td class="text-end fw-bold text-white border-0 pt-4 pb-4 total-label">ยอดรวมทั้งหมด:</td>
+            <td class="text-end fw-bold text-success fs-4 border-0 pe-md-4 pt-4 pb-4 total-value">฿<?= number_format($totalSum, 2) ?></td>
           </tr>
         </tfoot>
       </table>
