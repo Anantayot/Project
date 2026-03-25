@@ -64,12 +64,6 @@ ob_start();
   }
 </style>
 
-<div class="d-flex justify-content-start mb-4">
-  <a href="categories.php" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2 shadow-sm transition-all hover-scale">
-    <i class="bi bi-arrow-left me-1"></i> ย้อนกลับไปหน้ารายการ
-  </a>
-</div>
-
 <div class="row justify-content-center">
   <div class="col-lg-7 col-xl-6">
     
@@ -93,7 +87,7 @@ ob_start();
             
             <div class="col-md-12">
               <label class="form-label">ชื่อประเภทสินค้า <span class="text-danger">*</span></label>
-              <input type="text" name="cat_name" class="form-control form-control-custom" placeholder="เช่น เสื้อยืด, กางเกง, อุปกรณ์ไอที" required>
+              <input type="text" name="cat_name" class="form-control form-control-custom" placeholder="เช่น คีย์บอร์ด, เมาส์, อุปกรณ์ไอที" required>
             </div>
 
             <div class="col-md-12">
