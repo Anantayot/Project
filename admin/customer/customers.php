@@ -14,9 +14,9 @@ if (!isset($_SESSION['admin_id'])) {
 $pageTitle = "จัดการลูกค้า";
 include __DIR__ . "/../partials/connectdb.php";
 
-// 🔹 ดึงข้อมูลลูกค้าทั้งหมด
+// 🔹 ดึงข้อมูลลูกค้าทั้งหมด (✅ แก้เป็น ASC เรียงจากน้อยไปมาก)
 try {
-  $customers = $conn->query("SELECT * FROM customers ORDER BY customer_id DESC")->fetchAll(PDO::FETCH_ASSOC);
+  $customers = $conn->query("SELECT * FROM customers ORDER BY customer_id ASC")->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
   die("<div class='alert alert-danger text-center mt-4'>❌ SQL Error: " . htmlspecialchars($e->getMessage()) . "</div>");
 }
@@ -31,7 +31,6 @@ ob_start();
     border: 1px solid rgba(255, 255, 255, 0.05);
     overflow: hidden;
   }
-  /* แต่งหัวตาราง */
   .table-custom-header {
     background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important;
     color: #fff !important;
@@ -42,7 +41,6 @@ ob_start();
     border-bottom: none;
     padding: 15px 10px;
   }
-  /* แต่งตัวตาราง */
   .table-dark {
     --bs-table-bg: transparent;
     --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
@@ -54,11 +52,50 @@ ob_start();
     vertical-align: middle;
   }
 
-  /* ปรับแต่งสำหรับมือถือ */
+  /* 📱 ปรับแต่งสำหรับมือถือ (Mobile Card View) */
   @media (max-width: 768px) {
-    .d-mobile-none { display: none !important; } /* ซ่อนอีเมล/ที่อยู่ บนมือถือ */
-    .table-dark td, .table-dark th { padding: 10px 5px; font-size: 0.85rem; }
-    .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+    #dataTable thead { 
+      display: none; /* ซ่อนหัวตารางบนมือถือ */
+    }
+    #dataTable tbody tr {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    #dataTable tbody td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 5px;
+      border: none !important;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important;
+      text-align: right !important;
+      font-size: 0.9rem;
+    }
+    #dataTable tbody td:last-child {
+      border-bottom: none !important;
+      justify-content: center;
+      padding-top: 15px;
+    }
+    /* ใช้ data-label มาแสดงเป็นหัวข้อด้านซ้าย */
+    #dataTable tbody td::before {
+      content: attr(data-label);
+      font-weight: 500;
+      color: #94a3b8;
+      text-align: left;
+      margin-right: 15px;
+    }
+    .text-truncate-mobile {
+      max-width: 180px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 </style>
 
@@ -80,15 +117,15 @@ ob_start();
         <h5 class="text-muted mt-3">ยังไม่มีข้อมูลลูกค้าในระบบ</h5>
       </div>
     <?php else: ?>
-      <div class="table-responsive">
+      <div> 
         <table id="dataTable" class="table table-dark table-striped table-hover text-center align-middle w-100 mb-0">
           <thead>
             <tr class="table-custom-header">
               <th style="width: 80px;">รหัสลูกค้า</th>
               <th class="text-start">ชื่อ-นามสกุล</th>
-              <th class="d-mobile-none">อีเมล</th>
+              <th>อีเมล</th>
               <th>เบอร์โทร</th>
-              <th class="d-mobile-none">ที่อยู่จัดส่ง</th>
+              <th>ที่อยู่จัดส่ง</th>
               <th>รับข่าวสาร</th>
               <th style="width: 130px;">จัดการ</th>
             </tr>
@@ -96,15 +133,15 @@ ob_start();
           <tbody>
             <?php foreach($customers as $c): ?>
               <tr>
-                <td class="fw-bold text-success">#<?= htmlspecialchars($c['customer_id']) ?></td>
-                <td class="text-start text-white fw-medium"><?= htmlspecialchars($c['name']) ?></td>
-                <td class="text-light d-mobile-none"><?= htmlspecialchars($c['email'] ?: '-') ?></td>
-                <td class="text-info"><?= htmlspecialchars($c['phone'] ?: '-') ?></td>
-                <td class="text-light d-mobile-none text-truncate" style="max-width: 150px;" title="<?= htmlspecialchars($c['address']) ?>">
+                <td data-label="รหัสลูกค้า" class="fw-bold text-success">#<?= htmlspecialchars($c['customer_id']) ?></td>
+                <td data-label="ชื่อ-นามสกุล" class="text-start text-white fw-medium text-truncate-mobile"><?= htmlspecialchars($c['name']) ?></td>
+                <td data-label="อีเมล" class="text-light text-truncate-mobile"><?= htmlspecialchars($c['email'] ?: '-') ?></td>
+                <td data-label="เบอร์โทร" class="text-info"><?= htmlspecialchars($c['phone'] ?: '-') ?></td>
+                <td data-label="ที่อยู่จัดส่ง" class="text-light text-truncate-mobile" title="<?= htmlspecialchars($c['address']) ?>">
                   <?= htmlspecialchars($c['address'] ?: '-') ?>
                 </td>
 
-                <td>
+                <td data-label="รับข่าวสาร">
                   <?php if ($c['subscribe'] == 1): ?>
                     <span class="badge bg-success bg-opacity-75 rounded-pill px-3 py-2"><i class="bi bi-check-circle me-1"></i> สมัครแล้ว</span>
                   <?php else: ?>
@@ -112,7 +149,7 @@ ob_start();
                   <?php endif; ?>
                 </td>
 
-                <td>
+                <td data-label="จัดการ">
                   <div class="d-flex justify-content-center gap-2">
                     <a href="customer_edit.php?id=<?= $c['customer_id'] ?>" class="btn btn-sm btn-outline-warning rounded-circle" title="แก้ไข">
                       <i class="bi bi-pencil"></i>
@@ -148,34 +185,28 @@ ob_start();
         $('#dataTable').DataTable({
           language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
           pageLength: 10,
-          responsive: true,
-          order: [[0, "desc"]], // เรียงตามรหัสลูกค้าใหม่สุดขึ้นก่อน
+          responsive: false, // ปิด Responsive ของ DataTables เพื่อใช้ CSS Card View ของเราเอง
+          order: [[0, "asc"]], // ✅ เรียงคอลัมน์แรก (รหัสลูกค้า) จากน้อยไปมาก
           columnDefs: [
-            { orderable: false, targets: [6] } // ปิดปุ่มเรียงที่คอลัมน์ "จัดการ"
+            { orderable: false, targets: [6] } 
           ],
-          dom: '<"d-flex flex-wrap justify-content-between align-items-center mb-3"lf>rt<"d-flex flex-wrap justify-content-between align-items-center mt-3"ip>'
+          dom: '<"d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-2"lf>rt<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2"ip>'
         });
 
-        // แต่งกล่องค้นหา
+        // แต่งกล่องค้นหาและ Dropdown ให้เข้ากับตีม
         $(".dataTables_filter input")
-          .addClass("form-control form-control-sm ms-2")
+          .addClass("form-control form-control-sm")
           .css({
-            "background": "rgba(255,255,255,0.05)",
-            "color": "#fff",
-            "border": "1px solid rgba(255,255,255,0.1)",
-            "border-radius": "8px",
-            "padding": "6px 15px",
-            "min-width": "200px"
+            "background": "rgba(255,255,255,0.05)", "color": "#fff",
+            "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px",
+            "padding": "6px 15px", "min-width": "200px"
           });
 
-        // แต่ง Dropdown เลือกจำนวนหน้า
         $(".dataTables_length select")
           .addClass("form-select form-select-sm")
           .css({
-            "background": "rgba(255,255,255,0.05)",
-            "color": "#fff",
-            "border": "1px solid rgba(255,255,255,0.1)",
-            "border-radius": "8px"
+            "background": "rgba(255,255,255,0.05)", "color": "#fff",
+            "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px"
           });
           
         $(".dataTables_info, .dataTables_length, .dataTables_filter").addClass("text-light");
@@ -186,6 +217,5 @@ ob_start();
 
 <?php
 $pageContent = ob_get_clean();
-// ✅ ชี้ไปดึง layout จากโฟลเดอร์ partials
 include __DIR__ . "/../partials/layout.php";
 ?>
