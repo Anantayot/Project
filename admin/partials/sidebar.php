@@ -1,82 +1,45 @@
-<nav id="sidebar" class="sidebar sidebar-offcanvas" style="background:#0d1117; min-height:100vh; border-right:1px solid #2c313a;">
-  <div class="sidebar-brand-wrapper text-center py-4 border-bottom border-secondary">
-    <h4 class="text-white fw-bold mb-0">
-      <i class="bi bi-laptop"></i> MyCommiss
-    </h4>
+<aside id="sidebar">
+  <div class="sidebar-brand">
+    <i class="bi bi-laptop"></i> <span class="ms-2">MyCommiss</span>
+  </div>
+  
+  <div class="admin-profile">
+    <img src="/admin/partials/icon_mycommiss.png" alt="Admin" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+    <h6><?= $_SESSION['admin_name'] ?? 'ผู้ดูแลระบบ' ?></h6>
+    <small><i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i>Online</small>
   </div>
 
-  <ul class="nav flex-column mt-3">
-    <li class="nav-item mb-1">
-      <a href="/admin/index.php" class="nav-link d-flex align-items-center <?= basename($_SERVER['PHP_SELF'])=='index.php'?'active':'' ?>">
-        <i class="bi bi-speedometer2 me-2"></i> <span>Dashboard</span>
+  <ul class="sidebar-menu">
+    <li>
+      <a href="/admin/index.php" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
+        <i class="bi bi-grid-1x2"></i> แดชบอร์ด
       </a>
     </li>
-
-    <li class="nav-item mb-1">
-      <a href="/admin/product/products.php" class="nav-link d-flex align-items-center <?= strpos($_SERVER['PHP_SELF'],'product')?'active':'' ?>">
-        <i class="bi bi-box-seam me-2"></i> <span>จัดการสินค้า</span>
+    <li>
+      <a href="/admin/product/products.php" class="<?= strpos($_SERVER['PHP_SELF'], 'product') !== false ? 'active' : '' ?>">
+        <i class="bi bi-box-seam"></i> จัดการสินค้า
       </a>
     </li>
-
-    <li class="nav-item mb-1">
-      <a href="/admin/categories/categories.php" class="nav-link d-flex align-items-center <?= strpos($_SERVER['PHP_SELF'],'categories')?'active':'' ?>">
-        <i class="bi bi-tags me-2"></i> <span>ประเภทสินค้า</span>
+    <li>
+      <a href="/admin/categories/categories.php" class="<?= strpos($_SERVER['PHP_SELF'], 'categories') !== false ? 'active' : '' ?>">
+        <i class="bi bi-tags"></i> ประเภทสินค้า
       </a>
     </li>
-
-    <li class="nav-item mb-1">
-      <a href="/admin/customer/customers.php" class="nav-link d-flex align-items-center <?= strpos($_SERVER['PHP_SELF'],'customer')?'active':'' ?>">
-        <i class="bi bi-people me-2"></i> <span>ลูกค้า</span>
+    <li>
+      <a href="/admin/customer/customers.php" class="<?= strpos($_SERVER['PHP_SELF'], 'customer') !== false ? 'active' : '' ?>">
+        <i class="bi bi-people"></i> ข้อมูลลูกค้า
       </a>
     </li>
-
-    <li class="nav-item mb-1">
-      <a href="/admin/order/orders.php" class="nav-link d-flex align-items-center <?= strpos($_SERVER['PHP_SELF'],'order')?'active':'' ?>">
-        <i class="bi bi-bag-check me-2"></i> <span>คำสั่งซื้อ</span>
-      </a>
-    </li>
-
-    <li class="nav-item mt-4 border-top border-secondary pt-2">
-      <a href="/admin/logout.php" class="nav-link text-danger d-flex align-items-center">
-        <i class="bi bi-box-arrow-right me-2"></i> <span>ออกจากระบบ</span>
+    <li>
+      <a href="/admin/order/orders.php" class="<?= strpos($_SERVER['PHP_SELF'], 'order') !== false ? 'active' : '' ?>">
+        <i class="bi bi-bag-check"></i> คำสั่งซื้อ
       </a>
     </li>
   </ul>
-</nav>
 
-<style>
-/* ✅ Sidebar Theme */
-#sidebar {
-  background: #0d1117 !important;
-  min-height: 100vh;
-  box-shadow: 0 0 20px rgba(0,0,0,0.6);
-}
-#sidebar .nav-link {
-  color: #b0b9c4 !important;
-  font-weight: 500;
-  border-radius: 10px;
-  margin: 4px 10px;
-  transition: 0.3s ease;
-  padding: 10px 18px;
-}
-#sidebar .nav-link:hover {
-  background: linear-gradient(145deg, rgba(0,210,91,0.25), rgba(0,210,91,0.15));
-  color: #00d25b !important;
-  transform: translateX(4px);
-}
-#sidebar .nav-link.active {
-  background: linear-gradient(145deg, #00d25b, #00b14a);
-  color: #fff !important;
-  box-shadow: 0 0 12px rgba(0,210,91,0.4);
-}
-#sidebar .nav-link i {
-  font-size: 1.1rem;
-}
-#sidebar .text-danger {
-  font-weight: 600;
-  transition: 0.3s;
-}
-#sidebar .text-danger:hover {
-  color: #ff4d4d !important;
-}
-</style>
+  <div class="sidebar-footer">
+    <a href="/admin/logout.php" class="btn-logout" onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
+      <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
+    </a>
+  </div>
+</aside>
