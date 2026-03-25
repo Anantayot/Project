@@ -36,7 +36,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     .orders-wrapper { min-height: 80vh; padding-bottom: 50px; }
 
-    /* 🔹 Table Design */
+    /* 🔹 Table Design (Desktop) */
     .card-table {
       border: none;
       border-radius: 20px;
@@ -90,31 +90,17 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
       box-shadow: 0 4px 10px rgba(255, 193, 7, 0.2);
     }
 
-    /* 🔹 Badges - ปรับปรุงสีให้เข้มขึ้นตามคำขอ */
+    /* 🔹 Badges */
     .badge {
       font-size: 0.85rem;
       padding: 6px 12px;
       font-weight: 500;
       border-radius: 8px;
     }
-    
-    /* 🎨 ปรับสี badge ให้เข้มขึ้นสดใส (ไม่อ่อน) */
-    .badge.bg-warning {
-      background-color: #ff9800 !important; /* ส้มสด */
-      color: #fff !important;
-    }
-    .badge.bg-success {
-      background-color: #28a745 !important; /* เขียวสด */
-      color: #fff !important;
-    }
-    .badge.bg-danger {
-      background-color: #dc3545 !important; /* แดงเข้ม (ยกเลิก) */
-      color: #fff !important;
-    }
-    .badge.bg-info {
-      background-color: #17a2b8 !important; /* น้ำเงินเข้ม (เตรียมของ) */
-      color: #fff !important;
-    }
+    .badge.bg-warning { background-color: #ff9800 !important; color: #fff !important; }
+    .badge.bg-success { background-color: #28a745 !important; color: #fff !important; }
+    .badge.bg-danger { background-color: #dc3545 !important; color: #fff !important; }
+    .badge.bg-info { background-color: #17a2b8 !important; color: #fff !important; }
 
     /* ยกเลิกแถว */
     .row-cancelled td { opacity: 0.6; }
@@ -127,6 +113,75 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
       font-size: 0.9rem;
       border-top: 1px solid #eee;
       margin-top: auto;
+    }
+
+    /* 📱 MOBILE RESPONSIVE (แปลง Table เป็น Card) */
+    @media (max-width: 768px) {
+      .table-hover thead { display: none; } /* ซ่อนหัวตารางบนมือถือ */
+      
+      .table-hover tbody { display: block; padding: 10px; }
+      
+      .table-hover tbody tr {
+        display: block;
+        border: 1px solid #eaeaea;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      }
+      
+      .table-hover tbody tr.row-cancelled {
+        background-color: #fafafa; /* ออเดอร์ยกเลิกให้สีทึมลงนิดนึง */
+      }
+      
+      .table-hover tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: none;
+        padding: 10px 0 !important;
+        text-align: right;
+      }
+      
+      /* สร้าง Label ก่อนหน้าข้อมูล (ดึงจาก data-label) */
+      .table-hover tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #6c757d;
+        text-align: left;
+      }
+      
+      /* แถวแรก (หมายเลขคำสั่งซื้อ) */
+      .table-hover tbody td:first-child {
+        border-bottom: 1px dashed #eee;
+        margin-bottom: 10px;
+        padding-bottom: 15px !important;
+        font-size: 1.1rem;
+      }
+
+      /* แถวสุดท้าย (ปุ่มการจัดการ) */
+      .table-hover tbody td:last-child {
+        flex-direction: column;
+        align-items: stretch;
+        margin-top: 15px;
+        padding-top: 15px !important;
+        border-top: 1px solid #eee;
+      }
+      .table-hover tbody td:last-child::before {
+        display: none; /* ซ่อน Label การจัดการ */
+      }
+      
+      /* ขยายปุ่มให้เต็มหน้าจอมือถือ */
+      .table-hover tbody td .d-flex {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .table-hover tbody td .btn {
+        flex: 1;
+        margin: 0 5px;
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -166,8 +221,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
     <?php else: ?>
       <div class="card card-table">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle text-center">
+        <div class="table-responsive" style="overflow-x: hidden;"> <table class="table table-hover align-middle text-center">
             <thead>
               <tr>
                 <th class="text-start ps-4">หมายเลขคำสั่งซื้อ</th>
@@ -186,18 +240,17 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $order_status = $o['order_status'] ?? 'รอดำเนินการ';
                 $admin_verified = $o['admin_verified'] ?? 'รอตรวจสอบ';
 
-                /* ===== สีสถานะการชำระเงิน (ปรับให้เข้มขึ้น) ===== */
-                $payBadge = 'bg-warning'; // ส้มสด
-                if ($status === 'ชำระเงินแล้ว') $payBadge = 'bg-success'; // เขียวสด
-                if ($status === 'ยกเลิก') $payBadge = 'bg-danger'; // แดงเข้ม
+                /* ===== สีสถานะ ===== */
+                $payBadge = 'bg-warning';
+                if ($status === 'ชำระเงินแล้ว') $payBadge = 'bg-success';
+                if ($status === 'ยกเลิก') $payBadge = 'bg-danger';
 
-                /* ===== สีสถานะคำสั่งซื้อ (ปรับให้เข้มขึ้น) ===== */
-                $orderBadge = 'bg-warning'; // ส้มสด
-                if ($order_status === 'กำลังจัดเตรียม') $orderBadge = 'bg-info'; // น้ำเงินเข้ม
-                if ($order_status === 'จัดส่งแล้ว' || $order_status === 'สำเร็จ') $orderBadge = 'bg-success'; // เขียวสด
-                if ($order_status === 'ยกเลิก') $orderBadge = 'bg-danger'; // แดงเข้ม
+                $orderBadge = 'bg-warning';
+                if ($order_status === 'กำลังจัดเตรียม') $orderBadge = 'bg-info';
+                if ($order_status === 'จัดส่งแล้ว' || $order_status === 'สำเร็จ') $orderBadge = 'bg-success';
+                if ($order_status === 'ยกเลิก') $orderBadge = 'bg-danger';
 
-                /* ===== แปลงวิธีชำระเงิน ===== */
+                /* ===== วิธีชำระเงิน ===== */
                 $methodText = htmlspecialchars($o['payment_method']);
                 $methodIcon = 'bi-credit-card';
                 if ($o['payment_method'] === 'QR') {
@@ -209,33 +262,33 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
 
                 $isCancelled = ($order_status === 'ยกเลิก' || $status === 'ยกเลิก');
-                $rowClass = $isCancelled ? 'row-cancelled bg-light' : '';
+                $rowClass = $isCancelled ? 'row-cancelled' : '';
             ?>
               <tr class="<?= $rowClass ?>">
-                <td class="text-start ps-4 fw-bold text-dark">
+                <td data-label="หมายเลขคำสั่งซื้อ" class="text-start ps-md-4 fw-bold text-dark">
                   #<?= str_pad($o['order_id'], 5, '0', STR_PAD_LEFT) ?>
                 </td>
-                <td class="text-muted small">
-                  <?= date('d/m/Y', strtotime($o['order_date'])) ?><br>
-                  <?= date('H:i', strtotime($o['order_date'])) ?> น.
+                <td data-label="วันที่สั่งซื้อ" class="text-muted small">
+                  <?= date('d/m/Y', strtotime($o['order_date'])) ?>
+                  <span class="d-inline d-md-block"><?= date('H:i', strtotime($o['order_date'])) ?> น.</span>
                 </td>
-                <td>
+                <td data-label="วิธีชำระเงิน">
                   <i class="bi <?= $methodIcon ?> me-1"></i> <?= $methodText ?>
                 </td>
-                <td class="fw-bold text-danger">
+                <td data-label="ยอดชำระสุทธิ" class="fw-bold text-danger">
                   <?= number_format($o['total_price'], 2) ?> ฿
                 </td>
-                <td>
+                <td data-label="การชำระเงิน">
                   <span class="badge <?= $payBadge ?>">
                     <?= htmlspecialchars($status) ?>
                   </span>
                 </td>
-                <td>
+                <td data-label="สถานะจัดส่ง">
                   <span class="badge <?= $orderBadge ?>">
                     <?= htmlspecialchars($order_status) ?>
                   </span>
                 </td>
-                <td class="text-end pe-4">
+                <td data-label="การจัดการ" class="text-end pe-md-4">
                   <div class="d-flex justify-content-end gap-2">
                     
                     <?php if (
