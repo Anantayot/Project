@@ -1,5 +1,8 @@
 <?php
-session_start();
+// ✅ ตรวจสอบ Session (ป้องกันการเรียกซ้ำ)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include("connectdb.php");
 
 // ✅ ต้องเข้าสู่ระบบก่อน
@@ -132,21 +135,21 @@ $stocks = fetchStocks($conn, $cart);
     }
     .cart-wrapper { min-height: 80vh; }
 
-    /* 🔹 Card & Table */
+    /* 🔹 Card & Table (Desktop) */
     .card-cart {
       border: none;
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.05);
       background: #fff;
     }
-    .table th {
+    .table-cart th {
       background-color: #fcfcfc;
       color: #555;
       font-weight: 600;
       border-bottom: 2px solid #eee;
       padding: 15px;
     }
-    .table td {
+    .table-cart td {
       vertical-align: middle;
       border-bottom: 1px solid #f8f9fa;
       padding: 15px;
@@ -182,6 +185,7 @@ $stocks = fetchStocks($conn, $cart);
     }
     .btn-primary-custom:hover {
       background-color: #a5001b;
+      color: #fff;
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(209,0,36,0.2);
     }
@@ -225,6 +229,81 @@ $stocks = fetchStocks($conn, $cart);
       font-size: 0.9rem;
       border-top: 1px solid #eee;
       margin-top: 60px;
+    }
+
+    /* 📱 MOBILE RESPONSIVE (แปลง Table เป็น Card) */
+    @media (max-width: 768px) {
+      .table-cart thead { 
+        display: none; /* ซ่อนหัวตารางบนมือถือ */
+      }
+      .table-cart tbody tr {
+        display: block;
+        border: 1px solid #eee;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        padding: 15px;
+        position: relative; /* เพื่อให้จัดวางปุ่มลบ (absolute) ได้ */
+      }
+      .table-cart tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: none;
+        padding: 10px 0;
+        text-align: right;
+      }
+      /* แถวแรก (รูปภาพ+ชื่อสินค้า) ให้ชิดซ้ายและกินพื้นที่เต็ม */
+      .table-cart tbody td:first-child {
+        justify-content: flex-start;
+        padding-bottom: 15px;
+        border-bottom: 1px dashed #eee;
+        margin-bottom: 10px;
+        padding-right: 40px; /* เว้นที่ว่างฝั่งขวาให้ปุ่มลบ */
+      }
+      
+      /* สร้าง Label ก่อนหน้าตัวเลข ด้วยเทคนิค ::before (อิงจาก data-label ใน HTML) */
+      .table-cart tbody td[data-label]::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #6c757d;
+      }
+      .table-cart tbody td:first-child::before {
+        display: none; /* ช่องแรกไม่ต้องแสดง Label */
+      }
+
+      .qty-input { margin: 0; } /* รีเซ็ต margin-auto บนมือถือ */
+
+      /* จัดปุ่มลบให้ไปอยู่มุมขวาบนของการ์ดแต่ละใบ */
+      .td-delete {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        display: block !important;
+        padding: 0 !important;
+        border: none !important;
+      }
+
+      /* จัดการส่วนยอดรวม (Tfoot) */
+      .table-cart tfoot, .table-cart tfoot tr, .table-cart tfoot td {
+        display: block;
+        width: 100%;
+      }
+      .table-cart tfoot tr { border: none; padding: 0; }
+      .table-cart tfoot td.label-total { display: none; } /* ซ่อน Label เดิม */
+      .table-cart tfoot td.value-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 2px solid #eee;
+        padding-top: 15px;
+        text-align: right !important;
+      }
+      .table-cart tfoot td.value-total::before {
+        content: "ยอดชำระสุทธิ:";
+        font-size: 1.1rem;
+        color: #6c757d;
+        font-weight: 600;
+      }
     }
   </style>
 </head>
@@ -272,9 +351,7 @@ $stocks = fetchStocks($conn, $cart);
       </div>
     <?php else: ?>
       <form method="post">
-        <div class="card card-cart p-4">
-          <div class="table-responsive">
-            <table class="table align-middle text-center mb-0">
+        <div class="card card-cart p-md-4 p-3"> <div class="table-responsive" style="overflow-x: hidden;"> <table class="table table-cart align-middle text-center mb-0">
               <thead>
                 <tr>
                   <th class="text-start rounded-start">สินค้า</th>
@@ -298,29 +375,31 @@ $stocks = fetchStocks($conn, $cart);
                   $maxStock = $stocks[$id] ?? null;
                 ?>
                   <tr>
-                    <td class="text-start">
+                    <td data-label="สินค้า" class="text-start">
                       <div class="d-flex align-items-center gap-3">
                         <img src="<?= $imgPath ?>" class="item-img" alt="<?= htmlspecialchars($item['name']) ?>">
-                        <span class="fw-semibold text-dark"><?= htmlspecialchars($item['name']) ?></span>
+                        <span class="fw-semibold text-dark text-break" style="max-width: 200px;"><?= htmlspecialchars($item['name']) ?></span>
                       </div>
                     </td>
-                    <td class="text-muted"><?= number_format($item['price'], 2) ?> ฿</td>
-                    <td>
-                      <input
-                        type="number"
-                        name="qty[<?= $id ?>]"
-                        value="<?= (int)$item['qty'] ?>"
-                        min="1"
-                        class="form-control qty-input"
-                        <?= (!is_null($maxStock) ? 'max="'.$maxStock.'"' : '') ?>
-                        required
-                      >
-                      <?php if (!is_null($maxStock)): ?>
-                        <div class="small text-muted mt-1">เหลือ: <?= (int)$maxStock ?></div>
-                      <?php endif; ?>
+                    <td data-label="ราคาต่อชิ้น" class="text-muted"><?= number_format($item['price'], 2) ?> ฿</td>
+                    <td data-label="จำนวน">
+                      <div class="d-flex flex-column align-items-center align-items-md-center align-items-end">
+                        <input
+                          type="number"
+                          name="qty[<?= $id ?>]"
+                          value="<?= (int)$item['qty'] ?>"
+                          min="1"
+                          class="form-control qty-input"
+                          <?= (!is_null($maxStock) ? 'max="'.$maxStock.'"' : '') ?>
+                          required
+                        >
+                        <?php if (!is_null($maxStock)): ?>
+                          <div class="small text-muted mt-1">เหลือ: <?= (int)$maxStock ?></div>
+                        <?php endif; ?>
+                      </div>
                     </td>
-                    <td class="fw-bold text-dark"><?= number_format($sum, 2) ?> ฿</td>
-                    <td>
+                    <td data-label="ราคารวม" class="fw-bold text-dark"><?= number_format($sum, 2) ?> ฿</td>
+                    <td class="td-delete">
                       <a href="cart.php?remove=<?= $id ?>" class="btn-delete text-decoration-none" onclick="return confirm('ต้องการลบสินค้านี้ออกจากตะกร้าใช่หรือไม่?');" title="ลบสินค้า">
                         <i class="bi bi-trash3-fill"></i>
                       </a>
@@ -328,28 +407,31 @@ $stocks = fetchStocks($conn, $cart);
                   </tr>
                 <?php endforeach; ?>
               </tbody>
+              <tfoot>
+                <tr class="table-light">
+                  <td colspan="3" class="text-end fw-semibold text-muted pt-3 pb-3 label-total">ยอดชำระสุทธิ:</td>
+                  <td colspan="2" class="text-end pe-md-4 pt-3 pb-3 fw-bold text-danger fs-4 value-total"><?= number_format($total, 2) ?> ฿</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
+        </div>
 
-          <div class="row align-items-center border-top pt-4 mt-2">
-            <div class="col-md-6 mb-3 mb-md-0 text-center text-md-start">
-              <a href="index.php" class="btn btn-outline-custom"><i class="bi bi-arrow-left me-2"></i>เลือกซื้อสินค้าต่อ</a>
-            </div>
-            <div class="col-md-6 text-center text-md-end">
-              <span class="fs-5 text-muted me-3">ราคารวมทั้งหมด:</span>
-              <span class="fs-3 fw-bold text-danger"><?= number_format($total, 2) ?> ฿</span>
-            </div>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-4 gap-3">
+          <div class="text-center text-md-start">
+             <a href="index.php" class="btn btn-outline-custom w-100 w-md-auto"><i class="bi bi-arrow-left me-2"></i>เลือกซื้อสินค้าต่อ</a>
+          </div>
+          
+          <div class="d-flex flex-column flex-md-row gap-2">
+            <button type="submit" name="update" class="btn btn-update shadow-sm w-100 w-md-auto">
+              <i class="bi bi-arrow-clockwise me-2"></i>อัปเดตจำนวน
+            </button>
+            <a href="checkout.php" class="btn btn-primary-custom shadow-sm w-100 w-md-auto text-center">
+              ดำเนินการชำระเงิน <i class="bi bi-arrow-right ms-2"></i>
+            </a>
           </div>
         </div>
 
-        <div class="d-flex flex-column flex-md-row justify-content-end gap-3 mt-4">
-          <button type="submit" name="update" class="btn btn-update shadow-sm">
-            <i class="bi bi-arrow-clockwise me-2"></i>อัปเดตจำนวน
-          </button>
-          <a href="checkout.php" class="btn btn-primary-custom shadow-sm">
-            ดำเนินการชำระเงิน <i class="bi bi-arrow-right ms-2"></i>
-          </a>
-        </div>
       </form>
     <?php endif; ?>
   </div>
