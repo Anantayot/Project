@@ -21,11 +21,6 @@ if (!isset($_GET['id'])) {
 
 $order_id = intval($_GET['id']);
 
-// ✅ ดึงข้อมูลลูกค้า (ชื่อ, อีเมล, เบอร์โทร)
-$stmtUser = $conn->prepare("SELECT * FROM customers WHERE customer_id = ?");
-$stmtUser->execute([$customer_id]);
-$user = $stmtUser->fetch(PDO::FETCH_ASSOC);
-
 // ✅ ดึงข้อมูลคำสั่งซื้อของลูกค้าคนนี้
 $stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ? AND customer_id = ?");
 $stmt->execute([$order_id, $customer_id]);
@@ -34,6 +29,11 @@ $order = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$order) {
   die("<p class='text-center mt-5 text-danger'>❌ ไม่พบคำสั่งซื้อนี้ หรือคุณไม่มีสิทธิ์ดู</p>");
 }
+
+// ✅ ดึงข้อมูลลูกค้า
+$stmtUser = $conn->prepare("SELECT * FROM customers WHERE customer_id = ?");
+$stmtUser->execute([$customer_id]);
+$user = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
 // ✅ ฟังก์ชัน Toast
 function setToast($type, $msg) {
@@ -178,15 +178,22 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
       $payment_status = $order['payment_status'] ?? 'รอดำเนินการ';
       $order_status = $order['order_status'] ?? 'รอดำเนินการ';
+      
+      // ✅ ตรวจสอบการยกเลิก
+      $isCancelled = ($order_status === 'ยกเลิก' || $payment_status === 'ยกเลิก');
+
       $admin_verified = $order['admin_verified'] ?? 'รอตรวจสอบ';
+      
+      // ✅ ถ้าออเดอร์ถูกยกเลิก ให้เปลี่ยนการตรวจสอบจากแอดมินเป็น "ปฏิเสธ"
+      if ($isCancelled) {
+          $admin_verified = 'ปฏิเสธ';
+      }
 
       $paymentBadge = ($payment_status === 'ชำระเงินแล้ว') ? 'success' : (($payment_status === 'ยกเลิก') ? 'danger' : 'warning');
       $orderBadge = ($order_status === 'จัดส่งแล้ว' || $order_status === 'สำเร็จ') ? 'success' :
                     (($order_status === 'กำลังจัดเตรียม') ? 'info' : (($order_status === 'ยกเลิก') ? 'danger' : 'warning'));
       $adminBadge = ($admin_verified === 'อนุมัติ') ? 'success' : (($admin_verified === 'กำลังตรวจสอบ') ? 'info' :
                     (($admin_verified === 'ปฏิเสธ') ? 'danger' : 'warning'));
-      
-      $isCancelled = ($order_status === 'ยกเลิก' || $payment_status === 'ยกเลิก');
     ?>
 
     <div class="row">
@@ -265,7 +272,6 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
             <?php endif; ?>
 
             <div class="bg-light p-4 rounded-4 border flex-grow-1">
-              
               <div class="mb-3">
                 <div class="text-muted small fw-semibold mb-1">ชื่อผู้สั่งซื้อ</div>
                 <div class="fw-medium text-dark"><i class="bi bi-person me-2 text-muted"></i><?= htmlspecialchars($user['name'] ?? '-') ?></div>
@@ -288,7 +294,6 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
                   <?= nl2br(htmlspecialchars($order['shipping_address'] ?? 'ไม่ระบุที่อยู่')) ?>
                 </div>
               </div>
-
             </div>
 
           </div>
@@ -340,15 +345,19 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </div>
 
-    <?php if ($order_status === 'รอดำเนินการ' && $payment_status !== 'ยกเลิก'): ?>
-      <div class="text-end mt-4">
+    <div class="d-flex justify-content-end mt-4 gap-2">
+      <?php if ($isCancelled): ?>
+        <a href="index.php" class="btn btn-red rounded-pill px-4 shadow-sm">
+           <i class="bi bi-cart-plus me-1"></i> สั่งซื้อสินค้าอีกครั้ง
+        </a>
+      <?php elseif ($order_status === 'รอดำเนินการ' && $payment_status !== 'ยกเลิก'): ?>
         <a href="order_cancel.php?id=<?= $order_id ?>" 
            class="btn btn-outline-danger rounded-pill px-4"
            onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำสั่งซื้อนี้? (ไม่สามารถกู้คืนได้)');">
            <i class="bi bi-x-circle me-1"></i> ยกเลิกคำสั่งซื้อ
         </a>
-      </div>
-    <?php endif; ?>
+      <?php endif; ?>
+    </div>
 
   </div>
 </div>
