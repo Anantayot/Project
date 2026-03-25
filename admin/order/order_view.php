@@ -6,9 +6,8 @@ ini_set('display_errors', 1);
 $id = $_GET['id'] ?? null;
 if (!$id) die("<div class='alert alert-danger text-center mt-5'>❌ ไม่พบคำสั่งซื้อ</div>");
 
-// ✅ แก้ไข: เปลี่ยนไอคอนจากใบเสร็จ (bi-receipt-cutoff) เป็นเกจวัดความเร็ว หรือ รูปคน ตามต้องการ 
-// (จากรูปตัวอย่าง ไอคอนคล้ายๆ กับ bi-speedometer2 หรือคุณสามารถเปลี่ยนเป็น bi-person-badge ได้)
-$pageTitle = "<i class='bi bi-receipt-cutoff me-2 text-success'></i> รายละเอียดคำสั่งซื้อ <span class='text-success'>#" . htmlspecialchars($id) . "</span>";
+// ✅ แก้ไข: เอา Tag HTML (พวก <i> และ <span>) ออกให้หมด เพื่อไม่ให้โค้ดไปโผล่ดิบๆ บนหัวเว็บ
+$pageTitle = "รายละเอียดคำสั่งซื้อ #" . htmlspecialchars($id);
 
 ob_start();
 
@@ -344,7 +343,7 @@ $paymentColors = [
           <span class="badge bg-<?= $adminClass ?> rounded-pill badge-fixed"><?= htmlspecialchars($adminStatus) ?></span>
           
           <?php if (!empty($order['slip_image'])): ?>
-            <a href="../../admin/uploads/slips/<?= htmlspecialchars($order['slip_image']) ?>" target="_blank" class="btn btn-sm btn-outline-info ms-md-3 mt-2 mt-md-0 rounded-pill px-3 w-100 w-md-auto">
+            <a href="/Project/uploads/slips/<?= htmlspecialchars($order['slip_image']) ?>" target="_blank" class="btn btn-sm btn-outline-info ms-md-3 mt-2 mt-md-0 rounded-pill px-3 w-100 w-md-auto">
               <i class="bi bi-image me-1"></i> ดูสลิป
             </a>
           <?php endif; ?>
@@ -402,7 +401,7 @@ $paymentColors = [
           ?>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
             <td class="text-start py-3 ps-md-4">
-              <img src="../../admin/uploads/<?= htmlspecialchars($it['p_image'] ?? 'noimg.png') ?>" width="60" class="rounded shadow-sm" style="object-fit: cover; aspect-ratio: 1/1;">
+              <img src="/Project/admin/uploads/<?= htmlspecialchars($it['p_image'] ?? 'noimg.png') ?>" width="60" class="rounded shadow-sm" style="object-fit: cover; aspect-ratio: 1/1;">
             </td>
             <td class="text-start fw-medium text-white text-break" style="max-width: 250px;"><?= htmlspecialchars($it['p_name']) ?></td>
             <td><span class="badge bg-secondary rounded-pill px-3"><?= (int)$it['quantity'] ?></span></td>
