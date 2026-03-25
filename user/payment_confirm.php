@@ -324,7 +324,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               <a href="orders.php" class="btn btn-outline-custom w-100"><i class="bi bi-clock-history me-2"></i>ประวัติสั่งซื้อ</a>
             </div>
             <div class="col-6">
-              <a href="order_detail.php?id=<?= $order_id ?>" class="btn btn-outline-custom w-100"><i class="bi bi-file-earmark-text me-2"></i>รายละเอียดคำสั่งซื้อ</a>
+              <a href="order_detail.php?id=<?= $order_id ?>" class="btn btn-outline-custom w-100"><i class="bi bi-file-earmark-text me-2"></i>รายละเอียด</a>
             </div>
           </div>
         </div>
