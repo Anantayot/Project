@@ -69,6 +69,60 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['new_payment'])) {
   exit;
 }
 
+// ✅ เมื่อกดปุ่ม "สั่งซื้อสินค้าอีกครั้ง" (Reorder)
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['reorder'])) {
+  // ดึงรายการสินค้าทั้งหมดในออเดอร์นี้
+  $stmtReorder = $conn->prepare("SELECT p_id, quantity FROM order_details WHERE order_id = ?");
+  $stmtReorder->execute([$order_id]);
+  $reorderItems = $stmtReorder->fetchAll(PDO::FETCH_ASSOC);
+
+  $addedCount = 0;
+
+  foreach ($reorderItems as $item) {
+      $pid = (int)$item['p_id'];
+      $qty = (int)$item['quantity'];
+
+      // ดึงข้อมูลสินค้าและเช็คสต็อกปัจจุบัน
+      $stmtStock = $conn->prepare("SELECT p_name, p_price, p_image, p_stock FROM product WHERE p_id = ?");
+      $stmtStock->execute([$pid]);
+      $p = $stmtStock->fetch(PDO::FETCH_ASSOC);
+
+      if ($p && $p['p_stock'] > 0) {
+          // ถ้าสต็อกมีน้อยกว่าจำนวนที่เคยสั่ง ให้เอาจำนวนสต็อกที่มี
+          $addQty = ($qty > $p['p_stock']) ? $p['p_stock'] : $qty;
+
+          if (!isset($_SESSION['cart'])) {
+              $_SESSION['cart'] = [];
+          }
+
+          if (isset($_SESSION['cart'][$pid])) {
+              $_SESSION['cart'][$pid]['qty'] += $addQty;
+              // เช็คอีกทีไม่ให้เกินสต็อก
+              if ($_SESSION['cart'][$pid]['qty'] > $p['p_stock']) {
+                  $_SESSION['cart'][$pid]['qty'] = $p['p_stock'];
+              }
+          } else {
+              $_SESSION['cart'][$pid] = [
+                  'id' => $pid,
+                  'name' => $p['p_name'],
+                  'price' => $p['p_price'],
+                  'image' => $p['p_image'],
+                  'qty' => $addQty
+              ];
+          }
+          $addedCount++;
+      }
+  }
+
+  if ($addedCount > 0) {
+      $_SESSION['toast_success'] = "🛒 เพิ่มสินค้าจากคำสั่งซื้อเดิมลงตะกร้าแล้ว";
+  } else {
+      $_SESSION['toast_error'] = "❌ ขออภัย สินค้าในคำสั่งซื้อนี้หมดสต็อกทั้งหมด";
+  }
+  header("Location: cart.php");
+  exit;
+}
+
 // ✅ ดึงรายการสินค้าในคำสั่งซื้อ
 $stmt2 = $conn->prepare("SELECT d.*, p.p_name, p.p_image 
                          FROM order_details d 
@@ -347,9 +401,12 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
     <div class="d-flex justify-content-end mt-4 gap-2">
       <?php if ($isCancelled): ?>
-        <a href="index.php" class="btn btn-red rounded-pill px-4 shadow-sm">
-           <i class="bi bi-cart-plus me-1"></i> สั่งซื้อสินค้าอีกครั้ง
-        </a>
+        <form method="post" class="m-0">
+          <input type="hidden" name="reorder" value="1">
+          <button type="submit" class="btn btn-red rounded-pill px-4 shadow-sm">
+             <i class="bi bi-cart-plus me-1"></i> สั่งซื้อสินค้าอีกครั้ง
+          </button>
+        </form>
       <?php elseif ($order_status === 'รอดำเนินการ' && $payment_status !== 'ยกเลิก'): ?>
         <a href="order_cancel.php?id=<?= $order_id ?>" 
            class="btn btn-outline-danger rounded-pill px-4"
