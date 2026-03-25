@@ -5,9 +5,6 @@
     <a href="/Project/user/index.php" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-3">
       <i class="bi bi-shop me-1"></i> ดูหน้าร้าน
     </a>
-    <a href="/Project/admin/logout.php" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
-      <i class="bi bi-box-arrow-right me-1"></i> ออกจากระบบ
-    </a>
   </div>
 </div>
 
