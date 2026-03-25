@@ -1,41 +1,125 @@
 <?php
+session_start();
+// เปิดโหมดโชว์ Error
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// บังคับให้ต้องล็อกอิน
+if (!isset($_SESSION['admin_id'])) {
+  header("Location: ../login.php");
+  exit;
+}
+
+$pageTitle = "เพิ่มประเภทสินค้า";
 include __DIR__ . "/../partials/connectdb.php";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $name = $_POST['cat_name'];
-  $desc = $_POST['cat_description'];
+  $name = trim($_POST['cat_name']);
+  $desc = trim($_POST['cat_description']);
 
-  $stmt = $conn->prepare("INSERT INTO category (cat_name, cat_description) VALUES (?, ?)");
-  $stmt->execute([$name, $desc]);
-  header("Location: categories.php");
-  exit;
+  try {
+    $stmt = $conn->prepare("INSERT INTO category (cat_name, cat_description) VALUES (?, ?)");
+    $stmt->execute([$name, $desc]);
+    
+    // แจ้งเตือนเมื่อสำเร็จและเด้งกลับไปหน้าจัดการ
+    echo "<script>alert('✅ เพิ่มประเภทสินค้าสำเร็จ!'); window.location='categories.php';</script>";
+    exit;
+  } catch (PDOException $e) {
+    $error = "เกิดข้อผิดพลาด: " . $e->getMessage();
+  }
 }
+
+// ✅ เริ่มเก็บเนื้อหาเข้า Layout
+ob_start();
 ?>
 
-<h3 class="mb-4 text-center fw-bold text-white">
-  <i class="bi bi-plus-circle"></i> เพิ่มประเภทสินค้า
-</h3>
+<style>
+  .custom-card {
+    background: var(--bg-card, #1e293b);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+  }
+  .form-label {
+    color: #94a3b8;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .form-control-custom {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+    border-radius: 10px;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+  }
+  .form-control-custom:focus {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: #22c55e;
+    box-shadow: 0 0 0 0.25rem rgba(34, 197, 94, 0.25);
+    color: #fff;
+  }
+  .form-control-custom::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+</style>
 
-<form method="post" class="card p-4 shadow-lg border-0">
-  <div class="mb-3">
-    <label class="form-label">ชื่อประเภทสินค้า</label>
-    <input type="text" name="cat_name" class="form-control" required>
-  </div>
+<div class="d-flex justify-content-start mb-4">
+  <a href="categories.php" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2 shadow-sm transition-all hover-scale">
+    <i class="bi bi-arrow-left me-1"></i> ย้อนกลับไปหน้ารายการ
+  </a>
+</div>
 
-  <div class="mb-3">
-    <label class="form-label">รายละเอียด</label>
-    <textarea name="cat_description" rows="3" class="form-control"></textarea>
-  </div>
+<div class="row justify-content-center">
+  <div class="col-lg-7 col-xl-6">
+    
+    <div class="card custom-card shadow-lg mb-5">
+      <div class="card-header border-bottom border-secondary p-4" style="border-color: rgba(255,255,255,0.05) !important;">
+        <h4 class="fw-bold text-white mb-0 text-center">
+          <i class="bi bi-plus-circle text-success me-2"></i> เพิ่มประเภทสินค้า
+        </h4>
+      </div>
+      
+      <div class="card-body p-4 p-md-5">
 
-  <div class="text-end">
-    <button type="submit" class="btn btn-success">
-      <i class="bi bi-check-circle"></i> บันทึก
-    </button>
-    <a href="categories.php" class="btn btn-secondary">
-      <i class="bi bi-x-circle"></i> ยกเลิก
-    </a>
+        <?php if(!empty($error)): ?>
+          <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 text-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= $error ?>
+          </div>
+        <?php endif; ?>
+
+        <form method="post">
+          <div class="row g-4">
+            
+            <div class="col-md-12">
+              <label class="form-label">ชื่อประเภทสินค้า <span class="text-danger">*</span></label>
+              <input type="text" name="cat_name" class="form-control form-control-custom" placeholder="เช่น เสื้อยืด, กางเกง, อุปกรณ์ไอที" required>
+            </div>
+
+            <div class="col-md-12">
+              <label class="form-label">รายละเอียด (ไม่บังคับ)</label>
+              <textarea name="cat_description" rows="3" class="form-control form-control-custom" placeholder="กรอกคำอธิบายเพิ่มเติมเกี่ยวกับประเภทสินค้านี้..."></textarea>
+            </div>
+
+          </div>
+
+          <hr class="border-secondary my-4" style="opacity: 0.2;">
+
+          <div class="d-flex flex-column flex-sm-row justify-content-end gap-3">
+            <a href="categories.php" class="btn btn-outline-secondary rounded-pill px-4 py-2 w-100 w-sm-auto">
+              <i class="bi bi-x-circle me-1"></i> ยกเลิก
+            </a>
+            <button type="submit" class="btn btn-success rounded-pill px-5 py-2 w-100 w-sm-auto fw-bold shadow-sm hover-scale">
+              <i class="bi bi-check-circle me-1"></i> บันทึกข้อมูล
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
   </div>
-</form>
+</div>
 
 <?php
 $pageContent = ob_get_clean();
