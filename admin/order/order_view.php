@@ -6,7 +6,6 @@ ini_set('display_errors', 1);
 $id = $_GET['id'] ?? null;
 if (!$id) die("<div class='alert alert-danger text-center mt-5'>❌ ไม่พบคำสั่งซื้อ</div>");
 
-// ✅ แก้ไข: เอา Tag HTML (พวก <i> และ <span>) ออกให้หมด เพื่อไม่ให้โค้ดไปโผล่ดิบๆ บนหัวเว็บ
 $pageTitle = "รายละเอียดคำสั่งซื้อ #" . htmlspecialchars($id);
 
 ob_start();
@@ -45,7 +44,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (in_array($newPayment, ['รอดำเนินการ','ชำระเงินแล้ว','ยกเลิก'])) {
 
-      // ถ้าเลือก "ชำระเงินแล้ว" → อัปเดต admin_verified = 'อนุมัติ' และกำลังจัดเตรียม
       if ($newPayment === 'ชำระเงินแล้ว') {
         $stmt = $conn->prepare("UPDATE orders 
                                 SET payment_status=?, 
@@ -57,7 +55,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
       }
       
-      // ✅ ถ้าเลือก "ยกเลิก" → ยกเลิกทั้งหมด (ชำระเงิน, ตรวจสอบสลิป, จัดส่ง)
       elseif ($newPayment === 'ยกเลิก') {
         $stmt = $conn->prepare("UPDATE orders 
                                 SET payment_status=?, 
@@ -69,7 +66,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
       }
 
-      // ถ้าเป็นสถานะอื่น (เช่น รอดำเนินการ)
       else {
         $stmt = $conn->prepare("UPDATE orders SET payment_status=? WHERE order_id=?");
         $stmt->execute([$newPayment, $id]);
@@ -84,7 +80,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $newOrder = $_POST['order_status'] ?? '';
     if (in_array($newOrder, ['รอดำเนินการ','กำลังจัดเตรียม','จัดส่งแล้ว','สำเร็จ','ยกเลิก'])) {
         
-      // ✅ ถ้าเลือก "ยกเลิก" จากสถานะจัดส่ง → ให้ยกเลิกการชำระเงินและปฏิเสธสลิปด้วย
       if ($newOrder === 'ยกเลิก') {
           $stmt = $conn->prepare("UPDATE orders 
                                   SET order_status=?, 
@@ -197,7 +192,7 @@ $paymentColors = [
     box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
   }
 
-  /* 📱 ปรับแต่งสำหรับ Mobile */
+  /* 📱 ปรับแต่งสำหรับ Mobile (แก้ให้อ่านง่ายขึ้นมากๆ) */
   @media (max-width: 767px) {
     .info-label {
       width: 120px;
@@ -220,11 +215,12 @@ $paymentColors = [
     #productTable tbody tr {
       display: flex;
       flex-direction: column;
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.03);
       border-radius: 12px;
       margin-bottom: 15px;
       padding: 15px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
     #productTable tbody td {
@@ -232,36 +228,50 @@ $paymentColors = [
       justify-content: space-between;
       align-items: center;
       border: none !important;
-      padding: 8px 0;
+      padding: 10px 0;
       text-align: right !important;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important;
+    }
+    #productTable tbody td:last-child {
+      border-bottom: none !important;
+      padding-bottom: 0;
     }
 
-    /* เพิ่ม Label ให้ข้อมูลใน Card */
-    #productTable tbody td:nth-child(1):before { content: "รูปภาพ"; float: left; font-weight: 500; color: #94a3b8; }
-    #productTable tbody td:nth-child(2):before { content: "ชื่อสินค้า"; float: left; font-weight: 500; color: #94a3b8; }
-    #productTable tbody td:nth-child(3):before { content: "จำนวน"; float: left; font-weight: 500; color: #94a3b8; }
-    #productTable tbody td:nth-child(4):before { content: "ราคา/ชิ้น"; float: left; font-weight: 500; color: #94a3b8; }
-    #productTable tbody td:nth-child(5):before { content: "ยอดรวม"; float: left; font-weight: 500; color: #94a3b8; }
+    /* เพิ่ม Label ให้ข้อมูลใน Card ฝั่งซ้าย */
+    #productTable tbody td:nth-child(1):before { content: "รูปภาพ"; font-weight: 500; color: #94a3b8; margin-right: 15px; }
+    #productTable tbody td:nth-child(2):before { content: "ชื่อสินค้า"; font-weight: 500; color: #94a3b8; margin-right: 15px; }
+    #productTable tbody td:nth-child(3):before { content: "จำนวน"; font-weight: 500; color: #94a3b8; margin-right: 15px; }
+    #productTable tbody td:nth-child(4):before { content: "ราคา/ชิ้น"; font-weight: 500; color: #94a3b8; margin-right: 15px; }
+    #productTable tbody td:nth-child(5):before { content: "ยอดรวม"; font-weight: 500; color: #94a3b8; margin-right: 15px; }
 
-    /* ปรับ Tfoot บนมือถือ */
+    /* ปรับให้รูปกับข้อความไม่เบียดกัน */
+    .mobile-product-name { text-align: right; max-width: 160px; word-wrap: break-word; }
+
+    /* ปรับ Tfoot (ยอดรวม) บนมือถือ */
     #productTable tfoot tr {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
       padding: 15px;
-      background: rgba(22, 163, 74, 0.1);
+      background: rgba(22, 163, 74, 0.15);
       border-radius: 12px;
+      border: 1px solid rgba(34, 197, 94, 0.3);
     }
     #productTable tfoot td {
-      padding: 0 !important;
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0 !important;
       border: none !important;
+      width: 100%;
     }
-    #productTable tfoot td:first-child { display: none; } /* ซ่อนช่องว่าง */
+    #productTable tfoot td:first-child { display: none; } /* ซ่อนช่องว่าง td colspan=3 */
+    
+    .mobile-total-label { font-size: 1.1rem !important; }
+    .mobile-total-value { font-size: 1.4rem !important; text-align: right; }
   }
 </style>
 
 <div class="d-flex justify-content-end mb-4 mt-2">
-  <a href="orders.php" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2 shadow-sm w-100 w-md-auto text-center">
+  <a href="orders.php" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2 shadow-sm w-100 w-md-auto text-center hover-scale transition-all">
     <i class="bi bi-arrow-left me-1"></i> ย้อนกลับไปหน้าคำสั่งซื้อ
   </a>
 </div>
@@ -401,20 +411,20 @@ $paymentColors = [
           ?>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
             <td class="text-start py-3 ps-md-4">
-              <img src="/Project/admin/uploads/<?= htmlspecialchars($it['p_image'] ?? 'noimg.png') ?>" width="60" class="rounded shadow-sm" style="object-fit: cover; aspect-ratio: 1/1;">
+              <img src="/Project/admin/uploads/<?= htmlspecialchars($it['p_image'] ?? 'noimg.png') ?>" width="60" class="rounded shadow-sm border border-secondary" style="object-fit: cover; aspect-ratio: 1/1;">
             </td>
-            <td class="text-start fw-medium text-white text-break" style="max-width: 250px;"><?= htmlspecialchars($it['p_name']) ?></td>
+            <td class="text-start fw-medium text-white mobile-product-name"><?= htmlspecialchars($it['p_name']) ?></td>
             <td><span class="badge bg-secondary rounded-pill px-3"><?= (int)$it['quantity'] ?></span></td>
-            <td class="text-end text-muted">฿<?= number_format($it['price'], 2) ?></td>
+            <td class="text-end text-white">฿<?= number_format($it['price'], 2) ?></td>
             <td class="text-end text-info fw-bold pe-md-4">฿<?= number_format($it['subtotal'], 2) ?></td>
           </tr>
           <?php endforeach; ?>
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="3" class="border-0"></td>
-            <td class="text-end fw-bold text-white fs-5 border-0 pt-4 pb-4">ยอดรวมทั้งหมด:</td>
-            <td class="text-end fw-bold text-success fs-4 border-0 pe-md-4 pt-4 pb-4">฿<?= number_format($totalSum, 2) ?></td>
+            <td colspan="3" class="border-0 d-none d-md-table-cell"></td>
+            <td class="text-end fw-bold text-white border-0 pt-4 pb-4 mobile-total-label">ยอดรวมทั้งหมด:</td>
+            <td class="text-end fw-bold text-success fs-4 border-0 pe-md-4 pt-4 pb-4 mobile-total-value">฿<?= number_format($totalSum, 2) ?></td>
           </tr>
         </tfoot>
       </table>
