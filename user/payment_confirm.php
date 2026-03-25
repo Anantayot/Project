@@ -288,10 +288,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="total-price"><?= number_format($order['total_price'], 2) ?> ฿</div>
           </div>
           
-          <div class="mt-3 d-inline-block bg-white border px-3 py-2 rounded-pill shadow-sm">
-            <i class="bi bi-telephone-fill text-success me-2"></i>
-            <span class="fw-semibold text-dark"><?= htmlspecialchars($shopPromptPay) ?></span>
-          </div>
         </div>
 
         <script>
