@@ -1,7 +1,7 @@
 <?php
 session_start();
 // เรียกใช้ไฟล์เชื่อมต่อฐานข้อมูล (ถอยกลับไป 1 โฟลเดอร์)
-include("../connectdb.php");
+include("partials/connectdb.php");
 
 // ถ้ามีการล็อกอินอยู่แล้ว → กลับไปหน้า Dashboard
 if (isset($_SESSION['admin_id'])) {

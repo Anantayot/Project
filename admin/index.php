@@ -9,7 +9,7 @@ session_start();
 */
 
 // ออกไป 1 โฟลเดอร์เพื่อเรียกใช้ connectdb.php ของระบบหลัก
-include("../connectdb.php");
+include("partials/connectdb.php");
 
 // 📊 ดึงสถิติเบื้องต้นมาแสดงบน Dashboard
 // 1. จำนวนลูกค้าทั้งหมด
