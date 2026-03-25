@@ -4,7 +4,7 @@
   </div>
   
   <div class="admin-profile">
-    <img src="/mycommiss/icon_mycommiss.png" alt="Admin" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+    <img src="/mycommiss/partials/icon_mycommiss.png" alt="Admin" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
     <h6><?= $_SESSION['admin_name'] ?? 'ผู้ดูแลระบบ' ?></h6>
     <small><i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i>Online</small>
   </div>
