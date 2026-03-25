@@ -130,7 +130,6 @@ if (empty($search) && empty($cat_id)) {
             display: flex;
         }
         
-        /* ✅ แก้ปัญหาขอบถูกตัดเวลา Hover: เพิ่มพื้นที่ว่างบน-ล่างให้ตัว Swiper Container */
         .swiper {
             padding: 15px 5px !important; 
             margin: -15px -5px !important; 
@@ -138,7 +137,7 @@ if (empty($search) && empty($cat_id)) {
 
         /* 📦 Product Card */
         .product-card {
-            border: 1px solid #f0f0f0;
+            border: 1px solid #f0f0f0; /* ขอบปกติสีเทาอ่อน */
             border-radius: 15px;
             transition: all 0.3s ease;
             background: #fff;
@@ -147,15 +146,25 @@ if (empty($search) && empty($cat_id)) {
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            /* เพิ่มระยะขอบนิดนึงให้เส้น border สีแดงไม่โดนตัด */
             box-sizing: border-box;
+            position: relative;
         }
 
+        /* ✅ แก้ตรงนี้: ให้ทุกการ์ด (ทั้งในและนอก Swiper) มีกรอบสีแดงเวลา Hover */
         .product-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border-color: #D10024;
+            border: 1px solid #D10024 !important; /* บังคับเปลี่ยนสีขอบเป็นแดง */
         }
+
+        /* เผื่อกรณีใช้กรอบแบบ Box Shadow สำหรับสีแดง (สวยกว่า) */
+        /*
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 0 1px #D10024, 0 10px 20px rgba(0, 0, 0, 0.1); 
+            border-color: transparent !important;
+        }
+        */
 
         .product-card .img-wrapper {
             height: 200px;
@@ -254,6 +263,11 @@ if (empty($search) && empty($cat_id)) {
             padding-bottom: 10px;
             border-bottom: 2px solid #f0f0f0;
         }
+
+        /* ✅ เพิ่มพื้นที่ให้ผลการค้นหาไม่เบียดกัน และขอบแดงไม่ล้น */
+        .search-results-container {
+            padding: 15px 5px;
+        }
     </style>
 </head>
 
@@ -297,6 +311,7 @@ if (empty($search) && empty($cat_id)) {
             <h3 class="section-title"><?= ($cat_id === 'all') ? 'สินค้าทั้งหมด' : 'ผลการค้นหา' ?></h3>
 
             <?php if (count($searchResults) > 0): ?>
+                <div class="search-results-container">
                 <?php
                 $grouped = ($cat_id === 'all') ? [] : ['' => $searchResults];
                 if ($cat_id === 'all') {
@@ -308,13 +323,12 @@ if (empty($search) && empty($cat_id)) {
                 foreach ($grouped as $catName => $products):
                 ?>
                     <?php if ($catName): ?><h5 class="category-header"><?= htmlspecialchars($catName) ?></h5><?php endif; ?>
-                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-3 mt-1 mb-4" style="padding: 10px;">
+                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-3 mt-1 mb-4">
                         <?php foreach ($products as $p):
                             $img = "../admin/uploads/" . $p['p_image'];
                             if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
                         ?>
-                            <div class="col">
-                                <div class="product-card card border-0 shadow-sm">
+                            <div class="col" style="padding-bottom: 10px;"> <div class="product-card card border-0 shadow-sm">
                                     <div class="img-wrapper">
                                         <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
                                     </div>
@@ -333,6 +347,7 @@ if (empty($search) && empty($cat_id)) {
                         <?php endforeach; ?>
                     </div>
                 <?php endforeach; ?>
+                </div>
             <?php else: ?>
                 <div class="text-center py-5">
                     <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
