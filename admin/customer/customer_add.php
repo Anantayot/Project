@@ -105,7 +105,7 @@ ob_start();
 
             <div class="col-md-6">
               <label class="form-label">อีเมล <span class="text-danger">*</span></label>
-              <input type="email" name="email" class="form-control form-control-custom" placeholder="example@email.com" required>
+              <input type="email" name="email" class="form-control form-control-custom" placeholder="mycommiss@email.com" required>
             </div>
 
             <div class="col-md-6">
