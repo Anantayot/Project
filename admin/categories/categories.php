@@ -1,119 +1,204 @@
 <?php
-$pageTitle = "จัดการประเภทสินค้า";
-include __DIR__ . "/../../admin/partials/connectdb.php";
-ob_start();
+session_start();
+// เปิดโหมดโชว์ Error
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// 🔹 ดึงข้อมูลประเภทสินค้า
-$stmt = $conn->query("SELECT * FROM category ORDER BY cat_id ASC");
-$cats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// บังคับให้ต้องล็อกอิน
+if (!isset($_SESSION['admin_id'])) {
+  header("Location: ../login.php");
+  exit;
+}
+
+$pageTitle = "จัดการประเภทสินค้า";
+// ✅ แก้ไขพาธให้ชี้ไปหาไฟล์ฐานข้อมูลอย่างถูกต้อง
+include __DIR__ . "/../partials/connectdb.php";
+
+// 🔹 ดึงข้อมูลประเภทสินค้าทั้งหมด เรียงจากน้อยไปมาก
+try {
+  $stmt = $conn->query("SELECT * FROM category ORDER BY cat_id ASC");
+  $cats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  die("<div class='alert alert-danger text-center mt-4'>❌ SQL Error: " . htmlspecialchars($e->getMessage()) . "</div>");
+}
+
+ob_start();
 ?>
 
-<!-- 🔹 ส่วนหัว -->
-<h3 class="mb-4 text-center fw-bold text-white">
-  <i class="bi bi-tags"></i> จัดการประเภทสินค้า
-</h3>
+<style>
+  .table-card {
+    background: var(--bg-card);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+  }
+  .table-custom-header {
+    background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important;
+    color: #fff !important;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .table-custom-header th {
+    border-bottom: none;
+    padding: 15px 10px;
+  }
+  .table-dark {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  .table-dark td {
+    padding: 15px 10px;
+    vertical-align: middle;
+  }
 
-<div class="card shadow-lg border-0"
-     style="background:linear-gradient(145deg,#161b22,#0e1116);border:1px solid #2c313a;">
-  <div class="card-body">
+  /* ✅ เปลี่ยนสีข้อความ DataTables เป็นสีขาวทั้งหมด */
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_processing,
+  .dataTables_wrapper .dataTables_paginate {
+    color: #ffffff !important;
+  }
+  .dataTables_wrapper label {
+    color: #ffffff !important; 
+    font-weight: 500;
+  }
 
-    <!-- ปุ่มเพิ่มประเภทสินค้า -->
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-      <h4 class="text-light fw-semibold mb-0">
-        <i class="bi bi-list-ul"></i> รายการประเภทสินค้า
-      </h4>
-      <a href="category_add.php" class="btn btn-success btn-sm">
-        <i class="bi bi-plus-circle"></i> เพิ่มประเภทสินค้า
-      </a>
-    </div>
+  /* 📱 ปรับแต่งสำหรับมือถือ (Mobile Card View) */
+  @media (max-width: 768px) {
+    #dataTable thead { display: none; }
+    #dataTable tbody tr {
+      display: flex; flex-direction: column;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 15px; margin-bottom: 20px;
+      padding: 15px 20px; border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    #dataTable tbody td {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border: none !important;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important;
+      font-size: 0.95rem;
+    }
+    #dataTable tbody td:last-child {
+      border-bottom: none !important; padding-top: 18px; padding-bottom: 5px;
+    }
+    #dataTable tbody td::before {
+      content: attr(data-label); font-weight: 500; color: #94a3b8;
+      text-align: left; min-width: 120px; margin-right: 15px; flex-shrink: 0;
+    }
+    .mobile-value { text-align: right !important; word-break: break-word; flex-grow: 1; }
+    .mobile-actions { display: flex; justify-content: flex-end; width: 100%; gap: 10px; }
+  }
+</style>
 
-    <!-- ตารางประเภทสินค้า -->
-    <div class="table-responsive">
-      <table id="dataTable" class="table table-dark table-striped text-center align-middle mb-0"
-             style="border-radius:10px;overflow:hidden;">
-        <thead style="background:linear-gradient(90deg,#00d25b,#00b14a);color:#111;font-weight:600;">
-          <tr>
-            <th style="width:50px;">#</th>
-            <th>ชื่อประเภท</th>
-            <th>รายละเอียด</th>
-            <th style="width:120px;">จัดการ</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php if (empty($cats)): ?>
-            <tr>
-              <td colspan="4" class="text-center text-muted py-4">
-                <i class="bi bi-info-circle"></i> ยังไม่มีข้อมูลประเภทสินค้า
-              </td>
+<div class="d-flex justify-content-end mb-4">
+  <a href="category_add.php" class="btn btn-success rounded-pill px-4 py-2 shadow-sm transition-all hover-scale w-100 w-md-auto">
+    <i class="bi bi-plus-circle me-1"></i> เพิ่มประเภทสินค้า
+  </a>
+</div>
+
+<div class="card table-card shadow-lg">
+  <div class="card-body p-3 p-md-4">
+
+    <?php if (empty($cats)): ?>
+      <div class="text-center py-5">
+        <i class="bi bi-tags text-muted" style="font-size: 4rem;"></i>
+        <h5 class="text-muted mt-3">ยังไม่มีข้อมูลประเภทสินค้า</h5>
+      </div>
+    <?php else: ?>
+      <div> 
+        <table id="dataTable" class="table table-dark table-striped table-hover text-center align-middle w-100 mb-0">
+          <thead>
+            <tr class="table-custom-header">
+              <th style="width: 100px;">รหัสประเภท</th>
+              <th class="text-start">ชื่อประเภทสินค้า</th>
+              <th class="text-start">รายละเอียด</th>
+              <th style="width: 130px;">จัดการ</th>
             </tr>
-          <?php else: ?>
-            <?php foreach ($cats as $i => $c): ?>
+          </thead>
+          <tbody>
+            <?php foreach ($cats as $c): ?>
               <tr>
-                <td><?= $i + 1 ?></td>
-                <td class="text-white"><?= htmlspecialchars($c['cat_name']) ?></td>
-                <td class="text-light"><?= htmlspecialchars($c['cat_description'] ?? '-') ?></td>
-                <td>
-                  <a href="category_edit.php?id=<?= $c['cat_id'] ?>" 
-                     class="btn btn-warning btn-sm me-1" title="แก้ไข">
-                    <i class="bi bi-pencil-square"></i>
-                  </a>
-                  <a href="category_delete.php?id=<?= $c['cat_id'] ?>" 
-                     class="btn btn-danger btn-sm" title="ลบ"
-                     onclick="return confirm('ยืนยันการลบประเภทสินค้านี้หรือไม่?')">
-                    <i class="bi bi-trash"></i>
-                  </a>
+                <td data-label="รหัสประเภท" data-sort="<?= $c['cat_id'] ?>" class="fw-bold text-success mobile-value">
+                  #<?= htmlspecialchars($c['cat_id']) ?>
+                </td>
+                <td data-label="ชื่อประเภท" class="text-md-start text-white fw-medium mobile-value">
+                  <?= htmlspecialchars($c['cat_name']) ?>
+                </td>
+                <td data-label="รายละเอียด" class="text-md-start text-light mobile-value">
+                  <?= htmlspecialchars($c['cat_description'] ?: '-') ?>
+                </td>
+                <td data-label="จัดการ" class="mobile-value">
+                  <div class="d-flex justify-content-center mobile-actions">
+                    <a href="category_edit.php?id=<?= $c['cat_id'] ?>" class="btn btn-sm btn-outline-warning rounded-circle" title="แก้ไข">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="category_delete.php?id=<?= $c['cat_id'] ?>" class="btn btn-sm btn-outline-danger rounded-circle" title="ลบ" onclick="return confirm('ยืนยันการลบประเภทสินค้านี้หรือไม่? (หากลบ สินค้าที่อยู่ในประเภทนี้อาจไม่แสดงผล)');">
+                      <i class="bi bi-trash"></i>
+                    </a>
+                  </div>
                 </td>
               </tr>
             <?php endforeach; ?>
-          <?php endif; ?>
-        </tbody>
-      </table>
-    </div>
+          </tbody>
+        </table>
+      </div>
+    <?php endif; ?>
+
   </div>
 </div>
 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    let script1 = document.createElement('script');
+    script1.src = "https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js";
+    document.body.appendChild(script1);
+    
+    script1.onload = () => {
+      let script2 = document.createElement('script');
+      script2.src = "https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js";
+      document.body.appendChild(script2);
+      
+      script2.onload = () => {
+        $('#dataTable').DataTable({
+          language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
+          pageLength: 10,
+          responsive: false, 
+          order: [[0, "asc"]], // ✅ เรียงตามรหัสจากน้อยไปมาก
+          columnDefs: [
+            { orderable: false, targets: [3] } 
+          ],
+          dom: '<"d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3"lf>rt<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3"ip>'
+        });
+
+        // ✅ แต่งกล่องค้นหาและช่อง Dropdown ให้ข้อความเป็นสีขาว
+        $(".dataTables_filter input")
+          .addClass("form-control form-control-sm text-white")
+          .css({
+            "background": "rgba(255,255,255,0.05)", "color": "#ffffff",
+            "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px",
+            "padding": "8px 15px", "min-width": "250px"
+          });
+
+        $(".dataTables_length select")
+          .addClass("form-select form-select-sm text-white")
+          .css({
+            "background": "rgba(255,255,255,0.05)", "color": "#ffffff",
+            "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px",
+            "padding": "6px 30px 6px 15px"
+          });
+      };
+    };
+  });
+</script>
+
 <?php
 $pageContent = ob_get_clean();
+// ✅ ชี้ไปดึง layout จากโฟลเดอร์ partials อย่างถูกต้อง
 include __DIR__ . "/../partials/layout.php";
 ?>
-
-<!-- ✅ โหลดสคริปต์ DataTables หลัง Layout -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-<!-- 🔹 ตั้งค่า DataTables -->
-<script>
-$(document).ready(function() {
-  const table = $('#dataTable').DataTable({
-    language: {
-      url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json',
-      searchPlaceholder: "🔍 ค้นหาชื่อประเภท / รายละเอียด...",
-      lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
-      zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
-      info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
-      infoEmpty: "ไม่มีข้อมูล",
-      infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)"
-    },
-    pageLength: 10,
-    responsive: true,
-    order: [[0, "asc"]],
-    columnDefs: [
-      { orderable: false, targets: [3] } // ปิด sort ปุ่มจัดการ
-    ]
-  });
-
-  // 🎨 ปรับสไตล์ช่องค้นหาและ dropdown
-  $(".dataTables_filter input")
-    .addClass("form-control form-control-sm ms-2")
-    .css({
-      "width": "250px",
-      "background": "#161b22",
-      "color": "#fff",
-      "border": "1px solid #2c313a"
-    });
-
-  $(".dataTables_length select")
-    .addClass("form-select form-select-sm bg-dark text-light border-secondary");
-});
-</script>
