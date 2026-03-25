@@ -93,6 +93,7 @@ ob_start();
   .bg-orange { background-color: #f97316 !important; color: #fff; }
   .bg-custom-blue { background-color: #3b82f6 !important; color: #fff; } /* สีฟ้า */
   .bg-custom-success { background-color: #22c55e !important; color: #fff; } /* สีเขียว 22c55e */
+  .bg-custom-yellow { background-color: #facc15 !important; color: #0f172a !important; } /* สีเหลืองสว่าง + ตัวหนังสือสีเข้ม */
 
   /* 📱 ปรับแต่งสำหรับ Mobile */
   @media (max-width: 767px) {
@@ -176,11 +177,12 @@ ob_start();
                   <?php
                     $status = $o['order_status'] ?? 'รอดำเนินการ';
                     if ($status == 'สำเร็จ' || $status == 'จัดส่งแล้ว') $badge = 'success';
-                    elseif ($status == 'กำลังจัดเตรียม') $badge = 'custom-blue'; // เปลี่ยนเป็นสีฟ้า
+                    elseif ($status == 'กำลังจัดเตรียม') $badge = 'custom-blue'; // สีฟ้า
+                    elseif ($status == 'รอดำเนินการ') $badge = 'custom-yellow'; // เพิ่มสีเหลืองตรงนี้
                     elseif ($status == 'ยกเลิก') $badge = 'danger';
                     else $badge = 'secondary';
                   ?>
-                  <span class="badge bg-<?= $badge ?> rounded-pill px-3 py-2 fw-medium">
+                  <span class="badge bg-<?= $badge ?> rounded-pill px-3 py-2 fw-bold">
                     <?= htmlspecialchars($status) ?>
                   </span>
                 </td>
@@ -188,12 +190,12 @@ ob_start();
                 <td data-label="การโอน" class="text-center text-md-start">
                   <?php
                     $verify = $o['admin_verified'] ?? 'รอตรวจสอบ';
-                    if ($verify == 'อนุมัติ') $vbadge = 'custom-success'; // เปลี่ยนเป็นสีเขียว 22c55e
+                    if ($verify == 'อนุมัติ') $vbadge = 'custom-success'; // สีเขียว
                     elseif ($verify == 'ปฏิเสธ') $vbadge = 'danger';
                     elseif ($verify == 'กำลังตรวจสอบ') $vbadge = 'purple';
                     else $vbadge = 'warning text-dark';
                   ?>
-                  <span class="badge bg-<?= $vbadge ?> rounded-pill px-3 py-2 fw-medium">
+                  <span class="badge bg-<?= $vbadge ?> rounded-pill px-3 py-2 fw-bold">
                     <?= htmlspecialchars($verify) ?>
                   </span>
                 </td>
@@ -230,7 +232,7 @@ ob_start();
           language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
           pageLength: 10,
           responsive: false,
-          order: [[0, "desc"]], // บังคับให้คอลัมน์แรก (ID) เรียงจากมากไปน้อย (descending)
+          order: [[0, "desc"]], // บังคับให้คอลัมน์แรก (ID) เรียงจากมากไปน้อย
           dom: '<"d-flex flex-wrap justify-content-between align-items-center mb-3"lf>rt<"d-flex flex-wrap justify-content-between align-items-center mt-3"ip><"clear">',
         });
 
