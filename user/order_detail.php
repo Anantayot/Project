@@ -195,6 +195,80 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
     .btn-outline-red:hover { background-color: #D10024; color: #fff; }
 
     footer { background-color: #fff; color: #6c757d; padding: 20px; font-size: 0.9rem; border-top: 1px solid #eee; margin-top: auto; }
+
+    /* 📱 MOBILE RESPONSIVE (Table to Card) */
+    @media (max-width: 768px) {
+      /* ปรับตารางสินค้าในมือถือ */
+      .table-cart thead { display: none; }
+      .table-cart tbody tr {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #eee;
+        border-radius: 15px;
+        margin: 10px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      }
+      .table-cart tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: none;
+        padding: 8px 0;
+        text-align: right;
+      }
+      
+      /* รูปและชื่อสินค้า (ชิดซ้ายเต็มบรรทัด) */
+      .table-cart tbody td:first-child {
+        justify-content: flex-start;
+        border-bottom: 1px dashed #eee;
+        margin-bottom: 10px;
+        padding-bottom: 15px;
+      }
+      
+      /* สร้าง Label อัตโนมัติด้วย CSS ::before */
+      .table-cart tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #6c757d;
+        text-align: left;
+      }
+      .table-cart tbody td:first-child::before { display: none; } /* ซ่อน Label ช่องแรก */
+
+      /* ส่วนสรุปยอด (tfoot) */
+      .table-cart tfoot, .table-cart tfoot tr, .table-cart tfoot td {
+        display: block;
+        width: 100%;
+      }
+      .table-cart tfoot tr { border: none; padding: 0 10px; }
+      .table-cart tfoot td.label-total { display: none; } 
+      .table-cart tfoot td.value-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 2px solid #eee;
+        padding-top: 15px;
+        margin-top: 10px;
+        text-align: right !important;
+      }
+      .table-cart tfoot td.value-total::before {
+        content: "ยอดชำระสุทธิ:";
+        font-size: 1.1rem;
+        color: #6c757d;
+        font-weight: 600;
+      }
+
+      /* ปรับปุ่มด้านล่างให้เต็มจอในมือถือ */
+      .action-buttons {
+        flex-direction: column;
+        width: 100%;
+      }
+      .action-buttons a, .action-buttons button {
+        width: 100%;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -359,8 +433,7 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
     <div class="card card-custom mt-2">
       <div class="card-header-custom"><i class="bi bi-cart3 me-2 text-muted"></i>รายการสินค้าที่สั่งซื้อ</div>
       <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-cart text-center align-middle mb-0">
+        <div class="table-responsive" style="overflow-x: hidden;"> <table class="table table-cart text-center align-middle mb-0">
             <thead>
               <tr>
                 <th class="text-start ps-4">สินค้า</th>
@@ -376,22 +449,22 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
                 if (!file_exists($imgPath) || empty($d['p_image'])) $imgPath = "img/default.png";
               ?>
                 <tr>
-                  <td class="text-start ps-4">
+                  <td data-label="สินค้า" class="text-start ps-md-4">
                     <div class="d-flex align-items-center gap-3">
                       <img src="<?= $imgPath ?>" class="product-img bg-white" alt="<?= htmlspecialchars($d['p_name']) ?>">
                       <span class="fw-semibold text-dark text-truncate" style="max-width: 250px;"><?= htmlspecialchars($d['p_name']) ?></span>
                     </div>
                   </td>
-                  <td class="text-muted"><?= number_format($d['price'], 2) ?> ฿</td>
-                  <td class="fw-medium text-dark"><?= $d['quantity'] ?> ชิ้น</td>
-                  <td class="text-end pe-4 fw-bold text-dark"><?= number_format($sum, 2) ?> ฿</td>
+                  <td data-label="ราคาต่อหน่วย" class="text-muted"><?= number_format($d['price'], 2) ?> ฿</td>
+                  <td data-label="จำนวน" class="fw-medium text-dark"><?= $d['quantity'] ?> ชิ้น</td>
+                  <td data-label="ยอดรวม" class="text-end pe-md-4 fw-bold text-dark"><?= number_format($sum, 2) ?> ฿</td>
                 </tr>
               <?php endforeach; ?>
             </tbody>
             <tfoot>
               <tr class="table-light">
-                <td colspan="3" class="text-end fw-semibold text-muted pt-3 pb-3">ยอดชำระสุทธิ:</td>
-                <td class="text-end pe-4 pt-3 pb-3 fw-bold text-danger fs-4"><?= number_format($order['total_price'], 2) ?> ฿</td>
+                <td colspan="3" class="text-end fw-semibold text-muted pt-3 pb-3 label-total">ยอดชำระสุทธิ:</td>
+                <td class="text-end pe-md-4 pt-3 pb-3 fw-bold text-danger fs-4 value-total"><?= number_format($order['total_price'], 2) ?> ฿</td>
               </tr>
             </tfoot>
           </table>
@@ -399,17 +472,17 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </div>
 
-    <div class="d-flex justify-content-end mt-4 gap-2">
+    <div class="d-flex justify-content-end mt-4 action-buttons gap-2">
       <?php if ($isCancelled): ?>
-        <form method="post" class="m-0">
+        <form method="post" class="m-0 w-100 w-md-auto text-end">
           <input type="hidden" name="reorder" value="1">
-          <button type="submit" class="btn btn-red rounded-pill px-4 shadow-sm">
+          <button type="submit" class="btn btn-red rounded-pill px-4 shadow-sm w-100 w-md-auto">
              <i class="bi bi-cart-plus me-1"></i> สั่งซื้อสินค้าอีกครั้ง
           </button>
         </form>
       <?php elseif ($order_status === 'รอดำเนินการ' && $payment_status !== 'ยกเลิก'): ?>
         <a href="order_cancel.php?id=<?= $order_id ?>" 
-           class="btn btn-outline-danger rounded-pill px-4"
+           class="btn btn-outline-danger rounded-pill px-4 w-100 w-md-auto"
            onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำสั่งซื้อนี้? (ไม่สามารถกู้คืนได้)');">
            <i class="bi bi-x-circle me-1"></i> ยกเลิกคำสั่งซื้อ
         </a>
