@@ -1,5 +1,5 @@
 <div class="topbar d-none d-lg-flex">
-  <h4 class="mb-0 text-white fw-bold"><i class="bi bi-speedometer2 me-2 text-success"></i><?= $pageTitle ?? 'Dashboard' ?></h4>
+  <h4 class="mb-0 text-white fw-bold"><?= $pageTitle ?? '<i class="bi bi-speedometer2 me-2 text-success"></i> Dashboard' ?></h4>
   
   <div class="d-flex align-items-center gap-2">
     <a href="/Project/user/index.php" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-3">

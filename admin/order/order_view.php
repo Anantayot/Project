@@ -8,7 +8,7 @@ if (!$id) die("<div class='alert alert-danger text-center mt-5'>❌ ไม่พ
 
 // ✅ แก้ไข: เปลี่ยนไอคอนจากใบเสร็จ (bi-receipt-cutoff) เป็นเกจวัดความเร็ว หรือ รูปคน ตามต้องการ 
 // (จากรูปตัวอย่าง ไอคอนคล้ายๆ กับ bi-speedometer2 หรือคุณสามารถเปลี่ยนเป็น bi-person-badge ได้)
-$pageTitle = "<i class='bi bi-speedometer2 me-2 text-success'></i> รายละเอียดคำสั่งซื้อ <span class='text-success'>#" . htmlspecialchars($id) . "</span>";
+$pageTitle = "<i class='bi bi-receipt-cutoff me-2 text-success'></i> รายละเอียดคำสั่งซื้อ <span class='text-success'>#" . htmlspecialchars($id) . "</span>";
 
 ob_start();
 
