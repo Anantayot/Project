@@ -204,7 +204,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                   $methodText = 'QR Code';
                   $methodIcon = 'bi-qr-code-scan text-primary';
                 } elseif ($o['payment_method'] === 'COD') {
-                  $methodText = 'ปลายทาง (COD)';
+                  $methodText = 'ชำระเงินปลายทาง';
                   $methodIcon = 'bi-cash-coin text-success';
                 }
 
