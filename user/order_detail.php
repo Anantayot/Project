@@ -76,227 +76,260 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>รายละเอียดคำสั่งซื้อ #<?= $order_id ?> | MyCommiss</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายละเอียดคำสั่งซื้อ #<?= str_pad($order_id, 5, '0', STR_PAD_LEFT) ?> | MyCommiss</title>
   <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  
   <style>
-    body { background-color: #fff; font-family: "Prompt", sans-serif; }
+    body { background-color: #f8f9fa; font-family: "Prompt", sans-serif; color: #333; }
+    .page-wrapper { min-height: 80vh; padding-bottom: 50px; }
 
-    /* สีหลัก */
-    :root { --red-main: #D10024; }
-
-    .card-header {
-      background: var(--red-main) !important;
-      color: #fff;
-      font-weight: 600;
+    /* 🔹 Cards */
+    .card-custom {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      background: #fff;
+      overflow: hidden;
+      margin-bottom: 25px;
+    }
+    .card-header-custom {
+      background-color: #fff;
+      border-bottom: 2px solid #f1f1f1;
+      padding: 18px 25px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #333;
     }
 
-    .btn {
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.2s ease-in-out;
-    }
-    .btn:hover { transform: scale(1.05); }
-
-    /* ปุ่มธีมแดง */
-    .btn-primary, .btn-outline-primary:hover {
-      background-color: var(--red-main);
-      border-color: var(--red-main);
-      color: #fff;
-    }
-    .btn-outline-primary {
-      border-color: var(--red-main);
-      color: var(--red-main);
-    }
-
-    /* ตารางสินค้า */
-    .table thead {
-      background-color: var(--red-main);
-      color: #fff;
-    }
-
-    /* badge */
-    .badge {
-      font-size: 0.9rem;
-      padding: 6px 10px;
-    }
+    /* 🔹 Typography & Badges */
+    .info-label { color: #6c757d; font-size: 0.9rem; font-weight: 600; margin-bottom: 5px; }
+    .info-value { font-size: 1.05rem; font-weight: 500; color: #222; margin-bottom: 15px; }
+    
+    .badge { font-size: 0.85rem; padding: 6px 12px; font-weight: 500; border-radius: 8px; }
     .bg-warning { background-color: #ff9800 !important; color: #fff !important; }
-    .bg-secondary { background-color: var(--red-main) !important; color: #fff !important; }
     .bg-success { background-color: #28a745 !important; color: #fff !important; }
-    .bg-danger { background-color: #c82333 !important; color: #fff !important; }
+    .bg-danger { background-color: #dc3545 !important; color: #fff !important; }
+    .bg-info { background-color: #17a2b8 !important; color: #fff !important; }
 
-    footer {
-      background: var(--red-main);
-      color: white;
-      padding: 15px;
-      margin-top: 40px;
+    /* 🔹 Table */
+    .table-cart th {
+      background-color: #fcfcfc;
+      color: #555;
+      font-weight: 600;
+      border-bottom: 2px solid #eee;
+      padding: 15px 10px;
     }
+    .table-cart td { vertical-align: middle; padding: 15px 10px; border-bottom: 1px solid #f8f9fa; }
+    .product-img {
+      width: 70px; height: 70px; object-fit: contain;
+      border-radius: 10px; border: 1px solid #eee; padding: 5px;
+    }
+
+    /* 🔹 Buttons */
+    .btn-red { background-color: #D10024; color: #fff; border-radius: 50px; font-weight: 500; transition: 0.3s; border: none; }
+    .btn-red:hover { background-color: #a5001b; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(209, 0, 36, 0.2); }
+    .btn-outline-red { border: 1px solid #D10024; color: #D10024; border-radius: 50px; font-weight: 500; transition: 0.3s; background: #fff; }
+    .btn-outline-red:hover { background-color: #D10024; color: #fff; }
+
+    footer { background-color: #fff; color: #6c757d; padding: 20px; font-size: 0.9rem; border-top: 1px solid #eee; margin-top: auto; }
   </style>
 </head>
 <body>
 
 <?php include("navbar_user.php"); ?>
 
-<!-- ✅ Toast แจ้งเตือน -->
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:3000;">
-  <?php foreach (['success' => 'success', 'error' => 'danger', 'info' => 'info'] as $key => $color): ?>
-    <?php if (isset($_SESSION["toast_{$key}"])): ?>
-      <div class="toast align-items-center text-bg-<?= $color ?> border-0 show" role="alert">
-        <div class="d-flex">
-          <div class="toast-body"><?= $_SESSION["toast_{$key}"] ?></div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+<div class="page-wrapper">
+  <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index:3000;">
+    <?php foreach (['success' => 'success', 'error' => 'danger', 'info' => 'info'] as $key => $color): ?>
+      <?php if (isset($_SESSION["toast_{$key}"])): ?>
+        <div class="toast align-items-center text-bg-<?= $color ?> border-0 show shadow-lg" role="alert">
+          <div class="d-flex">
+            <div class="toast-body fs-6 fw-medium px-3 py-2"><?= $_SESSION["toast_{$key}"] ?></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+          </div>
         </div>
-      </div>
-      <?php unset($_SESSION["toast_{$key}"]); ?>
-    <?php endif; ?>
-  <?php endforeach; ?>
-</div>
+        <?php unset($_SESSION["toast_{$key}"]); ?>
+      <?php endif; ?>
+    <?php endforeach; ?>
+  </div>
 
-<div class="container mt-4 mb-5">
-  <h3 class="fw-bold text-center mb-4" style="color:#D10024;">📦 รายละเอียดคำสั่งซื้อ #<?= $order_id ?></h3>
+  <div class="container mt-5">
+    
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold mb-3 mb-md-0" style="color: #D10024;">
+        <i class="bi bi-receipt me-2"></i>รายละเอียดคำสั่งซื้อ #<?= str_pad($order_id, 5, '0', STR_PAD_LEFT) ?>
+      </h2>
+      <a href="orders.php" class="btn btn-outline-secondary rounded-pill px-4"><i class="bi bi-arrow-left me-2"></i>กลับหน้าประวัติ</a>
+    </div>
 
-  <!-- 🔹 ข้อมูลคำสั่งซื้อ -->
-  <div class="card mb-4 shadow-sm border-0">
-    <div class="card-header">ข้อมูลคำสั่งซื้อ</div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-6">
-          <p><strong>วันที่สั่งซื้อ:</strong> <?= date('d/m/Y H:i', strtotime($order['order_date'])) ?></p>
+    <?php
+      // เตรียมข้อมูลสถานะ
+      $methodText = ($order['payment_method'] === 'QR') ? 'สแกน QR Code' :
+                    (($order['payment_method'] === 'COD') ? 'เก็บเงินปลายทาง (COD)' : htmlspecialchars($order['payment_method']));
 
-          <?php
-          $methodText = ($order['payment_method'] === 'QR') ? 'ชำระด้วย QR Code' :
-                        (($order['payment_method'] === 'COD') ? 'เก็บเงินปลายทาง' :
-                        htmlspecialchars($order['payment_method']));
+      $payment_status = $order['payment_status'] ?? 'รอดำเนินการ';
+      $order_status = $order['order_status'] ?? 'รอดำเนินการ';
+      $admin_verified = $order['admin_verified'] ?? 'รอตรวจสอบ';
 
-          $payment_status = $order['payment_status'] ?? 'รอดำเนินการ';
-          $order_status = $order['order_status'] ?? 'รอดำเนินการ';
-          $admin_verified = $order['admin_verified'] ?? 'รอตรวจสอบ';
+      $paymentBadge = ($payment_status === 'ชำระเงินแล้ว') ? 'success' : (($payment_status === 'ยกเลิก') ? 'danger' : 'warning');
+      $orderBadge = ($order_status === 'จัดส่งแล้ว' || $order_status === 'สำเร็จ') ? 'success' :
+                    (($order_status === 'กำลังจัดเตรียม') ? 'info' : (($order_status === 'ยกเลิก') ? 'danger' : 'warning'));
+      $adminBadge = ($admin_verified === 'อนุมัติ') ? 'success' : (($admin_verified === 'กำลังตรวจสอบ') ? 'info' :
+                    (($admin_verified === 'ปฏิเสธ') ? 'danger' : 'warning'));
+      
+      $isCancelled = ($order_status === 'ยกเลิก' || $payment_status === 'ยกเลิก');
+    ?>
 
-          $paymentBadge = ($payment_status === 'ชำระเงินแล้ว') ? 'success' :
-                          (($payment_status === 'ยกเลิก') ? 'danger' : 'warning');
-          $orderBadge = ($order_status === 'จัดส่งแล้ว' || $order_status === 'สำเร็จ') ? 'success' :
-                        (($order_status === 'กำลังจัดเตรียม') ? 'info' :
-                        (($order_status === 'ยกเลิก') ? 'danger' : 'warning'));
-          $adminBadge = ($admin_verified === 'อนุมัติ') ? 'success' :
-                        (($admin_verified === 'กำลังตรวจสอบ') ? 'info' :
-                        (($admin_verified === 'ปฏิเสธ') ? 'danger' : 'warning'));
-          ?>
-
-          <p><strong>วิธีชำระเงิน:</strong> <?= $methodText ?></p>
-
-          <?php 
-          if (
-            $payment_status === 'รอดำเนินการ' &&
-            $order['admin_verified'] !== 'กำลังตรวจสอบ' &&
-            $order['admin_verified'] !== 'อนุมัติ'
-          ): 
-          ?>
-            <form method="post" class="mt-2">
-              <div class="input-group">
-                <select name="new_payment" class="form-select" required>
-                  <option value="COD" <?= $order['payment_method'] === 'COD' ? 'selected' : '' ?>>เก็บเงินปลายทาง</option>
-                  <option value="QR" <?= $order['payment_method'] === 'QR' ? 'selected' : '' ?>>ชำระด้วย QR Code</option>
-                </select>
-                <button type="submit" class="btn btn-outline-primary">🔄 เปลี่ยน</button>
+    <div class="row">
+      <div class="col-lg-7">
+        
+        <div class="card card-custom">
+          <div class="card-header-custom"><i class="bi bi-info-circle me-2 text-muted"></i>สถานะคำสั่งซื้อ</div>
+          <div class="card-body p-4">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="info-label">วันที่สั่งซื้อ</div>
+                <div class="info-value"><i class="bi bi-calendar-event text-muted me-2"></i><?= date('d/m/Y H:i', strtotime($order['order_date'])) ?> น.</div>
+                
+                <div class="info-label mt-3">สถานะคำสั่งซื้อ</div>
+                <div class="info-value"><span class="badge bg-<?= $orderBadge ?>"><?= htmlspecialchars($order_status) ?></span></div>
+                
+                <?php if (!empty($order['shipped_date'])): ?>
+                  <div class="info-label mt-3">วันที่จัดส่ง</div>
+                  <div class="info-value text-success"><i class="bi bi-truck me-2"></i><?= date('d/m/Y H:i', strtotime($order['shipped_date'])) ?> น.</div>
+                <?php endif; ?>
               </div>
-            </form>
-          <?php endif; ?>
+              <div class="col-sm-6 border-start ps-sm-4 mt-4 mt-sm-0">
+                <div class="info-label">วิธีชำระเงิน</div>
+                <div class="info-value"><i class="bi bi-credit-card text-muted me-2"></i><?= $methodText ?></div>
 
-          <p class="mt-3"><strong>สถานะการชำระเงิน:</strong>
-            <span class="badge bg-<?= $paymentBadge ?>"><?= htmlspecialchars($payment_status) ?></span>
-          </p>
-          <p><strong>สถานะคำสั่งซื้อ:</strong>
-            <span class="badge bg-<?= $orderBadge ?>"><?= htmlspecialchars($order_status) ?></span>
-          </p>
+                <div class="info-label mt-3">สถานะการชำระเงิน</div>
+                <div class="info-value"><span class="badge bg-<?= $paymentBadge ?>"><?= htmlspecialchars($payment_status) ?></span></div>
 
-          <?php if ($order['payment_method'] !== 'COD'): ?>
-            <p><strong>ตรวจสอบโดยแอดมิน:</strong>
-              <span class="badge bg-<?= $adminBadge ?>"><?= htmlspecialchars($admin_verified) ?></span>
-            </p>
-          <?php endif; ?>
+                <?php if ($order['payment_method'] !== 'COD'): ?>
+                  <div class="info-label mt-3">การตรวจสอบโดยแอดมิน</div>
+                  <div class="info-value"><span class="badge bg-<?= $adminBadge ?>"><?= htmlspecialchars($admin_verified) ?></span></div>
+                <?php endif; ?>
+              </div>
+            </div>
 
-          <?php if (!empty($order['shipped_date'])): ?>
-            <p><strong>วันที่จัดส่ง:</strong> <?= date('d/m/Y H:i', strtotime($order['shipped_date'])) ?></p>
-          <?php endif; ?>
-
-          <?php if (!empty($order['tracking_number'])): ?>
-            <p><strong>หมายเลขพัสดุ:</strong> 📦 <?= htmlspecialchars($order['tracking_number']) ?></p>
-          <?php endif; ?>
-
-          <?php
-          if (
-            $order['payment_method'] === 'QR' &&
-            $payment_status === 'รอดำเนินการ' &&
-            !in_array($order['admin_verified'], ['กำลังตรวจสอบ', 'อนุมัติ']) &&
-            $payment_status !== 'ชำระเงินแล้ว'
-          ):
-          ?>
-            <a href="payment_confirm.php?id=<?= $order_id ?>" class="btn btn-warning mt-2">
-              💰 แจ้งชำระเงิน
-            </a>
-          <?php endif; ?>
+            <?php if ($payment_status === 'รอดำเนินการ' && !in_array($admin_verified, ['กำลังตรวจสอบ', 'อนุมัติ']) && !$isCancelled): ?>
+              <hr class="text-muted opacity-25 my-4">
+              <div class="bg-light p-3 rounded-3 border">
+                <div class="info-label mb-2"><i class="bi bi-arrow-repeat me-1"></i>ต้องการเปลี่ยนวิธีชำระเงิน?</div>
+                <form method="post" class="d-flex gap-2">
+                  <select name="new_payment" class="form-select w-auto" required>
+                    <option value="COD" <?= $order['payment_method'] === 'COD' ? 'selected' : '' ?>>เก็บเงินปลายทาง</option>
+                    <option value="QR" <?= $order['payment_method'] === 'QR' ? 'selected' : '' ?>>ชำระด้วย QR Code</option>
+                  </select>
+                  <button type="submit" class="btn btn-outline-red px-3">ยืนยัน</button>
+                </form>
+              </div>
+            <?php endif; ?>
+            
+            <?php if ($order['payment_method'] === 'QR' && $payment_status === 'รอดำเนินการ' && !in_array($admin_verified, ['กำลังตรวจสอบ', 'อนุมัติ']) && $payment_status !== 'ชำระเงินแล้ว' && !$isCancelled): ?>
+              <div class="mt-4 text-center">
+                <a href="payment_confirm.php?id=<?= $order_id ?>" class="btn btn-warning rounded-pill px-5 py-2 fw-bold text-dark shadow-sm">
+                  <i class="bi bi-wallet2 me-2"></i>แจ้งชำระเงิน
+                </a>
+              </div>
+            <?php endif; ?>
+            
+          </div>
         </div>
 
-        <div class="col-md-6">
-          <p><strong>ที่อยู่จัดส่ง:</strong><br><?= nl2br(htmlspecialchars($order['shipping_address'] ?? '-')) ?></p>
-          <p><strong>ยอดรวมทั้งหมด:</strong>
-            <span class="text-danger fw-bold"><?= number_format($order['total_price'], 2) ?> บาท</span>
-          </p>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="card card-custom h-100">
+          <div class="card-header-custom"><i class="bi bi-geo-alt me-2 text-muted"></i>ที่อยู่จัดส่งพัสดุ</div>
+          <div class="card-body p-4 d-flex flex-column">
+            
+            <?php if (!empty($order['tracking_number'])): ?>
+              <div class="alert alert-success d-flex align-items-center shadow-sm">
+                <i class="bi bi-box2-heart fs-3 me-3"></i>
+                <div>
+                  <div class="small text-muted">หมายเลขพัสดุ (Tracking Number)</div>
+                  <strong class="fs-5 tracking-text"><?= htmlspecialchars($order['tracking_number']) ?></strong>
+                </div>
+              </div>
+            <?php endif; ?>
+
+            <div class="bg-light p-4 rounded-4 border flex-grow-1">
+              <p class="mb-0" style="line-height: 1.8;">
+                <i class="bi bi-house-door text-danger me-2"></i>
+                <?= nl2br(htmlspecialchars($order['shipping_address'] ?? 'ไม่ระบุที่อยู่')) ?>
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card card-custom mt-2">
+      <div class="card-header-custom"><i class="bi bi-cart3 me-2 text-muted"></i>รายการสินค้าที่สั่งซื้อ</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-cart text-center align-middle mb-0">
+            <thead>
+              <tr>
+                <th class="text-start ps-4">สินค้า</th>
+                <th>ราคา/หน่วย</th>
+                <th>จำนวน</th>
+                <th class="text-end pe-4">ยอดรวม</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($details as $d): 
+                $sum = $d['price'] * $d['quantity'];
+                $imgPath = "../admin/uploads/" . $d['p_image'];
+                if (!file_exists($imgPath) || empty($d['p_image'])) $imgPath = "img/default.png";
+              ?>
+                <tr>
+                  <td class="text-start ps-4">
+                    <div class="d-flex align-items-center gap-3">
+                      <img src="<?= $imgPath ?>" class="product-img bg-white" alt="<?= htmlspecialchars($d['p_name']) ?>">
+                      <span class="fw-semibold text-dark text-truncate" style="max-width: 250px;"><?= htmlspecialchars($d['p_name']) ?></span>
+                    </div>
+                  </td>
+                  <td class="text-muted"><?= number_format($d['price'], 2) ?> ฿</td>
+                  <td class="fw-medium text-dark"><?= $d['quantity'] ?> ชิ้น</td>
+                  <td class="text-end pe-4 fw-bold text-dark"><?= number_format($sum, 2) ?> ฿</td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+              <tr class="table-light">
+                <td colspan="3" class="text-end fw-semibold text-muted pt-3 pb-3">ยอดชำระสุทธิ:</td>
+                <td class="text-end pe-4 pt-3 pb-3 fw-bold text-danger fs-4"><?= number_format($order['total_price'], 2) ?> ฿</td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- 🔹 รายการสินค้า -->
-  <div class="card shadow-sm border-0">
-    <div class="card-header">รายการสินค้า</div>
-    <div class="card-body table-responsive">
-      <table class="table align-middle text-center">
-        <thead>
-          <tr>
-            <th>ภาพสินค้า</th>
-            <th>ชื่อสินค้า</th>
-            <th>จำนวน</th>
-            <th>ราคาต่อหน่วย</th>
-            <th>รวม</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($details as $d): ?>
-            <?php
-              $sum = $d['price'] * $d['quantity'];
-              $imgPath = "../admin/uploads/" . $d['p_image'];
-              if (!file_exists($imgPath) || empty($d['p_image'])) {
-                $imgPath = "img/default.png";
-              }
-            ?>
-            <tr>
-              <td><img src="<?= $imgPath ?>" width="80" height="80" class="rounded shadow-sm"></td>
-              <td><?= htmlspecialchars($d['p_name']) ?></td>
-              <td><?= $d['quantity'] ?></td>
-              <td><?= number_format($d['price'], 2) ?> บาท</td>
-              <td><?= number_format($sum, 2) ?> บาท</td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="d-flex justify-content-between mt-4">
-    <a href="orders.php" class="btn btn-secondary">⬅️ กลับไปหน้าคำสั่งซื้อ</a>
     <?php if ($order_status === 'รอดำเนินการ' && $payment_status !== 'ยกเลิก'): ?>
-      <a href="order_cancel.php?id=<?= $order_id ?>" 
-         class="btn btn-danger"
-         onclick="return confirm('แน่ใจหรือไม่ว่าต้องการยกเลิกคำสั่งซื้อนี้?');">
-         ❌ ยกเลิกคำสั่งซื้อ
-      </a>
+      <div class="text-end mt-4">
+        <a href="order_cancel.php?id=<?= $order_id ?>" 
+           class="btn btn-outline-danger rounded-pill px-4"
+           onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำสั่งซื้อนี้? (ไม่สามารถกู้คืนได้)');">
+           <i class="bi bi-x-circle me-1"></i> ยกเลิกคำสั่งซื้อ
+        </a>
+      </div>
     <?php endif; ?>
+
   </div>
 </div>
 
 <footer class="text-center">
-  © <?= date('Y') ?> MyCommiss | รายละเอียดคำสั่งซื้อ
+  © <?= date('Y') ?> MyCommiss | ระบบร้านค้าออนไลน์คอมพิวเตอร์
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
