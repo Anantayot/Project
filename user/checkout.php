@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   } else {
     try {
       // ✅ เริ่ม transaction
-      $conn->beginTransaction(); // :contentReference[oaicite:2]{index=2}
+      $conn->beginTransaction();
 
       // ✅ เตรียม statement สำหรับล็อกสต็อก + อัปเดตสต็อก
       $stmtLock = $conn->prepare("SELECT p_id, p_name, p_price, p_stock FROM product WHERE p_id = ? FOR UPDATE");
@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
       // ✅ คำนวณราคารวมจาก DB + เช็คสต็อกจริง
       $totalPrice = 0;
-      $itemsForInsert = []; // เก็บข้อมูลที่จะ insert ลง order_details แบบเชื่อถือได้
+      $itemsForInsert = [];
 
       foreach ($cart as $item) {
         $pid = (int)$item['id'];
@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           throw new Exception("จำนวนสินค้าไม่ถูกต้อง");
         }
 
-        // 🔒 ล็อกแถวสินค้าและอ่านสต็อกล่าสุด (FOR UPDATE) :contentReference[oaicite:3]{index=3}
+        // 🔒 ล็อกแถวสินค้าและอ่านสต็อกล่าสุด (FOR UPDATE)
         $stmtLock->execute([$pid]);
         $p = $stmtLock->fetch(PDO::FETCH_ASSOC);
 
@@ -75,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // ✅ รวมราคา (ใช้ราคาจาก DB เท่านั้น)
         $totalPrice += $price * $qty;
 
-        // ✅ เตรียมข้อมูลสำหรับ order_details (ใช้ราคา DB)
+        // ✅ เตรียมข้อมูลสำหรับ order_details
         $itemsForInsert[] = [
           'pid' => $pid,
           'qty' => $qty,
@@ -83,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ];
       }
 
-      // ✅ เพิ่มคำสั่งซื้อ (ยังเป็น 'รอดำเนินการ' เหมือนเดิม)
+      // ✅ เพิ่มคำสั่งซื้อ (สถานะ 'รอดำเนินการ')
       $stmt = $conn->prepare("INSERT INTO orders 
         (customer_id, shipping_address, payment_method, total_price, order_date, payment_status) 
         VALUES (:cid, :address, :payment, :total, NOW(), 'รอดำเนินการ')");
@@ -95,11 +95,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       ]);
 
       // ✅ เอา order id
-      $orderId = $conn->lastInsertId(); // :contentReference[oaicite:4]{index=4}
+      $orderId = $conn->lastInsertId();
 
-      // ✅ เพิ่มรายละเอียดสินค้า (ใช้ข้อมูลที่ผ่านการเช็คแล้ว)
+      // ✅ เพิ่มรายละเอียดสินค้า
       $stmtDetail = $conn->prepare("INSERT INTO order_details (order_id, p_id, quantity, price)
-                                   VALUES (:oid, :pid, :qty, :price)");
+                                    VALUES (:oid, :pid, :qty, :price)");
       foreach ($itemsForInsert as $it) {
         $stmtDetail->execute([
           ':oid' => $orderId,
@@ -110,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       }
 
       // ✅ commit
-      $conn->commit(); // :contentReference[oaicite:5]{index=5}
+      $conn->commit();
 
       unset($_SESSION['cart']);
       $_SESSION['toast_success'] = "✅ ขอบคุณคุณ " . htmlspecialchars($user['name']) . " 🎉 คำสั่งซื้อของคุณถูกบันทึกแล้ว";
@@ -118,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       exit;
 
     } catch (Exception $e) {
-      // ✅ rollback เมื่อมีปัญหา :contentReference[oaicite:6]{index=6}
+      // ✅ rollback เมื่อมีปัญหา
       if ($conn->inTransaction()) {
         $conn->rollBack();
       }
@@ -131,135 +131,249 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html lang="th">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ชำระเงิน | MyCommiss</title>
   <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  
   <style>
-    body { background-color: #fff; font-family: "Prompt", sans-serif; }
-    h3 { color: #D10024; }
-    .card-header { background-color: #D10024; color: #fff; font-weight: 600; }
-    .btn-success { background-color: #D10024; border: none; }
-    .btn-success:hover { background-color: #a5001b; }
-    .btn-secondary { border-radius: 8px; }
-    .table thead { background-color: #f8f9fa; }
-    footer { background-color: #D10024; color: #fff; margin-top: 50px; padding: 15px; font-size: 0.9rem; }
+    body { background-color: #f8f9fa; font-family: "Prompt", sans-serif; color: #333; }
+    
+    .checkout-wrapper { min-height: 80vh; padding-bottom: 50px; }
+    
+    /* 🔹 Cards */
+    .card-checkout {
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      background: #fff;
+      overflow: hidden;
+    }
+    .card-header-custom {
+      background-color: #fff;
+      border-bottom: 2px solid #f1f1f1;
+      padding: 20px 25px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    /* 🔹 Table Summary */
+    .table-summary th, .table-summary td {
+      vertical-align: middle;
+      padding: 12px 0;
+      border-bottom: 1px solid #f8f9fa;
+    }
+    .product-img-small {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      background: #fff;
+    }
+
+    /* 🔹 Form Elements */
+    .form-control, .form-select {
+      border-radius: 10px;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      background-color: #fcfcfc;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #D10024;
+      box-shadow: 0 0 0 0.2rem rgba(209, 0, 36, 0.15);
+      background-color: #fff;
+    }
+
+    /* 🔹 Buttons */
+    .btn-submit {
+      background-color: #D10024;
+      color: #fff;
+      border-radius: 50px;
+      font-weight: 600;
+      padding: 12px;
+      transition: 0.3s;
+      border: none;
+    }
+    .btn-submit:hover {
+      background-color: #a5001b;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(209, 0, 36, 0.2);
+    }
+    .btn-outline-custom {
+      border: 1px solid #ddd;
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-weight: 500;
+      color: #555;
+      transition: 0.3s;
+      background: #fff;
+    }
+    .btn-outline-custom:hover { background: #f1f1f1; color: #333; }
+
+    /* 🔹 Footer */
+    footer {
+      background-color: #fff;
+      color: #6c757d;
+      padding: 20px;
+      font-size: 0.9rem;
+      border-top: 1px solid #eee;
+      margin-top: auto;
+    }
   </style>
 </head>
 <body>
 
 <?php include("navbar_user.php"); ?>
 
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:3000;">
-  <?php if (isset($_SESSION['toast_success'])): ?>
-    <div class="toast align-items-center text-bg-success border-0 show" role="alert">
-      <div class="d-flex">
-        <div class="toast-body fw-semibold"><?= $_SESSION['toast_success'] ?></div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+<div class="checkout-wrapper">
+
+  <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index:3000;">
+    <?php if (isset($_SESSION['toast_success'])): ?>
+      <div class="toast align-items-center text-bg-success border-0 show shadow-lg" role="alert">
+        <div class="d-flex">
+          <div class="toast-body fs-6 fw-medium px-3 py-2"><?= $_SESSION['toast_success'] ?></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
       </div>
-    </div>
-    <?php unset($_SESSION['toast_success']); ?>
-  <?php endif; ?>
+      <?php unset($_SESSION['toast_success']); ?>
+    <?php endif; ?>
 
-  <?php if (isset($_SESSION['toast_error'])): ?>
-    <div class="toast align-items-center text-bg-danger border-0 show" role="alert">
-      <div class="d-flex">
-        <div class="toast-body fw-semibold"><?= $_SESSION['toast_error'] ?></div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    <?php if (isset($_SESSION['toast_error'])): ?>
+      <div class="toast align-items-center text-bg-danger border-0 show shadow-lg" role="alert">
+        <div class="d-flex">
+          <div class="toast-body fs-6 fw-medium px-3 py-2"><?= $_SESSION['toast_error'] ?></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
       </div>
+      <?php unset($_SESSION['toast_error']); ?>
+    <?php endif; ?>
+  </div>
+
+  <div class="container mt-5">
+    
+    <div class="text-center mb-5">
+      <h2 class="fw-bold" style="color: #D10024;"><i class="bi bi-wallet2 me-2"></i>ชำระเงิน</h2>
+      <p class="text-muted">ตรวจสอบสินค้าและกรอกข้อมูลการจัดส่งเพื่อยืนยันคำสั่งซื้อ</p>
     </div>
-    <?php unset($_SESSION['toast_error']); ?>
-  <?php endif; ?>
-</div>
 
-<div class="container mt-4">
-  <h3 class="fw-bold mb-4 text-center">💳 ยืนยันคำสั่งซื้อ</h3>
-
-  <div class="row">
-    <div class="col-md-7 mb-4">
-      <div class="card shadow-sm border-0">
-        <div class="card-header">สินค้าในตะกร้า</div>
-        <div class="card-body">
-          <table class="table table-borderless align-middle">
-            <thead class="text-center">
-              <tr>
-                <th>สินค้า</th>
-                <th>จำนวน</th>
-                <th>ราคา</th>
-                <th>รวม</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              $total = 0;
-              foreach ($cart as $item):
-                $sum = $item['price'] * $item['qty'];
-                $total += $sum;
-              ?>
-              <tr class="text-center">
-                <td><?= htmlspecialchars($item['name']) ?></td>
-                <td><?= (int)$item['qty'] ?></td>
-                <td><?= number_format((float)$item['price'], 2) ?></td>
-                <td><?= number_format((float)$sum, 2) ?></td>
-              </tr>
-              <?php endforeach; ?>
-              <tr class="fw-bold text-danger text-end">
-                <td colspan="3">💰 ราคารวมทั้งหมด</td>
-                <td><?= number_format((float)$total, 2) ?> บาท</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="text-muted small">
-
+    <form method="post">
+      <div class="row g-4">
+        
+        <div class="col-lg-7 mb-4">
+          <div class="card card-checkout h-100">
+            <div class="card-header-custom d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-bag-check me-2 text-muted"></i>รายการสินค้า (<?= count($cart) ?>)</span>
+              <a href="cart.php" class="text-decoration-none small text-muted"><i class="bi bi-pencil-square"></i> แก้ไข</a>
+            </div>
+            <div class="card-body p-4">
+              <div class="table-responsive">
+                <table class="table table-borderless table-summary mb-0">
+                  <tbody>
+                    <?php
+                    $total = 0;
+                    foreach ($cart as $item):
+                      $sum = $item['price'] * $item['qty'];
+                      $total += $sum;
+                      
+                      // ดึงรูปภาพเล็ก
+                      $imgPath = "../admin/uploads/" . $item['image'];
+                      if (empty($item['image']) || !file_exists($imgPath)) $imgPath = "img/default.png";
+                    ?>
+                    <tr>
+                      <td style="width: 60px;">
+                        <img src="<?= $imgPath ?>" class="product-img-small" alt="<?= htmlspecialchars($item['name']) ?>">
+                      </td>
+                      <td>
+                        <div class="fw-semibold text-dark text-truncate" style="max-width: 250px;"><?= htmlspecialchars($item['name']) ?></div>
+                        <div class="text-muted small"><?= number_format((float)$item['price'], 2) ?> ฿ x <?= (int)$item['qty'] ?> ชิ้น</div>
+                      </td>
+                      <td class="text-end fw-bold text-dark align-bottom">
+                        <?= number_format((float)$sum, 2) ?> ฿
+                      </td>
+                    </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              </div>
+              
+              <hr class="text-muted opacity-25 my-4">
+              
+              <div class="d-flex justify-content-between align-items-center px-2">
+                <span class="fs-5 text-muted fw-semibold">ยอดชำระสุทธิ</span>
+                <span class="fs-3 fw-bold text-danger"><?= number_format((float)$total, 2) ?> ฿</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="col-md-5">
-      <div class="card shadow-sm border-0">
-        <div class="card-header">ข้อมูลผู้สั่งซื้อ</div>
-        <div class="card-body">
-          <form method="post">
-            <div class="mb-3">
-              <label class="form-label fw-semibold">ชื่อผู้ใช้</label>
-              <input type="text" class="form-control" value="<?= htmlspecialchars($user['name']) ?>" disabled>
+        <div class="col-lg-5">
+          <div class="card card-checkout">
+            <div class="card-header-custom">
+              <i class="bi bi-truck me-2 text-muted"></i>ข้อมูลการจัดส่ง
             </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">อีเมล</label>
-              <input type="text" class="form-control" value="<?= htmlspecialchars($user['email']) ?>" disabled>
+            <div class="card-body p-4">
+              
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label text-muted small fw-semibold mb-1">ชื่อผู้สั่งซื้อ</label>
+                  <input type="text" class="form-control bg-light" value="<?= htmlspecialchars($user['name']) ?>" disabled>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label text-muted small fw-semibold mb-1">อีเมล</label>
+                  <input type="text" class="form-control bg-light" value="<?= htmlspecialchars($user['email']) ?>" disabled>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label text-dark fw-semibold mb-1">ที่อยู่สำหรับจัดส่ง <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white text-muted align-items-start pt-2 border-end-0"><i class="bi bi-geo-alt"></i></span>
+                  <textarea name="address" class="form-control border-start-0 ps-0" rows="3" required placeholder="กรุณาระบุ บ้านเลขที่, ถนน, ตำบล, อำเภอ, จังหวัด, รหัสไปรษณีย์"><?= htmlspecialchars($user['address']) ?></textarea>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label text-dark fw-semibold mb-1">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-telephone"></i></span>
+                  <input type="text" name="phone" maxlength="10" pattern="^[0-9]{10}$"
+                         title="กรุณากรอกเฉพาะตัวเลข 10 หลัก"
+                         oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                         class="form-control border-start-0 ps-0" value="<?= htmlspecialchars($user['phone']) ?>" required placeholder="08XXXXXXXX">
+                </div>
+              </div>
+
+              <hr class="text-muted opacity-25 mb-4">
+
+              <div class="mb-5">
+                <label class="form-label text-dark fw-semibold mb-2">ช่องทางการชำระเงิน <span class="text-danger">*</span></label>
+                <select name="payment" class="form-select form-select-lg fs-6" required>
+                  <option value="" disabled selected>-- เลือกวิธีชำระเงิน --</option>
+                  <option value="COD">💵 ชำระเงินปลายทาง (COD)</option>
+                  <option value="QR">📱 สแกนชำระผ่าน QR Code</option>
+                </select>
+              </div>
+
+              <div class="d-grid gap-3">
+                <button type="submit" class="btn btn-submit fs-5"><i class="bi bi-check2-circle me-2"></i>ยืนยันคำสั่งซื้อ</button>
+                <a href="cart.php" class="btn btn-outline-custom text-center"><i class="bi bi-arrow-left me-2"></i>ย้อนกลับไปแก้ไขตะกร้า</a>
+              </div>
+
             </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">ที่อยู่จัดส่ง</label>
-              <textarea name="address" class="form-control" rows="3" required><?= htmlspecialchars($user['address']) ?></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">เบอร์โทรศัพท์</label>
-              <input type="text" name="phone" maxlength="10" pattern="^[0-9]{10}$"
-                     title="กรุณากรอกเฉพาะตัวเลข 10 หลัก"
-                     oninput="this.value=this.value.replace(/[^0-9]/g,'');"
-                     class="form-control" value="<?= htmlspecialchars($user['phone']) ?>" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">วิธีชำระเงิน</label>
-              <select name="payment" class="form-select" required>
-                <option value="COD">💵 เก็บเงินปลายทาง</option>
-                <option value="QR">📱 ชำระด้วย QR Code</option>
-              </select>
-            </div>
-            <div class="d-grid">
-              <button type="submit" class="btn btn-success">✅ ยืนยันคำสั่งซื้อ</button>
-              <a href="cart.php" class="btn btn-secondary mt-2">⬅️ กลับไปแก้ไขตะกร้า</a>
-            </div>
-          </form>
+          </div>
         </div>
-      </div>
-    </div>
 
+      </div>
+    </form>
   </div>
 </div>
 
 <footer class="text-center">
-  © <?= date('Y') ?> MyCommiss | ชำระเงิน
+  © <?= date('Y') ?> MyCommiss | ระบบร้านค้าออนไลน์คอมพิวเตอร์
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
