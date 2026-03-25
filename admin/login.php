@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // อิงจากรูปโครงสร้างล่าสุด ไฟล์ connectdb.php อยู่ในโฟลเดอร์ admin ที่เดียวกันเลย
-include __DIR__ . "/../partials/connectdb.php";
+include __DIR__ . "/partials/connectdb.php";
 
 if (isset($_SESSION['admin_id'])) {
   header("Location: index.php");
