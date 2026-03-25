@@ -21,6 +21,11 @@ if (!isset($_GET['id'])) {
 
 $order_id = intval($_GET['id']);
 
+// ✅ ดึงข้อมูลลูกค้า (ชื่อ, อีเมล, เบอร์โทร)
+$stmtUser = $conn->prepare("SELECT * FROM customers WHERE customer_id = ?");
+$stmtUser->execute([$customer_id]);
+$user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
 // ✅ ดึงข้อมูลคำสั่งซื้อของลูกค้าคนนี้
 $stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ? AND customer_id = ?");
 $stmt->execute([$order_id, $customer_id]);
@@ -246,11 +251,11 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
       <div class="col-lg-5">
         <div class="card card-custom h-100">
-          <div class="card-header-custom"><i class="bi bi-geo-alt me-2 text-muted"></i>ที่อยู่จัดส่งพัสดุ</div>
+          <div class="card-header-custom"><i class="bi bi-person-lines-fill me-2 text-muted"></i>ข้อมูลผู้สั่งซื้อและจัดส่ง</div>
           <div class="card-body p-4 d-flex flex-column">
             
             <?php if (!empty($order['tracking_number'])): ?>
-              <div class="alert alert-success d-flex align-items-center shadow-sm">
+              <div class="alert alert-success d-flex align-items-center shadow-sm mb-4">
                 <i class="bi bi-box2-heart fs-3 me-3"></i>
                 <div>
                   <div class="small text-muted">หมายเลขพัสดุ (Tracking Number)</div>
@@ -260,10 +265,30 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
             <?php endif; ?>
 
             <div class="bg-light p-4 rounded-4 border flex-grow-1">
-              <p class="mb-0" style="line-height: 1.8;">
-                <i class="bi bi-house-door text-danger me-2"></i>
-                <?= nl2br(htmlspecialchars($order['shipping_address'] ?? 'ไม่ระบุที่อยู่')) ?>
-              </p>
+              
+              <div class="mb-3">
+                <div class="text-muted small fw-semibold mb-1">ชื่อผู้สั่งซื้อ</div>
+                <div class="fw-medium text-dark"><i class="bi bi-person me-2 text-muted"></i><?= htmlspecialchars($user['name'] ?? '-') ?></div>
+              </div>
+
+              <div class="mb-3">
+                <div class="text-muted small fw-semibold mb-1">เบอร์โทรศัพท์</div>
+                <div class="fw-medium text-dark"><i class="bi bi-telephone me-2 text-muted"></i><?= htmlspecialchars($user['phone'] ?? '-') ?></div>
+              </div>
+
+              <div class="mb-3">
+                <div class="text-muted small fw-semibold mb-1">อีเมล</div>
+                <div class="fw-medium text-dark"><i class="bi bi-envelope me-2 text-muted"></i><?= htmlspecialchars($user['email'] ?? '-') ?></div>
+              </div>
+
+              <div class="mt-4">
+                <div class="text-muted small fw-semibold mb-1">ที่อยู่สำหรับจัดส่งพัสดุ</div>
+                <div class="fw-medium text-dark" style="line-height: 1.6;">
+                  <i class="bi bi-house-door text-danger me-2"></i>
+                  <?= nl2br(htmlspecialchars($order['shipping_address'] ?? 'ไม่ระบุที่อยู่')) ?>
+                </div>
+              </div>
+
             </div>
 
           </div>
