@@ -114,10 +114,9 @@ ob_start();
         <table id="dataTable" class="table table-dark table-striped table-hover text-center align-middle w-100 mb-0">
           <thead>
             <tr class="table-custom-header">
-              <th style="width: 100px;">รหัสประเภท</th>
+              <th style="width: 150px;">รหัสประเภท</th>
               <th class="text-start">ชื่อประเภทสินค้า</th>
-              <th class="text-start">รายละเอียด</th>
-              <th style="width: 130px;">จัดการ</th>
+              <th style="width: 150px;">จัดการ</th>
             </tr>
           </thead>
           <tbody>
@@ -128,9 +127,6 @@ ob_start();
                 </td>
                 <td data-label="ชื่อประเภท" class="text-md-start text-white fw-medium mobile-value">
                   <?= htmlspecialchars($c['cat_name']) ?>
-                </td>
-                <td data-label="รายละเอียด" class="text-md-start text-light mobile-value">
-                  <?= htmlspecialchars($c['cat_description'] ?: '-') ?>
                 </td>
                 <td data-label="จัดการ" class="mobile-value">
                   <div class="d-flex justify-content-center mobile-actions">
@@ -171,7 +167,7 @@ ob_start();
           responsive: false, 
           order: [[0, "asc"]], // ✅ เรียงตามรหัสจากน้อยไปมาก
           columnDefs: [
-            { orderable: false, targets: [3] } 
+            { orderable: false, targets: [2] } // ✅ แก้เป็น 2 เพราะเหลือแค่ 3 คอลัมน์ (นับ 0, 1, 2)
           ],
           dom: '<"d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3"lf>rt<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3"ip>'
         });
