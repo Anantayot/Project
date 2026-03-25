@@ -65,6 +65,7 @@ ob_start();
   .table-custom-header th {
     border-bottom: none;
     padding: 15px 10px;
+    cursor: pointer; /* ให้รู้ว่ากดเรียงได้ */
   }
   .table-dark {
     --bs-table-bg: transparent;
@@ -149,12 +150,6 @@ ob_start();
   }
 </style>
 
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-  <h4 class="fw-bold text-white mb-0 d-none d-md-block">
-    <i class="bi bi-bag-check me-2 text-success"></i> รายการคำสั่งซื้อ
-  </h4>
-</div>
-
 <div class="card table-card shadow-lg mt-2">
   <div class="card-body p-3 p-md-4">
 
@@ -183,17 +178,20 @@ ob_start();
                 <td data-label="ID" data-sort="<?= $o['order_id'] ?>" class="fw-bold text-success mobile-value">
                     #<?= htmlspecialchars($o['order_id']) ?>
                 </td>
-                <td data-label="ลูกค้า" class="text-md-start text-white fw-medium mobile-value">
+
+                <td data-label="ลูกค้า" data-sort="<?= htmlspecialchars($o['customer_name'] ?? 'ไม่ระบุ') ?>" class="text-md-start text-white fw-medium mobile-value">
                   <?= htmlspecialchars($o['customer_name'] ?? 'ไม่ระบุ') ?>
                 </td>
-                <td data-label="วันที่" class="text-light mobile-value">
+
+                <td data-label="วันที่" data-sort="<?= strtotime($o['order_date']) ?>" class="text-light mobile-value">
                   <?= date("d/m/y H:i", strtotime($o['order_date'])) ?>
                 </td>
-                <td data-label="ยอดรวม" class="fw-bold text-info mobile-value">
+
+                <td data-label="ยอดรวม" data-sort="<?= $o['total_price'] ?>" class="fw-bold text-info mobile-value">
                   ฿<?= number_format($o['total_price'], 2) ?>
                 </td>
 
-                <td data-label="พัสดุ" class="mobile-value">
+                <td data-label="พัสดุ" data-sort="<?= $o['order_status'] ?>" class="mobile-value">
                   <?php 
                     $status = $o['order_status'] ?? 'รอดำเนินการ';
                     $badgeClass = $statusColors[$status] ?? 'secondary'; 
@@ -203,7 +201,7 @@ ob_start();
                   </span>
                 </td>
 
-                <td data-label="การโอน" class="mobile-value">
+                <td data-label="การโอน" data-sort="<?= $o['admin_verified'] ?>" class="mobile-value">
                   <?php 
                     $verify = $o['admin_verified'] ?? 'รอตรวจสอบ';
                     $vBadgeClass = $verifyColors[$verify] ?? 'secondary'; 
