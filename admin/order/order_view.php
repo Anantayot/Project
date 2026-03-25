@@ -196,10 +196,72 @@ $paymentColors = [
     border-color: #22c55e;
     box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
   }
+
+  /* 📱 ปรับแต่งสำหรับ Mobile */
+  @media (max-width: 767px) {
+    .info-label {
+      width: 120px;
+      margin-bottom: 5px;
+    }
+    
+    .form-wrapper {
+      flex-direction: column;
+      align-items: stretch !important;
+    }
+
+    .form-wrapper form {
+      max-width: 100% !important;
+      margin-top: 10px;
+    }
+
+    /* เปลี่ยนตารางสินค้าเป็น Card บนมือถือ */
+    #productTable thead { display: none; }
+    
+    #productTable tbody tr {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      margin-bottom: 15px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    #productTable tbody td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: none !important;
+      padding: 8px 0;
+      text-align: right !important;
+    }
+
+    /* เพิ่ม Label ให้ข้อมูลใน Card */
+    #productTable tbody td:nth-child(1):before { content: "รูปภาพ"; float: left; font-weight: 500; color: #94a3b8; }
+    #productTable tbody td:nth-child(2):before { content: "ชื่อสินค้า"; float: left; font-weight: 500; color: #94a3b8; }
+    #productTable tbody td:nth-child(3):before { content: "จำนวน"; float: left; font-weight: 500; color: #94a3b8; }
+    #productTable tbody td:nth-child(4):before { content: "ราคา/ชิ้น"; float: left; font-weight: 500; color: #94a3b8; }
+    #productTable tbody td:nth-child(5):before { content: "ยอดรวม"; float: left; font-weight: 500; color: #94a3b8; }
+
+    /* ปรับ Tfoot บนมือถือ */
+    #productTable tfoot tr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background: rgba(22, 163, 74, 0.1);
+      border-radius: 12px;
+    }
+    #productTable tfoot td {
+      padding: 0 !important;
+      border: none !important;
+    }
+    #productTable tfoot td:first-child { display: none; } /* ซ่อนช่องว่าง */
+  }
 </style>
 
 <div class="d-flex justify-content-end mb-4 mt-2">
-  <a href="orders.php" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2 shadow-sm">
+  <a href="orders.php" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2 shadow-sm w-100 w-md-auto text-center">
     <i class="bi bi-arrow-left me-1"></i> ย้อนกลับไปหน้าคำสั่งซื้อ
   </a>
 </div>
@@ -212,15 +274,15 @@ $paymentColors = [
           <i class="bi bi-person-vcard text-info me-2"></i> ข้อมูลลูกค้า
         </h5>
         
-        <div class="mb-3 d-flex">
+        <div class="mb-3 d-flex flex-column flex-sm-row">
           <span class="info-label">ชื่อลูกค้า:</span>
           <span class="info-value"><?= htmlspecialchars($order['customer_name'] ?? 'ไม่ระบุ') ?></span>
         </div>
-        <div class="mb-3 d-flex">
+        <div class="mb-3 d-flex flex-column flex-sm-row">
           <span class="info-label">เบอร์โทรติดต่อ:</span>
           <span class="info-value"><?= htmlspecialchars($order['phone'] ?? '-') ?></span>
         </div>
-        <div class="mb-3 d-flex">
+        <div class="mb-3 d-flex flex-column flex-sm-row">
           <span class="info-label">ที่อยู่จัดส่ง:</span>
           <span class="info-value" style="line-height: 1.6; flex: 1;"><?= htmlspecialchars($order['address'] ?? '-') ?></span>
         </div>
@@ -252,7 +314,7 @@ $paymentColors = [
 
         <hr class="border-secondary my-3" style="opacity: 0.3;">
 
-        <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 gap-2">
+        <div class="form-wrapper d-flex flex-column flex-md-row align-items-md-center mb-3 gap-2">
           <span class="info-label mb-1 mb-md-0">สถานะชำระเงิน:</span>
           <?php 
             $payStatus = $order['payment_status'] ?? 'รอดำเนินการ';
@@ -272,8 +334,8 @@ $paymentColors = [
         </div>
 
         <?php if ($order['payment_method'] !== 'COD'): ?>
-        <div class="d-flex align-items-center mb-3">
-          <span class="info-label">ตรวจสอบสลิป:</span>
+        <div class="d-flex flex-column flex-md-row align-items-md-center mb-3">
+          <span class="info-label mb-2 mb-md-0">ตรวจสอบสลิป:</span>
           <?php 
             $adminStatus = $order['admin_verified'] ?? 'รอตรวจสอบ';
             $adminClass = $verifyColors[$adminStatus] ?? 'secondary';
@@ -281,14 +343,14 @@ $paymentColors = [
           <span class="badge bg-<?= $adminClass ?> rounded-pill badge-fixed"><?= htmlspecialchars($adminStatus) ?></span>
           
           <?php if (!empty($order['slip_image'])): ?>
-            <a href="../../admin/uploads/slips/<?= htmlspecialchars($order['slip_image']) ?>" target="_blank" class="btn btn-sm btn-outline-info ms-3 rounded-pill px-3">
+            <a href="../../admin/uploads/slips/<?= htmlspecialchars($order['slip_image']) ?>" target="_blank" class="btn btn-sm btn-outline-info ms-md-3 mt-2 mt-md-0 rounded-pill px-3 w-100 w-md-auto">
               <i class="bi bi-image me-1"></i> ดูสลิป
             </a>
           <?php endif; ?>
         </div>
         <?php endif; ?>
 
-        <div class="d-flex flex-column flex-md-row align-items-md-center mb-2 gap-2">
+        <div class="form-wrapper d-flex flex-column flex-md-row align-items-md-center mb-2 gap-2">
           <span class="info-label mb-1 mb-md-0">สถานะจัดส่ง:</span>
           <?php 
             $orderStatus = $order['order_status'] ?? 'รอดำเนินการ';
@@ -320,12 +382,11 @@ $paymentColors = [
       <h5 class="fw-bold text-white mb-0"><i class="bi bi-basket2 me-2 text-warning"></i> รายการสินค้าที่สั่งซื้อ</h5>
     </div>
     
-    <div class="table-responsive">
-      <table class="table table-dark align-middle text-center mb-0 border-0">
+    <div class="table-responsive" style="overflow-x: hidden;">
+      <table id="productTable" class="table table-dark align-middle text-center mb-0 border-0 w-100">
         <thead>
           <tr class="table-custom-header">
-            <th class="py-3">#</th>
-            <th class="py-3 text-start">รูปภาพ</th>
+            <th class="py-3 text-start ps-4">รูปภาพ</th>
             <th class="py-3 text-start">ชื่อสินค้า</th>
             <th class="py-3">จำนวน</th>
             <th class="py-3 text-end">ราคา/ชิ้น</th>
@@ -335,26 +396,25 @@ $paymentColors = [
         <tbody>
           <?php 
           $totalSum = 0;
-          foreach ($items as $i => $it): 
+          foreach ($items as $it): 
             $totalSum += $it['subtotal'];
           ?>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-            <td class="text-muted"><?= $i + 1 ?></td>
-            <td class="text-start py-3">
+            <td class="text-start py-3 ps-md-4">
               <img src="../../admin/uploads/<?= htmlspecialchars($it['p_image'] ?? 'noimg.png') ?>" width="60" class="rounded shadow-sm" style="object-fit: cover; aspect-ratio: 1/1;">
             </td>
-            <td class="text-start fw-medium text-white"><?= htmlspecialchars($it['p_name']) ?></td>
+            <td class="text-start fw-medium text-white text-break" style="max-width: 250px;"><?= htmlspecialchars($it['p_name']) ?></td>
             <td><span class="badge bg-secondary rounded-pill px-3"><?= (int)$it['quantity'] ?></span></td>
             <td class="text-end text-muted">฿<?= number_format($it['price'], 2) ?></td>
-            <td class="text-end text-info fw-bold pe-4">฿<?= number_format($it['subtotal'], 2) ?></td>
+            <td class="text-end text-info fw-bold pe-md-4">฿<?= number_format($it['subtotal'], 2) ?></td>
           </tr>
           <?php endforeach; ?>
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="4" class="border-0"></td>
+            <td colspan="3" class="border-0"></td>
             <td class="text-end fw-bold text-white fs-5 border-0 pt-4 pb-4">ยอดรวมทั้งหมด:</td>
-            <td class="text-end fw-bold text-success fs-4 border-0 pe-4 pt-4 pb-4">฿<?= number_format($totalSum, 2) ?></td>
+            <td class="text-end fw-bold text-success fs-4 border-0 pe-md-4 pt-4 pb-4">฿<?= number_format($totalSum, 2) ?></td>
           </tr>
         </tfoot>
       </table>
