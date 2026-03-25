@@ -1,7 +1,7 @@
 <?php
 session_start();
 // ✅ เปลี่ยนเส้นทางให้ดึงไฟล์ให้ถูกตำแหน่ง
-include "connectdb.php";
+include "partials/connectdb.php";
 
 // ถ้ามีการล็อกอินอยู่แล้ว → กลับไปหน้า Dashboard
 if (isset($_SESSION['admin_id'])) {
