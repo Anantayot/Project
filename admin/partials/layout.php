@@ -6,8 +6,7 @@
   <title><?= $pageTitle ?? 'MyCommiss Admin' ?></title>
   <link rel="icon" type="image/png" href="../partials/icon_mycommiss.png">
   <!-- CSS -->
-  <link rel="stylesheet" href="../template_corona/assets/vendors/css/vendor.bundle.base.css">
-  <link rel="stylesheet" href="../template_corona/assets/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
