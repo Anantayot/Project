@@ -137,6 +137,145 @@ ob_start();
 <div class="card table-card shadow-lg">
   <div class="card-body p-3 p-md-4">
 
+    <?php
+session_start();
+// เปิดโหมดโชว์ Error
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// บังคับให้ต้องล็อกอิน
+if (!isset($_SESSION['admin_id'])) {
+  header("Location: ../login.php");
+  exit;
+}
+
+$pageTitle = "จัดการสินค้า";
+include __DIR__ . "/../partials/connectdb.php";
+
+// 🔹 ดึงข้อมูลสินค้าทั้งหมด (JOIN กับหมวดหมู่) เรียงตาม ID
+try {
+  $sql = "SELECT p.*, c.cat_name 
+          FROM product p
+          LEFT JOIN category c ON p.cat_id = c.cat_id
+          ORDER BY p.p_id ASC";
+  $products = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  die("<div class='alert alert-danger text-center mt-4'>❌ SQL Error: " . htmlspecialchars($e->getMessage()) . "</div>");
+}
+
+ob_start();
+?>
+
+<style>
+  .table-card {
+    background: var(--bg-card);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+  }
+  .table-custom-header {
+    background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important;
+    color: #fff !important;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .table-custom-header th {
+    border-bottom: none;
+    padding: 15px 10px;
+  }
+  .table-dark {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  .table-dark td {
+    padding: 15px 10px;
+    vertical-align: middle;
+  }
+
+  /* 🔸 ควบคุมข้อความยาวบนจอคอม */
+  .truncate-text {
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ✅ เปลี่ยนสีข้อความ DataTables เป็นสีขาวทั้งหมด */
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_processing,
+  .dataTables_wrapper .dataTables_paginate {
+    color: #ffffff !important;
+  }
+  .dataTables_wrapper label {
+    color: #ffffff !important; 
+    font-weight: 500;
+  }
+  
+  /* 🔸 Pagination เข้าธีม */
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #fff !important;
+    border-radius: 6px;
+    margin: 0 3px;
+    border: 1px solid transparent !important;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: rgba(34, 197, 94, 0.2) !important;
+    border: 1px solid #22c55e !important;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: linear-gradient(145deg, #22c55e, #16a34a) !important;
+    color: #fff !important;
+    border: none !important;
+  }
+
+  /* 📱 ปรับแต่งสำหรับมือถือ (Mobile Card View) */
+  @media (max-width: 768px) {
+    #dataTable thead { display: none; }
+    #dataTable tbody tr {
+      display: flex; flex-direction: column;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 15px; margin-bottom: 20px;
+      padding: 15px 20px; border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    #dataTable tbody td {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border: none !important;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important;
+      font-size: 0.95rem;
+    }
+    #dataTable tbody td:last-child {
+      border-bottom: none !important; padding-top: 18px; padding-bottom: 5px;
+    }
+    #dataTable tbody td::before {
+      content: attr(data-label); font-weight: 500; color: #94a3b8;
+      text-align: left; min-width: 90px; margin-right: 15px; flex-shrink: 0;
+    }
+    .mobile-value { text-align: right !important; word-break: break-word; flex-grow: 1; }
+    .mobile-actions { display: flex; justify-content: flex-end; width: 100%; gap: 10px; }
+    .truncate-text { max-width: 100%; white-space: normal; text-align: right; }
+  }
+</style>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <h4 class="fw-bold text-white mb-0 d-none d-md-block">
+    <i class="bi bi-box-seam me-2 text-success"></i> จัดการสินค้า
+  </h4>
+  <div class="ms-auto w-100 w-md-auto text-end">
+    <a href="product_add.php" class="btn btn-success rounded-pill px-4 py-2 shadow-sm w-100 w-md-auto transition-all hover-scale">
+      <i class="bi bi-plus-circle me-1"></i> เพิ่มสินค้าใหม่
+    </a>
+  </div>
+</div>
+
+<div class="card table-card shadow-lg">
+  <div class="card-body p-3 p-md-4">
+
     <?php if(empty($products)): ?>
       <div class="text-center py-5">
         <i class="bi bi-box-seam text-muted" style="font-size: 4rem;"></i>
@@ -165,14 +304,13 @@ ob_start();
                 
                 <td data-label="รูปภาพ" class="mobile-value">
                   <?php 
-                    // ตรวจสอบรูปภาพ
-                    // ⚠️ หมายเหตุ: ตอนรันจริงอาจจะต้องเช็ค Path ตรงนี้นะครับว่าชี้ไปที่ /Project/ หรือเปล่า
-                    $imagePath = __DIR__ . "/../../../uploads/" . $p['p_image']; // ชี้ออกไปโฟลเดอร์หลัก
-                    $imageURL  = "/Project/uploads/" . htmlspecialchars($p['p_image']); // ชี้ URL ไปที่ Project/uploads
+                    // ✅ กลับมาใช้ Path เดิมที่ถูกต้อง
+                    $imagePath = __DIR__ . "/../uploads/" . $p['p_image'];
+                    $imageURL  = "../uploads/" . htmlspecialchars($p['p_image']);
                     
-                    if (!empty($p['p_image'])): 
+                    if (!empty($p['p_image']) && file_exists($imagePath)): 
                   ?>
-                    <img src="<?= $imageURL ?>" style="width: 60px; height: 60px; object-fit: cover;" class="rounded border border-secondary shadow-sm" alt="product" onerror="this.src='https://placehold.co/60x60/1e293b/fff?text=No+Img'">
+                    <img src="<?= $imageURL ?>" style="width: 60px; height: 60px; object-fit: cover;" class="rounded border border-secondary shadow-sm" alt="product">
                   <?php else: ?>
                     <span class="badge bg-secondary">ไม่มีรูป</span>
                   <?php endif; ?>
@@ -235,14 +373,14 @@ ob_start();
           language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
           pageLength: 10,
           responsive: false, 
-          order: [[0, "asc"]], // ✅ เรียงตามรหัสสินค้าจากน้อยไปมาก
+          order: [[0, "asc"]], // เรียงตามรหัสสินค้าจากน้อยไปมาก
           columnDefs: [
             { orderable: false, targets: [1, 6] } // ปิด sort รูปภาพ และจัดการ
           ],
           dom: '<"d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3"lf>rt<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3"ip>'
         });
 
-        // ✅ แต่งกล่องค้นหาและช่อง Dropdown ให้ข้อความเป็นสีขาว
+        // แต่งกล่องค้นหาและช่อง Dropdown ให้ข้อความเป็นสีขาว
         $(".dataTables_filter input")
           .addClass("form-control form-control-sm text-white")
           .css({
