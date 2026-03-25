@@ -32,28 +32,58 @@ ob_start();
 ?>
 
 <style>
+  /* 🎨 แต่งตารางสำหรับ Desktop */
   .table-card {
     background: var(--bg-card);
     border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    overflow: hidden;
   }
   .table-custom-header {
     background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important;
     color: #fff !important;
-    font-weight: 500;
   }
-  .table-dark {
-    --bs-table-bg: transparent;
-    border-color: rgba(255, 255, 255, 0.05);
-  }
-  
-  /* ปรับแต่งสำหรับมือถือ */
-  @media (max-width: 768px) {
-    .d-mobile-none { display: none !important; } /* ซ่อนวันที่บนมือถือเพื่อประหยัดพื้นที่ */
-    .table-dark td, .table-dark th { padding: 10px 5px; font-size: 0.85rem; }
-    .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
-    .badge { font-size: 0.7rem; padding: 0.4em 0.6em; }
+  .table-dark { --bs-table-bg: transparent; border-color: rgba(255, 255, 255, 0.05); }
+
+  /* 📱 ปรับแต่งสำหรับ Mobile (Mobile First) */
+  @media (max-width: 767px) {
+    /* ซ่อนหัวตารางบนมือถือ */
+    #dataTable thead { display: none; }
+    
+    /* ปรับแต่ละแถวให้กลายเป็นการ์ด */
+    #dataTable tbody tr {
+      display: block;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      margin-bottom: 15px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+    }
+    
+    /* จัดเลย์เอาต์ภายในแต่ละการ์ด */
+    #dataTable tbody td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: none;
+      padding: 5px 0;
+      text-align: right;
+    }
+
+    /* เพิ่มหัวข้อกำกับแต่ละข้อมูล */
+    #dataTable tbody td:before {
+      content: attr(data-label);
+      float: left;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    /* ปรับแต่งจุดเฉพาะ */
+    #dataTable td[data-label="ID"] { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px; font-size: 1.1rem; }
+    #dataTable td[data-label="จัดการ"] { width: 100%; justify-content: center; padding-top: 10px; }
+    #dataTable td[data-label="จัดการ"] a { width: 100%; }
+    
+    .dataTables_wrapper .dataTables_filter { text-align: left !important; margin-bottom: 15px; }
   }
 
   .bg-purple { background-color: #8b5cf6 !important; color: #fff; }
@@ -66,20 +96,23 @@ ob_start();
   </h4>
 </div>
 
-<div class="card table-card shadow-lg">
-  <div class="card-body p-2 p-md-4"> <?php if (empty($orders)): ?>
+<div class="card table-card shadow-lg border-0">
+  <div class="card-body p-3 p-md-4">
+
+    <?php if (empty($orders)): ?>
       <div class="text-center py-5">
         <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
         <h5 class="text-muted mt-3">ยังไม่มีคำสั่งซื้อ</h5>
       </div>
     <?php else: ?>
-      <div class="table-responsive">
-        <table id="dataTable" class="table table-dark table-hover text-center w-100 align-middle">
+      <div class="table-responsive" style="overflow-x: hidden;">
+        <table id="dataTable" class="table table-dark align-middle w-100">
           <thead>
-            <tr class="table-custom-header">
+            <tr class="table-custom-header text-center">
               <th>ID</th>
-              <th class="text-start">ลูกค้า</th>
-              <th class="d-mobile-none">วันที่</th> <th>ยอดรวม</th>
+              <th>ลูกค้า</th>
+              <th>วันที่</th>
+              <th>ยอดรวม</th>
               <th>พัสดุ</th>
               <th>การโอน</th>
               <th>จัดการ</th>
@@ -88,15 +121,12 @@ ob_start();
           <tbody>
             <?php foreach ($orders as $o): ?>
               <tr>
-                <td class="fw-bold text-success">#<?= htmlspecialchars($o['order_id']) ?></td>
-                <td class="text-start text-white text-truncate" style="max-width: 100px;">
-                    <?= htmlspecialchars($o['customer_name'] ?? 'ไม่ระบุ') ?>
-                </td>
-                <td class="text-light d-mobile-none"> <?= date("d/m/y", strtotime($o['order_date'])) ?>
-                </td>
-                <td class="fw-bold text-info">฿<?= number_format($o['total_price'], 0) ?></td>
+                <td data-label="ID" class="fw-bold text-success">#<?= htmlspecialchars($o['order_id']) ?></td>
+                <td data-label="ลูกค้า" class="text-white fw-medium"><?= htmlspecialchars($o['customer_name'] ?? 'ไม่ระบุ') ?></td>
+                <td data-label="วันที่" class="text-light"><?= date("d/m/y H:i", strtotime($o['order_date'])) ?></td>
+                <td data-label="ยอดรวม" class="fw-bold text-info">฿<?= number_format($o['total_price'], 2) ?></td>
 
-                <td>
+                <td data-label="พัสดุ">
                   <?php
                     $status = $o['order_status'] ?? 'รอดำเนินการ';
                     if ($status == 'สำเร็จ' || $status == 'จัดส่งแล้ว') $badge = 'success';
@@ -104,12 +134,12 @@ ob_start();
                     elseif ($status == 'ยกเลิก') $badge = 'danger';
                     else $badge = 'secondary';
                   ?>
-                  <span class="badge bg-<?= $badge ?> rounded-pill">
+                  <span class="badge bg-<?= $badge ?> rounded-pill px-3">
                     <?= htmlspecialchars($status) ?>
                   </span>
                 </td>
 
-                <td>
+                <td data-label="การโอน">
                   <?php
                     $verify = $o['admin_verified'] ?? 'รอตรวจสอบ';
                     if ($verify == 'อนุมัติ') $vbadge = 'success';
@@ -117,14 +147,14 @@ ob_start();
                     elseif ($verify == 'กำลังตรวจสอบ') $vbadge = 'purple';
                     else $vbadge = 'warning text-dark';
                   ?>
-                  <span class="badge bg-<?= $vbadge ?> rounded-pill">
+                  <span class="badge bg-<?= $vbadge ?> rounded-pill px-3">
                     <?= htmlspecialchars($verify) ?>
                   </span>
                 </td>
 
-                <td>
-                  <a href="order_view.php?id=<?= $o['order_id'] ?>" class="btn btn-sm btn-outline-success rounded-pill">
-                    <i class="bi bi-search"></i>
+                <td data-label="จัดการ">
+                  <a href="order_view.php?id=<?= $o['order_id'] ?>" class="btn btn-outline-success rounded-pill btn-sm py-2">
+                    <i class="bi bi-search me-1"></i> ตรวจสอบข้อมูล
                   </a>
                 </td>
               </tr>
@@ -153,13 +183,13 @@ ob_start();
         $('#dataTable').DataTable({
           language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
           pageLength: 10,
-          responsive: true,
-          order: [[0, "desc"]], // เรียงตาม ID ใหม่สุดขึ้นก่อน
-          dom: '<"top"f>rt<"bottom"lp><"clear">', // ปรับตำแหน่ง Search ให้เหมาะกับมือถือ
+          responsive: false, // ปิด responsive ของตัวปลั๊กอินเพื่อให้ใช้ CSS card ของเราแทน
+          order: [[0, "desc"]],
+          dom: '<"top"f>rt<"bottom"lp><"clear">',
         });
 
-        // ตกแต่งเพิ่มเติม
-        $(".dataTables_filter input").addClass("form-control form-control-sm").css({"background": "#161b22", "color": "#fff", "border": "1px solid #334155"});
+        // ตกแต่ง UI
+        $(".dataTables_filter input").addClass("form-control").css({"background": "#161b22", "color": "#fff", "border": "1px solid #334155", "border-radius": "10px"});
         $(".dataTables_info, .dataTables_length, .dataTables_filter").addClass("text-light small mt-2");
       };
     };
