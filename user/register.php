@@ -11,9 +11,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $address = trim($_POST['address']);
   $subscribe = isset($_POST['subscribe']) ? 1 : 0; // ✅ รับค่าจาก checkbox
 
-  // ✅ ตรวจสอบเบอร์โทรศัพท์ (ต้องเป็นตัวเลข 10 หลัก)
-  if (!preg_match('/^[0-9]{10}$/', $phone)) {
-    $_SESSION['toast_error'] = "⚠️ กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เฉพาะตัวเลข 10 หลัก)";
+  // ✅ ตรวจสอบความยาวรหัสผ่าน (ต้อง 6 ตัวอักษรขึ้นไป)
+  if (strlen($password) < 6) {
+    $_SESSION['toast_error'] = "❌ รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร";
     header("Location: register.php");
     exit;
   }
@@ -21,6 +21,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   // ✅ ตรวจสอบรหัสผ่านตรงกันไหม
   if ($password !== $confirm) {
     $_SESSION['toast_error'] = "❌ รหัสผ่านไม่ตรงกัน";
+    header("Location: register.php");
+    exit;
+  }
+
+  // ✅ ตรวจสอบเบอร์โทรศัพท์ (ต้องเป็นตัวเลข 10 หลัก)
+  if (!preg_match('/^[0-9]{10}$/', $phone)) {
+    $_SESSION['toast_error'] = "⚠️ กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เฉพาะตัวเลข 10 หลัก)";
     header("Location: register.php");
     exit;
   }
@@ -222,14 +229,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <label class="form-label fw-semibold text-secondary">รหัสผ่าน</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-lock text-muted"></i></span>
-              <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+              <input type="password" name="password" class="form-control" placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" required>
             </div>
           </div>
           <div class="col-md-6 mb-3">
             <label class="form-label fw-semibold text-secondary">ยืนยันรหัสผ่าน</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-shield-lock text-muted"></i></span>
-              <input type="password" name="confirm" class="form-control" placeholder="••••••••" required>
+              <input type="password" name="confirm" class="form-control" placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" required>
             </div>
           </div>
         </div>
