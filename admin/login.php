@@ -1,9 +1,13 @@
 <?php
 session_start();
-// ✅ เปลี่ยนเส้นทางให้ดึงไฟล์ให้ถูกตำแหน่ง
-include "partials/connectdb.php";
+// เปิดโหมดโชว์ Error จะได้รู้ว่าพังตรงไหน
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// ถ้ามีการล็อกอินอยู่แล้ว → กลับไปหน้า Dashboard
+// อิงจากรูปโครงสร้างล่าสุด ไฟล์ connectdb.php อยู่ในโฟลเดอร์ admin ที่เดียวกันเลย
+include __DIR__ . "/partials/connectdb.php";
+
 if (isset($_SESSION['admin_id'])) {
   header("Location: index.php");
   exit;
