@@ -1,6 +1,7 @@
 <?php
 session_start();
-include __DIR__ . "/partials/connectdb.php";
+// เรียกใช้ไฟล์เชื่อมต่อฐานข้อมูล (ถอยกลับไป 1 โฟลเดอร์)
+include("../connectdb.php");
 
 // ถ้ามีการล็อกอินอยู่แล้ว → กลับไปหน้า Dashboard
 if (isset($_SESSION['admin_id'])) {
@@ -14,12 +15,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $username = trim($_POST['username']);
   $password = trim($_POST['password']);
 
-  // 🌟 แบบทดสอบ (ในอนาคตเชื่อมฐานข้อมูลได้)
-  if ($username === "admin" && $password === "1234") {
+  // 🌟 ค้นหาข้อมูลแอดมินจากตาราง admins
+  $stmt = $conn->prepare("SELECT * FROM admins WHERE username = ?");
+  $stmt->execute([$username]);
+  $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // ✅ ตั้ง session ให้ตรงกับ index.php
-    $_SESSION['admin_id'] = 1;              // ไอดีสมมติ
-    $_SESSION['admin_username'] = $username;
+  // เช็คว่ามีผู้ใช้นี้ไหม และ รหัสผ่านตรงกันไหม
+  // (อิงจากฐานข้อมูลของคุณ รหัสผ่านถูกเก็บเป็นข้อความธรรมดา เช่น '1234')
+  if ($admin && $password === $admin['password']) {
+
+    // ✅ ตั้งค่า Session ให้แอดมิน
+    $_SESSION['admin_id'] = $admin['admin_id'];
+    $_SESSION['admin_username'] = $admin['username'];
+    $_SESSION['admin_name'] = $admin['name']; // เผื่อเอาชื่อไปแสดงมุมขวาบน
 
     header("Location: index.php");
     exit;
@@ -33,14 +41,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
   <meta charset="UTF-8">
   <title>เข้าสู่ระบบ - MyCommiss Admin</title>
-  <link rel="icon" type="image/png" href="partials/icon_mycommiss.png">
+  <link rel="icon" type="image/png" href="../icon_mycommiss.png">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Bootstrap + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
-  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
@@ -52,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      margin: 0;
     }
 
     .stars {
@@ -110,7 +117,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     .form-control:focus {
       background: rgba(255,255,255,0.15);
       border-color: #22c55e;
+      color: #fff;
       box-shadow: 0 0 10px rgba(34,197,94,0.4);
+    }
+    .form-control::placeholder {
+      color: rgba(255,255,255,0.5);
     }
 
     .btn-login {
@@ -126,6 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       background: linear-gradient(90deg, #16a34a, #15803d);
       box-shadow: 0 0 20px rgba(22,165,74,0.5);
       transform: scale(1.02);
+      color: #fff;
     }
 
     .alert {
@@ -146,7 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
   <div class="stars"></div>
 
-  <div class="login-card text-center">
+  <div class="login-card text-center mx-3 mx-md-0">
     <div class="login-icon">
       <i class="bi bi-shield-lock-fill"></i>
     </div>
