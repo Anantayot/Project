@@ -171,7 +171,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <label class="form-label fw-semibold text-secondary">รหัสผ่าน</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                        <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="••••••••" required>
+                        <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="••••••••" minlength="6" required>
                     </div>
                 </div>
 
