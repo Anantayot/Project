@@ -10,31 +10,11 @@
   </div>
 
   <ul class="sidebar-menu">
-    <li>
-      <a href="/admin/index.php" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
-        <i class="bi bi-grid-1x2"></i> แดชบอร์ด
-      </a>
-    </li>
-    <li>
-      <a href="/admin/product/products.php" class="<?= strpos($_SERVER['PHP_SELF'], 'product') !== false ? 'active' : '' ?>">
-        <i class="bi bi-box-seam"></i> จัดการสินค้า
-      </a>
-    </li>
-    <li>
-      <a href="/admin/categories/categories.php" class="<?= strpos($_SERVER['PHP_SELF'], 'categories') !== false ? 'active' : '' ?>">
-        <i class="bi bi-tags"></i> ประเภทสินค้า
-      </a>
-    </li>
-    <li>
-      <a href="/admin/customer/customers.php" class="<?= strpos($_SERVER['PHP_SELF'], 'customer') !== false ? 'active' : '' ?>">
-        <i class="bi bi-people"></i> ข้อมูลลูกค้า
-      </a>
-    </li>
-    <li>
-      <a href="/admin/order/orders.php" class="<?= strpos($_SERVER['PHP_SELF'], 'order') !== false ? 'active' : '' ?>">
-        <i class="bi bi-bag-check"></i> คำสั่งซื้อ
-      </a>
-    </li>
+    <li><a href="/admin/index.php" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class="bi bi-grid-1x2"></i> แดชบอร์ด</a></li>
+    <li><a href="/admin/product/products.php" class="<?= strpos($_SERVER['PHP_SELF'], 'product') !== false ? 'active' : '' ?>"><i class="bi bi-box-seam"></i> จัดการสินค้า</a></li>
+    <li><a href="/admin/categories/categories.php" class="<?= strpos($_SERVER['PHP_SELF'], 'categories') !== false ? 'active' : '' ?>"><i class="bi bi-tags"></i> ประเภทสินค้า</a></li>
+    <li><a href="/admin/customer/customers.php" class="<?= strpos($_SERVER['PHP_SELF'], 'customer') !== false ? 'active' : '' ?>"><i class="bi bi-people"></i> ข้อมูลลูกค้า</a></li>
+    <li><a href="/admin/order/orders.php" class="<?= strpos($_SERVER['PHP_SELF'], 'order') !== false ? 'active' : '' ?>"><i class="bi bi-bag-check"></i> คำสั่งซื้อ</a></li>
   </ul>
 
   <div class="sidebar-footer">
