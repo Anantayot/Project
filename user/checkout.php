@@ -223,6 +223,53 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       border-top: 1px solid #eee;
       margin-top: auto;
     }
+
+    /* 📱 MOBILE RESPONSIVE */
+    @media (max-width: 768px) {
+      .card-body { padding: 15px !important; }
+      
+      /* แปลง Table รายการสินค้า เป็น Flexbox ให้ดูเหมือนการ์ด */
+      .table-summary tbody tr {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding-bottom: 12px;
+        margin-bottom: 12px;
+        border-bottom: 1px dashed #eee;
+      }
+      .table-summary tbody td {
+        padding: 0;
+        border: none;
+      }
+      /* รูปภาพ */
+      .table-summary tbody td:nth-child(1) {
+        width: 60px;
+      }
+      /* ชื่อสินค้า และ ราคาต่อชิ้น */
+      .table-summary tbody td:nth-child(2) {
+        width: calc(100% - 60px);
+        padding-left: 15px;
+      }
+      /* ราคารวม */
+      .table-summary tbody td:nth-child(3) {
+        width: 100%;
+        text-align: right !important;
+        margin-top: 8px;
+        font-size: 1.1rem;
+        color: #D10024 !important; /* เน้นสีแดง */
+      }
+
+      /* ส่วนสรุปยอดรวม */
+      .total-summary-box {
+        flex-direction: column;
+        align-items: flex-end !important;
+        text-align: right;
+      }
+      .total-summary-box span:first-child {
+        font-size: 1rem !important;
+        margin-bottom: 5px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -255,22 +302,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   <div class="container mt-5">
     
-    <div class="text-center mb-5">
+    <div class="text-center mb-4 mb-md-5">
       <h2 class="fw-bold" style="color: #D10024;"><i class="bi bi-wallet2 me-2"></i>ชำระเงิน</h2>
-      <p class="text-muted">ตรวจสอบสินค้าและกรอกข้อมูลการจัดส่งเพื่อยืนยันคำสั่งซื้อ</p>
+      <p class="text-muted small d-none d-md-block">ตรวจสอบสินค้าและกรอกข้อมูลการจัดส่งเพื่อยืนยันคำสั่งซื้อ</p>
     </div>
 
     <form method="post">
       <div class="row g-4">
         
-        <div class="col-lg-7 mb-4">
+        <div class="col-lg-7 mb-2 mb-lg-4">
           <div class="card card-checkout h-100">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
               <span><i class="bi bi-bag-check me-2 text-muted"></i>รายการสินค้า (<?= count($cart) ?>)</span>
               <a href="cart.php" class="text-decoration-none small text-muted"><i class="bi bi-pencil-square"></i> แก้ไข</a>
             </div>
             <div class="card-body p-4">
-              <div class="table-responsive">
+              <div class="table-responsive" style="overflow-x: hidden;">
                 <table class="table table-borderless table-summary mb-0">
                   <tbody>
                     <?php
@@ -300,9 +347,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </table>
               </div>
               
-              <hr class="text-muted opacity-25 my-4">
+              <hr class="text-muted opacity-25 my-3 my-md-4">
               
-              <div class="d-flex justify-content-between align-items-center px-2">
+              <div class="d-flex justify-content-between align-items-center px-2 total-summary-box">
                 <span class="fs-5 text-muted fw-semibold">ยอดชำระสุทธิ</span>
                 <span class="fs-3 fw-bold text-danger"><?= number_format((float)$total, 2) ?> ฿</span>
               </div>
@@ -312,7 +359,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <div class="col-lg-5">
           <div class="card card-checkout">
-            <div class="card-header-custom">
+            <div class="card-header-custom d-flex align-items-center">
               <i class="bi bi-truck me-2 text-muted"></i>ข้อมูลการจัดส่ง
             </div>
             <div class="card-body p-4">
@@ -349,7 +396,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
               <hr class="text-muted opacity-25 mb-4">
 
-              <div class="mb-5">
+              <div class="mb-4 mb-md-5">
                 <label class="form-label text-dark fw-semibold mb-2">ช่องทางการชำระเงิน <span class="text-danger">*</span></label>
                 <select name="payment" class="form-select form-select-lg fs-6" required>
                   <option value="" disabled selected>-- เลือกวิธีชำระเงิน --</option>
