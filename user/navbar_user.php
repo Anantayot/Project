@@ -77,42 +77,37 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 function confirmLogout(e) {
     e.preventDefault();
     if (confirm("คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?")) {
-        // ใช้แอนิเมชันออกก่อนแล้วค่อยเด้งไปหน้า logout
         document.body.classList.add('fade-out');
         setTimeout(() => {
             window.location = "logout.php";
-        }, 300);
+        }, 150); // ลดเวลาลงเหลือ 150ms
     }
 }
 
-// 🌟 ระบบ Page Transition (แอนิเมชันเปลี่ยนหน้า)
+// 🌟 ระบบ Page Transition แบบกระชับและรวดเร็ว
 document.addEventListener("DOMContentLoaded", () => {
-    // หาลิงก์ทั้งหมดที่ไม่ใช่แท็บใหม่ และไม่ใช่ลิงก์ # เปล่าๆ
     const links = document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="#"]):not([onclick])');
     
     links.forEach(link => {
         link.addEventListener('click', function(e) {
-            // ถ้ากดปุ่ม Ctrl หรือ Cmd ค้างไว้ (เปิดแท็บใหม่) ให้ปล่อยผ่าน
             if (e.ctrlKey || e.metaKey) return;
             
             const targetUrl = this.href;
             const currentUrl = window.location.href;
 
-            // ถ้าเป็นลิงก์หน้าเดียวกันไม่ต้องทำแอนิเมชัน
             if (targetUrl !== currentUrl) {
                 e.preventDefault();
-                document.body.classList.add('fade-out'); // เล่นแอนิเมชันออก
+                document.body.classList.add('fade-out'); 
                 
-                // รอให้แอนิเมชันจบ (300ms) ค่อยเปลี่ยนหน้า
+                // ลดเวลาหน่วงก่อนเปลี่ยนหน้าลงเหลือ 150ms
                 setTimeout(() => {
                     window.location.href = targetUrl;
-                }, 300);
+                }, 150);
             }
         });
     });
 });
 
-// 🌟 แก้ปัญหาหน้าจอดำเวลากดปุ่ม Back (ย้อนกลับ) ของเบราว์เซอร์
 window.addEventListener('pageshow', function (event) {
     if (event.persisted || document.body.classList.contains('fade-out')) {
         document.body.classList.remove('fade-out');
@@ -121,24 +116,24 @@ window.addEventListener('pageshow', function (event) {
 </script>
 
 <style>
-    /* 🌟 Page Transition Animations */
+    /* 🌟 Page Transition Animations - ทำให้เร็วขึ้น */
     body {
         opacity: 0;
-        animation: fadePageIn 0.4s ease-out forwards; /* โหลดหน้าเว็บสว่างขึ้น */
+        animation: fadePageIn 0.25s ease-out forwards; /* โหลดหน้าสว่างขึ้นใน 0.25 วิ */
     }
     
     body.fade-out {
-        animation: fadePageOut 0.3s ease-in forwards; /* กดลิงก์แล้วจางลง */
+        animation: fadePageOut 0.15s ease-in forwards; /* ตอนออกจางลงใน 0.15 วิ */
     }
 
     @keyframes fadePageIn {
-        0% { opacity: 0; transform: translateY(15px); }
+        0% { opacity: 0; transform: translateY(10px); }
         100% { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes fadePageOut {
         0% { opacity: 1; transform: translateY(0); }
-        100% { opacity: 0; transform: translateY(-10px); }
+        100% { opacity: 0; transform: translateY(-5px); }
     }
 
     /* 💎 Navbar Base */
