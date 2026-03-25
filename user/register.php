@@ -220,7 +220,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           <label class="form-label fw-semibold text-secondary">อีเมล</label>
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-envelope text-muted"></i></span>
-            <input type="email" name="email" class="form-control" placeholder="example@email.com" required>
+            <input type="email" name="email" class="form-control" placeholder="mycommiss@email.com" required>
           </div>
         </div>
 
