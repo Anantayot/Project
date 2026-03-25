@@ -2,13 +2,16 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$pageTitle = "รายละเอียดคำสั่งซื้อ";
+// ดึงรหัสออเดอร์จาก URL มาก่อน
+$id = $_GET['id'] ?? null;
+if (!$id) die("<div class='alert alert-danger text-center mt-5'>❌ ไม่พบคำสั่งซื้อ</div>");
+
+// ✅ เปลี่ยนให้แสดงรหัสออเดอร์บน Topbar (เมนูด้านบน)
+$pageTitle = "<i class='bi bi-receipt-cutoff me-2 text-success'></i> รายละเอียดคำสั่งซื้อ <span class='text-success'>#" . htmlspecialchars($id) . "</span>";
+
 ob_start();
 
 include __DIR__ . "/../partials/connectdb.php";
-
-$id = $_GET['id'] ?? null;
-if (!$id) die("<div class='alert alert-danger text-center mt-5'>❌ ไม่พบคำสั่งซื้อ</div>");
 
 // ✅ อัปเดตสถานะคำสั่งซื้อ / ชำระเงิน
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -133,7 +136,7 @@ $paymentColors = [
     font-weight: 500;
   }
   
-  /* สี Custom Badges (ดึงมาจากไฟล์ที่แล้ว) */
+  /* สี Custom Badges */
   .bg-purple { background-color: #8b5cf6 !important; color: #fff; }
   .bg-custom-blue { background-color: #3b82f6 !important; color: #fff; } 
   .bg-custom-success { background-color: #22c55e !important; color: #fff; } 
@@ -168,12 +171,9 @@ $paymentColors = [
   }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4 mt-2">
-  <h4 class="fw-bold text-white mb-0">
-    <i class="bi bi-receipt-cutoff me-2 text-success"></i> รายละเอียดคำสั่งซื้อ <span class="text-success">#<?= htmlspecialchars($order['order_id']) ?></span>
-  </h4>
-  <a href="orders.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
-    <i class="bi bi-arrow-left me-1"></i> ย้อนกลับ
+<div class="d-flex justify-content-end mb-4 mt-2">
+  <a href="orders.php" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2 shadow-sm">
+    <i class="bi bi-arrow-left me-1"></i> ย้อนกลับไปหน้าคำสั่งซื้อ
   </a>
 </div>
 
