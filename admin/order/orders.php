@@ -8,8 +8,8 @@ error_reporting(E_ALL);
 // ✅ ดึงไฟล์เชื่อมต่อฐานข้อมูลจากโฟลเดอร์ partials
 include __DIR__ . "/../partials/connectdb.php";
 
-// 👇 1. เปลี่ยนชื่อ Title ตรงนี้ ซึ่งจะไปแสดงที่ Topbar ด้านบนสุด
-$pageTitle = "รายการคำสั่งซื้อ"; 
+// 👇 เปลี่ยนชื่อ Title ตรงนี้ ซึ่งจะไปแสดงที่ Topbar
+$pageTitle = "รายการคำสั่งซื้อ";
 
 // บังคับให้ต้องล็อกอิน
 if (!isset($_SESSION['admin_id'])) {
@@ -17,8 +17,25 @@ if (!isset($_SESSION['admin_id'])) {
   exit;
 }
 
+/* =========================================================
+   🟢 ส่วนตั้งค่า (Config): แก้ไขสีหรือเพิ่มสถานะใหม่ได้ที่นี่เลย!
+   ========================================================= */
+$statusColors = [
+    'รอดำเนินการ'    => 'custom-yellow', 
+    'กำลังจัดเตรียม'  => 'custom-blue',   
+    'จัดส่งแล้ว'      => 'success',       
+    'สำเร็จ'         => 'success',       
+    'ยกเลิก'         => 'danger'         
+];
+
+$verifyColors = [
+    'รอตรวจสอบ'     => 'warning text-dark',
+    'กำลังตรวจสอบ'   => 'purple',
+    'อนุมัติ'         => 'custom-success', 
+    'ปฏิเสธ'         => 'danger'
+];
+
 try {
-    // เรียงลำดับจากฐานข้อมูล (ดึงข้อมูลล่าสุดขึ้นก่อน)
     $sql = "SELECT o.order_id, o.order_date, o.total_price, o.order_status, o.admin_verified, c.name AS customer_name 
             FROM orders o 
             LEFT JOIN customers c ON o.customer_id = c.customer_id 
@@ -34,103 +51,30 @@ ob_start();
 ?>
 
 <style>
-  /* 🎨 แต่งตารางสำหรับ Desktop */
-  .table-card {
-    background: var(--bg-card, #1e1e2d);
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-  .table-custom-header {
-    background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important;
-    color: #ffffff !important;
-  }
-  .table-dark { 
-    --bs-table-bg: transparent; 
-    --bs-table-color: #ffffff; 
-    border-color: rgba(255, 255, 255, 0.05); 
-  }
-  
-  #dataTable tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    transition: all 0.3s ease-in-out;
-  }
+  .table-card { background: var(--bg-card, #1e1e2d); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.05); }
+  .table-custom-header { background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important; color: #ffffff !important; }
+  .table-dark { --bs-table-bg: transparent; --bs-table-color: #ffffff; border-color: rgba(255, 255, 255, 0.05); }
+  #dataTable tbody tr:hover { background-color: rgba(255, 255, 255, 0.05) !important; transition: all 0.3s ease-in-out; }
 
-  /* 🎨 ตกแต่ง DataTables */
-  .dataTables_wrapper .dataTables_length, 
-  .dataTables_wrapper .dataTables_filter, 
-  .dataTables_wrapper .dataTables_info, 
-  .dataTables_wrapper .dataTables_processing, 
-  .dataTables_wrapper .dataTables_paginate {
-    color: #ffffff !important;
-  }
-  
-  .dataTables_length select {
-    background-color: #161b22;
-    color: #ffffff;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    padding: 3px 10px;
-    outline: none;
-  }
+  .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate { color: #ffffff !important; }
+  .dataTables_length select { background-color: #161b22; color: #ffffff; border: 1px solid #334155; border-radius: 8px; padding: 3px 10px; outline: none; }
+  .page-item.active .page-link { background-color: #16a34a !important; border-color: #16a34a !important; color: #ffffff !important; box-shadow: 0 0 10px rgba(22, 163, 74, 0.4); }
+  .page-link { background-color: rgba(255, 255, 255, 0.05) !important; border-color: rgba(255, 255, 255, 0.1) !important; color: #e2e8f0 !important; }
+  .page-link:hover { background-color: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; }
 
-  .page-item.active .page-link {
-    background-color: #16a34a !important;
-    border-color: #16a34a !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 10px rgba(22, 163, 74, 0.4);
-  }
-  .page-link {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    color: #e2e8f0 !important;
-  }
-  .page-link:hover {
-    background-color: rgba(255, 255, 255, 0.15) !important;
-    color: #ffffff !important;
-  }
-
-  /* สี Custom สำหรับป้ายสถานะ */
   .bg-purple { background-color: #8b5cf6 !important; color: #fff; }
-  .bg-orange { background-color: #f97316 !important; color: #fff; }
   .bg-custom-blue { background-color: #3b82f6 !important; color: #fff; } 
   .bg-custom-success { background-color: #22c55e !important; color: #fff; } 
   .bg-custom-yellow { background-color: #facc15 !important; color: #0f172a !important; } 
 
-  /* 📱 ปรับแต่งสำหรับ Mobile */
   @media (max-width: 767px) {
     #dataTable thead { display: none; }
-    
-    #dataTable tbody tr {
-      display: block;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 12px;
-      margin-bottom: 15px;
-      padding: 15px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      position: relative;
-    }
-    
-    #dataTable tbody td {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: none;
-      padding: 8px 0;
-      text-align: right;
-      color: #ffffff !important;
-    }
-
-    #dataTable tbody td:before {
-      content: attr(data-label);
-      float: left;
-      font-weight: 500;
-      color: #94a3b8; 
-    }
-
+    #dataTable tbody tr { display: block; background: rgba(255, 255, 255, 0.04); border-radius: 12px; margin-bottom: 15px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.08); position: relative; }
+    #dataTable tbody td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 8px 0; text-align: right; color: #ffffff !important; }
+    #dataTable tbody td:before { content: attr(data-label); float: left; font-weight: 500; color: #94a3b8; }
     #dataTable td[data-label="ID"] { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px; font-size: 1.1rem; }
     #dataTable td[data-label="จัดการ"] { width: 100%; justify-content: center; padding-top: 15px; }
     #dataTable td[data-label="จัดการ"] a { width: 100%; font-weight: 600; }
-    
     .dataTables_wrapper .dataTables_filter { text-align: left !important; margin-bottom: 15px; }
     .dataTables_wrapper .dataTables_filter input { width: 100%; margin-left: 0 !important; margin-top: 5px; }
   }
@@ -169,28 +113,21 @@ ob_start();
                 <td data-label="ยอดรวม" class="fw-bold text-info">฿<?= number_format($o['total_price'], 2) ?></td>
 
                 <td data-label="พัสดุ" class="text-center text-md-start">
-                  <?php
+                  <?php 
                     $status = $o['order_status'] ?? 'รอดำเนินการ';
-                    if ($status == 'สำเร็จ' || $status == 'จัดส่งแล้ว') $badge = 'success';
-                    elseif ($status == 'กำลังจัดเตรียม') $badge = 'custom-blue'; 
-                    elseif ($status == 'รอดำเนินการ') $badge = 'custom-yellow'; 
-                    elseif ($status == 'ยกเลิก') $badge = 'danger';
-                    else $badge = 'secondary';
+                    $badgeClass = $statusColors[$status] ?? 'secondary'; 
                   ?>
-                  <span class="badge bg-<?= $badge ?> rounded-pill px-3 py-2 fw-bold">
+                  <span class="badge bg-<?= $badgeClass ?> rounded-pill px-3 py-2 fw-bold">
                     <?= htmlspecialchars($status) ?>
                   </span>
                 </td>
 
                 <td data-label="การโอน" class="text-center text-md-start">
-                  <?php
+                  <?php 
                     $verify = $o['admin_verified'] ?? 'รอตรวจสอบ';
-                    if ($verify == 'อนุมัติ') $vbadge = 'custom-success'; 
-                    elseif ($verify == 'ปฏิเสธ') $vbadge = 'danger';
-                    elseif ($verify == 'กำลังตรวจสอบ') $vbadge = 'purple';
-                    else $vbadge = 'warning text-dark';
+                    $vBadgeClass = $verifyColors[$verify] ?? 'secondary'; 
                   ?>
-                  <span class="badge bg-<?= $vbadge ?> rounded-pill px-3 py-2 fw-bold">
+                  <span class="badge bg-<?= $vBadgeClass ?> rounded-pill px-3 py-2 fw-bold">
                     <?= htmlspecialchars($verify) ?>
                   </span>
                 </td>
@@ -227,26 +164,15 @@ ob_start();
           language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
           pageLength: 10,
           responsive: false,
-          order: [[0, "desc"]],
+          order: [[0, "desc"]], 
           dom: '<"d-flex flex-wrap justify-content-between align-items-center mb-3"lf>rt<"d-flex flex-wrap justify-content-between align-items-center mt-3"ip><"clear">',
         });
 
         $(".dataTables_filter input")
             .addClass("form-control d-inline-block")
-            .css({
-                "background": "#161b22", 
-                "color": "#ffffff", 
-                "border": "1px solid #334155", 
-                "border-radius": "8px",
-                "padding": "5px 15px",
-                "width": "auto"
-            })
-            .on("focus", function() {
-                $(this).css({"border-color": "#22c55e", "box-shadow": "0 0 0 0.2rem rgba(34, 197, 94, 0.25)", "outline": "none"});
-            })
-            .on("blur", function() {
-                $(this).css({"border-color": "#334155", "box-shadow": "none"});
-            });
+            .css({ "background": "#161b22", "color": "#ffffff", "border": "1px solid #334155", "border-radius": "8px", "padding": "5px 15px", "width": "auto" })
+            .on("focus", function() { $(this).css({"border-color": "#22c55e", "box-shadow": "0 0 0 0.2rem rgba(34, 197, 94, 0.25)", "outline": "none"}); })
+            .on("blur", function() { $(this).css({"border-color": "#334155", "box-shadow": "none"}); });
             
         $(".dataTables_info").addClass("text-light small mt-2 mt-md-0");
       };
