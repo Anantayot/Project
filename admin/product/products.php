@@ -1,237 +1,273 @@
 <?php
-include __DIR__ . "/../partials/connectdb.php";
+session_start();
+// เปิดโหมดโชว์ Error
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// บังคับให้ต้องล็อกอิน
+if (!isset($_SESSION['admin_id'])) {
+  header("Location: ../login.php");
+  exit;
+}
 
 $pageTitle = "จัดการสินค้า";
-ob_start();
+include __DIR__ . "/../partials/connectdb.php";
 
-// 🔹 ดึงข้อมูลสินค้าทั้งหมด (JOIN กับหมวดหมู่)
-$sql = "SELECT p.*, c.cat_name 
-        FROM product p
-        LEFT JOIN category c ON p.cat_id = c.cat_id
-        ORDER BY p.p_id ASC";
-$products = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+// 🔹 ดึงข้อมูลสินค้าทั้งหมด (JOIN กับหมวดหมู่) เรียงตาม ID
+try {
+  $sql = "SELECT p.*, c.cat_name 
+          FROM product p
+          LEFT JOIN category c ON p.cat_id = c.cat_id
+          ORDER BY p.p_id ASC";
+  $products = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  die("<div class='alert alert-danger text-center mt-4'>❌ SQL Error: " . htmlspecialchars($e->getMessage()) . "</div>");
+}
+
+ob_start();
 ?>
 
-<!-- 🔹 ส่วนหัว -->
-<h3 class="mb-4 text-center fw-bold text-white">
-  <i class="bi bi-box-seam"></i> จัดการสินค้า
-</h3>
+<style>
+  .table-card {
+    background: var(--bg-card);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+  }
+  .table-custom-header {
+    background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important;
+    color: #fff !important;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .table-custom-header th {
+    border-bottom: none;
+    padding: 15px 10px;
+  }
+  .table-dark {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  .table-dark td {
+    padding: 15px 10px;
+    vertical-align: middle;
+  }
 
-<div class="card shadow-lg border-0"
-     style="background: linear-gradient(145deg,#161b22,#0e1116); border:1px solid #2c313a;">
-  <div class="card-body">
+  /* 🔸 ควบคุมข้อความยาวบนจอคอม */
+  .truncate-text {
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    <!-- ปุ่มเพิ่มสินค้า -->
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-      <h4 class="text-light fw-semibold mb-0">
-        <i class="bi bi-list-ul"></i> รายการสินค้า
-      </h4>
-      <a href="product_add.php" class="btn btn-success btn-sm shadow-sm">
-        <i class="bi bi-plus-circle"></i> เพิ่มสินค้า
-      </a>
-    </div>
+  /* ✅ เปลี่ยนสีข้อความ DataTables เป็นสีขาวทั้งหมด */
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_processing,
+  .dataTables_wrapper .dataTables_paginate {
+    color: #ffffff !important;
+  }
+  .dataTables_wrapper label {
+    color: #ffffff !important; 
+    font-weight: 500;
+  }
+  
+  /* 🔸 Pagination เข้าธีม */
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #fff !important;
+    border-radius: 6px;
+    margin: 0 3px;
+    border: 1px solid transparent !important;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: rgba(34, 197, 94, 0.2) !important;
+    border: 1px solid #22c55e !important;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: linear-gradient(145deg, #22c55e, #16a34a) !important;
+    color: #fff !important;
+    border: none !important;
+  }
 
-    <!-- ตารางสินค้า -->
-    <div class="table-responsive">
-      <table id="dataTable" class="table table-dark table-striped text-center align-middle mb-0"
-             style="border-radius:10px; overflow:hidden;">
-        <thead style="background:linear-gradient(90deg,#00d25b,#00b14a); color:#111; font-weight:600;">
-          <tr>
-            <th style="width:50px;">#</th>
-            <th>รูปภาพ</th>
-            <th>ชื่อสินค้า</th>
-            <th>ราคา (฿)</th>
-            <th>หมวดหมู่</th>
-            <th>สต็อก</th>
-            <th style="width:120px;">จัดการ</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php if(empty($products)): ?>
-            <tr>
-              <td colspan="7" class="text-center text-muted py-4">
-                <i class="bi bi-info-circle"></i> ยังไม่มีข้อมูลสินค้าในระบบ
-              </td>
-            </tr>
-          <?php else: ?>
-            <?php foreach($products as $index => $p): ?>
-            <tr>
-              <td><?= $index + 1 ?></td>
-              <td>
-                <?php 
-                  $imagePath = __DIR__ . "/../uploads/" . $p['p_image'];
-                  $imageURL  = "../uploads/" . htmlspecialchars($p['p_image']);
-                  if (!empty($p['p_image']) && file_exists($imagePath)): 
-                ?>
-                  <img src="<?= $imageURL ?>" width="60" class="rounded border border-secondary shadow-sm" alt="product">
-                <?php else: ?>
-                  <span class="text-muted">ไม่มีรูป</span>
-                <?php endif; ?>
-              </td>
-              <td class="text-start text-white truncate-text" title="<?= htmlspecialchars($p['p_name']) ?>">
-                <?= htmlspecialchars($p['p_name']) ?>
-              </td>
-              <td class="text-success fw-semibold"><?= number_format($p['p_price'], 2) ?></td>
-              <td class="text-info"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></td>
-              <td class="text-warning"><?= htmlspecialchars($p['p_stock']) ?></td>
-              <td>
-                <button type="button" 
-                        class="btn btn-warning btn-sm"
-                        data-bs-toggle="tooltip"
-                        data-bs-title="แก้ไขสินค้า"
-                        onclick="window.location='product_edit.php?id=<?= $p['p_id'] ?>'">
-                  <i class="bi bi-pencil-square"></i>
-                </button>
-                <button type="button" 
-                        class="btn btn-danger btn-sm"
-                        data-bs-toggle="tooltip"
-                        data-bs-title="ลบสินค้า"
-                        onclick="if(confirm('ยืนยันการลบสินค้านี้หรือไม่?')) window.location='product_delete.php?id=<?= $p['p_id'] ?>'">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </td>
-            </tr>
-            <?php endforeach; ?>
-          <?php endif; ?>
-        </tbody>
-      </table>
-    </div>
+  /* 📱 ปรับแต่งสำหรับมือถือ (Mobile Card View) */
+  @media (max-width: 768px) {
+    #dataTable thead { display: none; }
+    #dataTable tbody tr {
+      display: flex; flex-direction: column;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 15px; margin-bottom: 20px;
+      padding: 15px 20px; border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    #dataTable tbody td {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border: none !important;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important;
+      font-size: 0.95rem;
+    }
+    #dataTable tbody td:last-child {
+      border-bottom: none !important; padding-top: 18px; padding-bottom: 5px;
+    }
+    #dataTable tbody td::before {
+      content: attr(data-label); font-weight: 500; color: #94a3b8;
+      text-align: left; min-width: 90px; margin-right: 15px; flex-shrink: 0;
+    }
+    .mobile-value { text-align: right !important; word-break: break-word; flex-grow: 1; }
+    .mobile-actions { display: flex; justify-content: flex-end; width: 100%; gap: 10px; }
+    .truncate-text { max-width: 100%; white-space: normal; text-align: right; }
+  }
+</style>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <h4 class="fw-bold text-white mb-0 d-none d-md-block">
+    <i class="bi bi-box-seam me-2 text-success"></i> จัดการสินค้า
+  </h4>
+  <div class="ms-auto w-100 w-md-auto text-end">
+    <a href="product_add.php" class="btn btn-success rounded-pill px-4 py-2 shadow-sm w-100 w-md-auto transition-all hover-scale">
+      <i class="bi bi-plus-circle me-1"></i> เพิ่มสินค้าใหม่
+    </a>
   </div>
 </div>
 
-<!-- ✅ CSS: ปรับสไตล์ให้เข้ากับธีม -->
-<style>
-/* 🔸 ควบคุมข้อความยาว */
-.truncate-text {
-  max-width: 260px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.truncate-text:hover {
-  background: rgba(255,255,255,0.05);
-}
+<div class="card table-card shadow-lg">
+  <div class="card-body p-3 p-md-4">
 
-/* 🔸 Scrollbar ตาราง */
-.table-responsive {
-  overflow-x: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #2c313a #0d1117;
-}
+    <?php if(empty($products)): ?>
+      <div class="text-center py-5">
+        <i class="bi bi-box-seam text-muted" style="font-size: 4rem;"></i>
+        <h5 class="text-muted mt-3">ยังไม่มีข้อมูลสินค้าในระบบ</h5>
+      </div>
+    <?php else: ?>
+      <div> 
+        <table id="dataTable" class="table table-dark table-striped table-hover text-center align-middle w-100 mb-0">
+          <thead>
+            <tr class="table-custom-header">
+              <th style="width: 80px;">รหัส</th>
+              <th style="width: 100px;">รูปภาพ</th>
+              <th class="text-start">ชื่อสินค้า</th>
+              <th>ราคา (฿)</th>
+              <th>หมวดหมู่</th>
+              <th>สต็อก</th>
+              <th style="width: 120px;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach($products as $p): ?>
+              <tr>
+                <td data-label="รหัสสินค้า" data-sort="<?= $p['p_id'] ?>" class="fw-bold text-success mobile-value">
+                  #<?= htmlspecialchars($p['p_id']) ?>
+                </td>
+                
+                <td data-label="รูปภาพ" class="mobile-value">
+                  <?php 
+                    // ตรวจสอบรูปภาพ
+                    // ⚠️ หมายเหตุ: ตอนรันจริงอาจจะต้องเช็ค Path ตรงนี้นะครับว่าชี้ไปที่ /Project/ หรือเปล่า
+                    $imagePath = __DIR__ . "/../../../uploads/" . $p['p_image']; // ชี้ออกไปโฟลเดอร์หลัก
+                    $imageURL  = "/Project/uploads/" . htmlspecialchars($p['p_image']); // ชี้ URL ไปที่ Project/uploads
+                    
+                    if (!empty($p['p_image'])): 
+                  ?>
+                    <img src="<?= $imageURL ?>" style="width: 60px; height: 60px; object-fit: cover;" class="rounded border border-secondary shadow-sm" alt="product" onerror="this.src='https://placehold.co/60x60/1e293b/fff?text=No+Img'">
+                  <?php else: ?>
+                    <span class="badge bg-secondary">ไม่มีรูป</span>
+                  <?php endif; ?>
+                </td>
+                
+                <td data-label="ชื่อสินค้า" class="text-md-start text-white fw-medium truncate-text mobile-value" title="<?= htmlspecialchars($p['p_name']) ?>">
+                  <?= htmlspecialchars($p['p_name']) ?>
+                </td>
+                
+                <td data-label="ราคา" class="text-info fw-bold mobile-value">
+                  ฿<?= number_format($p['p_price'], 2) ?>
+                </td>
+                
+                <td data-label="หมวดหมู่" class="text-light mobile-value">
+                  <?= htmlspecialchars($p['cat_name'] ?? '-') ?>
+                </td>
+                
+                <td data-label="สต็อก" class="mobile-value">
+                  <?php if($p['p_stock'] > 0): ?>
+                    <span class="badge bg-success bg-opacity-75 px-3 py-2 rounded-pill"><?= htmlspecialchars($p['p_stock']) ?> ชิ้น</span>
+                  <?php else: ?>
+                    <span class="badge bg-danger px-3 py-2 rounded-pill">หมด</span>
+                  <?php endif; ?>
+                </td>
+                
+                <td data-label="จัดการ" class="mobile-value">
+                  <div class="d-flex justify-content-center mobile-actions">
+                    <a href="product_edit.php?id=<?= $p['p_id'] ?>" class="btn btn-sm btn-outline-warning rounded-circle" data-bs-toggle="tooltip" title="แก้ไขสินค้า">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="product_delete.php?id=<?= $p['p_id'] ?>" class="btn btn-sm btn-outline-danger rounded-circle" data-bs-toggle="tooltip" title="ลบสินค้า" onclick="return confirm('ยืนยันการลบสินค้า #<?= htmlspecialchars($p['p_id']) ?> หรือไม่?');">
+                      <i class="bi bi-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    <?php endif; ?>
 
-/* 🔸 ปุ่มในคอลัมน์ “จัดการ” */
-.table td:last-child {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-}
-.btn-sm i {
-  font-size: 1rem;
-  vertical-align: middle;
-}
-.table td, .table th {
-  vertical-align: middle !important;
-  padding: 10px 8px !important;
-}
+  </div>
+</div>
 
-/* 🔸 ช่องค้นหา */
-.dataTables_filter input {
-  background: #161b22 !important;
-  color: #fff !important;
-  border: 1px solid #2c313a !important;
-  border-radius: 8px !important;
-  padding: 6px 10px !important;
-}
-.dataTables_filter label {
-  color: #ccc;
-}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    let script1 = document.createElement('script');
+    script1.src = "https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js";
+    document.body.appendChild(script1);
+    
+    script1.onload = () => {
+      let script2 = document.createElement('script');
+      script2.src = "https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js";
+      document.body.appendChild(script2);
+      
+      script2.onload = () => {
+        $('#dataTable').DataTable({
+          language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
+          pageLength: 10,
+          responsive: false, 
+          order: [[0, "asc"]], // ✅ เรียงตามรหัสสินค้าจากน้อยไปมาก
+          columnDefs: [
+            { orderable: false, targets: [1, 6] } // ปิด sort รูปภาพ และจัดการ
+          ],
+          dom: '<"d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3"lf>rt<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3"ip>'
+        });
 
-/* 🔸 Dropdown แสดงรายการ */
-.dataTables_length select {
-  background: #161b22 !important;
-  color: #00d25b !important;
-  border: 1px solid #2c313a !important;
-  border-radius: 6px !important;
-}
+        // ✅ แต่งกล่องค้นหาและช่อง Dropdown ให้ข้อความเป็นสีขาว
+        $(".dataTables_filter input")
+          .addClass("form-control form-control-sm text-white")
+          .css({
+            "background": "rgba(255,255,255,0.05)", "color": "#ffffff",
+            "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px",
+            "padding": "8px 15px", "min-width": "250px"
+          });
 
-/* 🔸 Pagination เข้าธีม */
-.dataTables_wrapper .dataTables_paginate {
-  margin-top: 15px;
-  text-align: center;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-  background: #0d1117 !important;
-  border: 1px solid #2c313a !important;
-  color: #00d25b !important;
-  border-radius: 6px;
-  margin: 0 3px;
-  transition: all 0.2s ease;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: linear-gradient(145deg, #00d25b, #00b14a) !important;
-  color: #fff !important;
-  border-color: #00b14a !important;
-  box-shadow: 0 0 6px rgba(0,210,91,0.5);
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-  background: linear-gradient(145deg, #00d25b, #00b14a) !important;
-  color: #fff !important;
-  border: none !important;
-  box-shadow: 0 0 10px rgba(0,210,91,0.5);
-  font-weight: 600;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-  color: #555 !important;
-  background: #161b22 !important;
-  border: 1px solid #2c313a !important;
-}
-
-/* 🔸 ปุ่มก่อนหน้า-ถัดไป */
-.dataTables_wrapper .dataTables_paginate .previous,
-.dataTables_wrapper .dataTables_paginate .next {
-  color: #00d25b !important;
-}
-
-/* 🔸 Responsive: มือถือ */
-@media (max-width: 991px) {
-  .truncate-text { max-width: 150px; }
-  .table td, .table th { font-size: 0.85rem; }
-  .table td:last-child { flex-wrap: wrap; gap: 4px; }
-}
-</style>
+        $(".dataTables_length select")
+          .addClass("form-select form-select-sm text-white")
+          .css({
+            "background": "rgba(255,255,255,0.05)", "color": "#ffffff",
+            "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px",
+            "padding": "6px 30px 6px 15px"
+          });
+          
+        // เปิด Tooltip
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+      };
+    };
+  });
+</script>
 
 <?php
 $pageContent = ob_get_clean();
 include __DIR__ . "/../partials/layout.php";
 ?>
-
-<!-- ✅ JS: DataTables + Tooltip -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-<script>
-$(document).ready(function() {
-  const table = $('#dataTable').DataTable({
-    language: {
-      url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json',
-      searchPlaceholder: "🔍 ค้นหาชื่อสินค้า / หมวดหมู่ / ราคา...",
-      lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
-      zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
-      info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
-      infoEmpty: "ไม่มีข้อมูล",
-      infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)"
-    },
-    pageLength: 10,
-    responsive: true,
-    order: [[0, "asc"]],
-    columnDefs: [
-      { orderable: false, targets: [1, 6] }
-    ]
-  });
-
-  // 🧩 เปิด tooltip ทั้งหน้า
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
-});
-</script>
