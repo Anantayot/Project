@@ -55,74 +55,122 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="th">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>เปลี่ยนรหัสผ่าน | MyCommiss</title>
   <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  
   <style>
-    :root {
-      --red: #D10024;
-      --light-bg: #f8f9fa;
-    }
-
     body {
-      background-color: var(--light-bg);
+      background-color: #f8f9fa;
       font-family: "Prompt", sans-serif;
-    }
-
-    .card {
-      max-width: 500px;
-      margin: 60px auto;
-      border-radius: 15px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-      overflow: hidden;
-    }
-
-    .card-header {
-      background: var(--red);
-      color: #fff;
-      font-weight: 600;
-      border-radius: 15px 15px 0 0;
-      text-align: center;
-      font-size: 1.2rem;
-      letter-spacing: 0.5px;
-    }
-
-    .form-label {
-      font-weight: 500;
       color: #333;
     }
-
-    .btn {
-      border-radius: 10px;
-      transition: all 0.2s ease-in-out;
-      font-weight: 500;
+    
+    .password-wrapper {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 15px;
     }
-    .btn:hover { transform: scale(1.05); }
 
-    /* ปุ่มธีมแดง */
-    .btn-primary, .btn-outline-primary:hover {
-      background-color: var(--red);
-      border-color: var(--red);
+    /* 🔹 Card */
+    .card-password {
+      width: 100%;
+      max-width: 500px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      overflow: hidden;
+      border: none;
+    }
+
+    .card-header-custom {
+      background-color: #D10024;
       color: #fff;
+      font-weight: 700;
+      font-size: 1.25rem;
+      padding: 25px 20px;
+      text-align: center;
+      position: relative;
+    }
+    
+    /* ไอคอนด้านบน */
+    .lock-icon {
+      width: 70px;
+      height: 70px;
+      background-color: #fff;
+      color: #D10024;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 15px auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    .btn-outline-primary {
-      border-color: var(--red);
-      color: var(--red);
+    /* 🔹 Input Fields */
+    .form-control {
+      border-radius: 0 10px 10px 0;
+      padding: 12px 15px;
+      background-color: #fcfcfc;
+      border: 1px solid #e0e0e0;
+    }
+    .form-control:focus {
+      border-color: #D10024;
+      box-shadow: 0 0 0 0.2rem rgba(209, 0, 36, 0.15);
+      background-color: #fff;
+      z-index: 1;
+    }
+    .input-group-text {
+      border-radius: 10px 0 0 10px;
+      background-color: #fff;
+      border: 1px solid #e0e0e0;
+      border-right: none;
     }
 
+    /* 🔹 Buttons */
+    .btn-submit {
+      background-color: #D10024;
+      color: #fff;
+      border-radius: 50px;
+      font-weight: 600;
+      padding: 12px;
+      border: none;
+      transition: 0.3s;
+    }
+    .btn-submit:hover {
+      background-color: #a5001b;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(209, 0, 36, 0.2);
+    }
+
+    .btn-outline-custom {
+      border: 1px solid #ddd;
+      color: #555;
+      border-radius: 50px;
+      font-weight: 500;
+      padding: 10px;
+      transition: 0.3s;
+      background: #fff;
+      text-align: center;
+      display: inline-block;
+    }
+    .btn-outline-custom:hover { background-color: #f1f1f1; color: #333; }
+
+    /* 🔹 Footer */
     footer {
-      background-color: var(--red);
-      color: white;
-      padding: 15px;
-      margin-top: 60px;
-    }
-
-    .toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
+      background-color: #fff;
+      color: #6c757d;
+      padding: 20px;
+      font-size: 0.9rem;
+      border-top: 1px solid #eee;
+      text-align: center;
     }
   </style>
 </head>
@@ -130,12 +178,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php include("navbar_user.php"); ?>
 
-<!-- 🔔 Toast แจ้งเตือน -->
-<div class="toast-container">
+<div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 3000;">
   <?php if (isset($_SESSION['toast_error'])): ?>
-    <div class="toast align-items-center text-bg-danger border-0 show" role="alert">
+    <div class="toast align-items-center text-bg-danger border-0 show shadow-lg" role="alert">
       <div class="d-flex">
-        <div class="toast-body"><?= $_SESSION['toast_error'] ?></div>
+        <div class="toast-body fs-6 fw-medium px-3 py-2"><?= $_SESSION['toast_error'] ?></div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
       </div>
     </div>
@@ -143,9 +190,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 
   <?php if (isset($_SESSION['toast_success'])): ?>
-    <div class="toast align-items-center text-bg-success border-0 show" role="alert">
+    <div class="toast align-items-center text-bg-success border-0 show shadow-lg" role="alert">
       <div class="d-flex">
-        <div class="toast-body"><?= $_SESSION['toast_success'] ?></div>
+        <div class="toast-body fs-6 fw-medium px-3 py-2"><?= $_SESSION['toast_success'] ?></div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
       </div>
     </div>
@@ -153,44 +200,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 </div>
 
-<div class="card">
-  <div class="card-header">🔑 เปลี่ยนรหัสผ่าน</div>
-  <div class="card-body p-4">
-    <form method="POST">
-      <div class="mb-3">
-        <label class="form-label">รหัสผ่านเดิม</label>
-        <input type="password" name="old_password" class="form-control" required>
+<div class="password-wrapper">
+  <div class="card-password">
+    
+    <div class="card-header-custom">
+      <div class="lock-icon">
+        <i class="bi bi-shield-lock-fill"></i>
       </div>
+      <span>เปลี่ยนรหัสผ่าน</span>
+      <p class="mb-0 mt-1 fw-normal" style="font-size: 0.85rem; opacity: 0.9;">ตั้งรหัสผ่านที่คาดเดายากเพื่อความปลอดภัย</p>
+    </div>
 
-      <div class="mb-3">
-        <label class="form-label">รหัสผ่านใหม่</label>
-        <input type="password" name="new_password" class="form-control" minlength="6" required>
-      </div>
+    <div class="card-body p-4 p-md-5">
+      <form method="POST">
+        
+        <div class="mb-4">
+          <label class="form-label fw-semibold text-secondary mb-1">รหัสผ่านเดิม</label>
+          <div class="input-group shadow-sm">
+            <span class="input-group-text"><i class="bi bi-unlock text-muted"></i></span>
+            <input type="password" name="old_password" class="form-control" placeholder="กรอกรหัสผ่านปัจจุบัน" required>
+          </div>
+        </div>
 
-      <div class="mb-3">
-        <label class="form-label">ยืนยันรหัสผ่านใหม่</label>
-        <input type="password" name="confirm_password" class="form-control" minlength="6" required>
-      </div>
+        <div class="mb-4">
+          <label class="form-label fw-semibold text-secondary mb-1">รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)</label>
+          <div class="input-group shadow-sm">
+            <span class="input-group-text"><i class="bi bi-lock text-muted"></i></span>
+            <input type="password" name="new_password" class="form-control" placeholder="••••••••" minlength="6" required>
+          </div>
+        </div>
 
-      <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2">
-        <a href="profile.php" class="btn btn-outline-primary">⬅️ กลับ</a>
-        <button type="submit" class="btn btn-primary">💾 เปลี่ยนรหัสผ่าน</button>
-      </div>
-    </form>
+        <div class="mb-4">
+          <label class="form-label fw-semibold text-secondary mb-1">ยืนยันรหัสผ่านใหม่</label>
+          <div class="input-group shadow-sm">
+            <span class="input-group-text"><i class="bi bi-check-circle text-muted"></i></span>
+            <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" minlength="6" required>
+          </div>
+        </div>
+
+        <hr class="text-muted opacity-25 my-4">
+
+        <div class="d-grid gap-3">
+          <button type="submit" class="btn btn-submit fs-5">
+            <i class="bi bi-check2-circle me-2"></i>ยืนยันการเปลี่ยนรหัสผ่าน
+          </button>
+          
+          <a href="profile.php" class="btn btn-outline-custom mt-2">
+            <i class="bi bi-arrow-left me-2"></i>ยกเลิกและกลับหน้าโปรไฟล์
+          </a>
+        </div>
+
+      </form>
+    </div>
   </div>
 </div>
 
-<footer class="text-center">
-  © <?= date('Y') ?> MyCommiss | เปลี่ยนรหัสผ่าน
+<footer>
+  © <?= date('Y') ?> MyCommiss | ระบบร้านค้าออนไลน์คอมพิวเตอร์
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // ✅ Toast แสดง 5 วิ แล้วปิดอัตโนมัติ
   document.addEventListener("DOMContentLoaded", () => {
     const toastElList = [].slice.call(document.querySelectorAll('.toast'));
     toastElList.forEach(toastEl => {
-      const toast = new bootstrap.Toast(toastEl, { delay: 5000, autohide: true });
+      const toast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
       toast.show();
     });
   });
