@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 24, 2026 at 01:19 PM
+-- Generation Time: Mar 25, 2026 at 11:59 AM
 -- Server version: 10.5.29-MariaDB-0+deb11u1
 -- PHP Version: 7.4.33
 
@@ -129,7 +129,8 @@ INSERT INTO `customers` (`customer_id`, `name`, `email`, `password`, `phone`, `a
 (23, 'ชาติชาย แข็งแรง', 'chartchai.k@gmail.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0978901234', 'สงขลา', '2026-03-12 02:15:33', 0),
 (24, 'สุพรรษา บานเย็น', 'supansa.b@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0989012345', 'นครสวรรค์', '2026-03-18 06:40:09', 0),
 (25, 'ไพโรจน์ สมบูรณ์', 'pairoj_s@yahoo.com', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0990123456', 'สมุทรปราการ', '2026-03-22 03:05:55', 0),
-(26, 'กมลวรรณ ดวงดี', 'kamolwan.d@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0801234567', 'สุรินทร์', '2026-03-24 01:30:15', 0);
+(26, 'กมลวรรณ ดวงดี', 'kamolwan.d@msu.ac.th', '$2y$10$g2ToWNeq8WS/qkne/Dml.eHW.AdPRzysgMa7RcKhqj...', '0801234567', 'สุรินทร์', '2026-03-24 01:30:15', 0),
+(27, '123', '123@gmail.com', '$2y$10$MvvXBBF6wKsMI9ZZT26qD.4aaglcGz3Re4L.bFamupyKLx98eXeWa', '0000000000', '', '2026-03-25 03:01:06', 0);
 
 -- --------------------------------------------------------
 
@@ -166,7 +167,7 @@ INSERT INTO `orders` (`order_id`, `customer_id`, `total_price`, `shipping_addres
 (5, 7, '12900.00', 'มหาสารคาม', 'QR', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2025-11-05 09:20:00', NULL, NULL, NULL),
 (6, 3, '3980.00', 'โปรตุเกต', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2025-11-08 06:10:00', NULL, NULL, NULL),
 (7, 8, '17400.00', 'ขอนแก่น', 'QR', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2025-11-12 01:50:00', NULL, NULL, NULL),
-(8, 1, '1290.00', 'ประจวบ', 'COD', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2025-11-15 08:30:00', NULL, NULL, NULL),
+(8, 1, '1290.00', 'ประจวบ', 'COD', NULL, NULL, 'ยกเลิก', 'รอตรวจสอบ', 'ยกเลิก', '2025-11-15 08:30:00', NULL, NULL, NULL),
 (9, 5, '20990.00', 'ปารีส', 'QR', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2025-11-18 03:05:00', NULL, NULL, NULL),
 (10, 9, '56900.00', 'กรุงเทพฯ', 'COD', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2025-11-21 07:40:00', NULL, NULL, NULL),
 (11, 2, '3590.00', '57/4', 'QR', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2025-12-12 02:00:00', NULL, NULL, NULL),
@@ -258,7 +259,13 @@ INSERT INTO `orders` (`order_id`, `customer_id`, `total_price`, `shipping_addres
 (97, 26, '12920.00', 'สุรินทร์', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-03-17 14:00:00', NULL, NULL, NULL),
 (98, 3, '3290.00', 'โปรตุเกต', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-03-18 08:00:00', NULL, NULL, NULL),
 (99, 24, '31140.00', 'นครสวรรค์', 'COD', NULL, NULL, 'รอดำเนินการ', 'รอตรวจสอบ', 'รอดำเนินการ', '2026-03-19 02:00:00', NULL, NULL, NULL),
-(100, 16, '17890.00', 'ปทุมธานี', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-03-19 20:00:00', NULL, NULL, NULL);
+(100, 16, '17890.00', 'ปทุมธานี', 'COD', NULL, NULL, 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-03-19 20:00:00', NULL, NULL, NULL),
+(101, 1, '50.00', 'ประจวบ', 'QR', 'slip_1774335693_3357.jpeg', '2026-03-24 14:01:33', 'ยกเลิก', 'ปฏิเสธ', 'ยกเลิก', '2026-03-24 07:01:05', NULL, NULL, NULL),
+(102, 1, '50.00', 'ประจวบ', 'QR', 'slip_1774335795_9150.jpeg', '2026-03-24 14:03:15', 'ยกเลิก', 'ปฏิเสธ', 'ยกเลิก', '2026-03-24 07:02:36', NULL, NULL, NULL),
+(103, 1, '50.00', 'ประจวบ', 'QR', 'slip_1774336428_3526.jpeg', '2026-03-24 14:13:48', 'ชำระเงินแล้ว', 'อนุมัติ', 'กำลังจัดเตรียม', '2026-03-24 07:04:56', NULL, NULL, NULL),
+(104, 1, '12490.00', 'ประจวบ', 'QR', NULL, NULL, 'รอดำเนินการ', NULL, 'รอดำเนินการ', '2026-03-25 02:37:44', NULL, NULL, NULL),
+(105, 1, '490.00', 'ประจวบ', 'QR', NULL, NULL, 'ยกเลิก', 'รอตรวจสอบ', 'ยกเลิก', '2026-03-25 03:06:16', NULL, NULL, NULL),
+(106, 1, '2980.00', 'ประจวบ', 'COD', NULL, NULL, 'ยกเลิก', 'รอตรวจสอบ', 'ยกเลิก', '2026-03-25 03:14:53', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -474,7 +481,15 @@ INSERT INTO `order_details` (`id`, `order_id`, `p_id`, `quantity`, `price`) VALU
 (192, 99, 181, 4, '310.00'),
 (193, 99, 116, 1, '29900.00'),
 (194, 100, 180, 1, '490.00'),
-(195, 100, 136, 4, '4350.00');
+(195, 100, 136, 4, '4350.00'),
+(196, 101, 175, 1, '50.00'),
+(197, 102, 175, 1, '50.00'),
+(198, 103, 175, 1, '50.00'),
+(199, 104, 167, 1, '990.00'),
+(200, 104, 28, 1, '11500.00'),
+(201, 105, 83, 1, '490.00'),
+(202, 106, 59, 1, '1990.00'),
+(203, 106, 128, 1, '990.00');
 
 -- --------------------------------------------------------
 
@@ -525,7 +540,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (25, 'ONEX GX3 (BLACK-RED)', '5890.00', 19, 'Gaming Chair', '1770969590_1.jpg', 3, '2026-02-13 07:59:50'),
 (26, 'OCPC SATAN SERIES (OC-GC-SAT-BW) (BLUE-WHITE)', '6990.00', 15, 'Gaming Chair', '1770969617_1.jpg', 3, '2026-02-13 08:00:17'),
 (27, 'ANDA SEAT JIB SERIES (AD12XL-02-S-PV-JIB) (BLUE)', '15990.00', 12, 'Gaming Chair', '1770969666_1.jpg', 3, '2026-02-13 08:01:06'),
-(28, 'DXRACER MITH TEAM (RZ134/NY) (BLACK-YELLOW)', '11500.00', 15, 'Gaming Chair', '1770969712_1.jpg', 3, '2026-02-13 08:01:37'),
+(28, 'DXRACER MITH TEAM (RZ134/NY) (BLACK-YELLOW)', '11500.00', 14, 'Gaming Chair', '1770969712_1.jpg', 3, '2026-02-13 08:01:37'),
 (29, 'ANDA SEAT PHANTOM 3 SERIES (AD18Y-06-B-PV/C) (BLACK)', '8900.00', 17, 'Gaming Chair', '1770969791_1.jpg', 3, '2026-02-13 08:02:16'),
 (30, 'NOBLECHAIRS EPIC (JAVA EDITION) PU HYBRID LEATHER (GC-NBC-EPIC-JE)', '13900.00', 18, 'Gaming Chair', '1770969764_1.jpg', 3, '2026-02-13 08:02:44'),
 (31, 'ACER VG240YBMIIX 23.8 INCH IPS 75Hz', '3600.00', 14, '• Panel Size : 23.8\"\r\n• Panel Type : IPS\r\n• Maximum Resolution : 1920 x 1080\r\n• Refresh Rate : 75 Hz\r\n• Response Time : 1 ms\r\n• Variable Refresh Rate : AMD FreeSync', '1770969942_1.jpg', 4, '2026-02-13 08:05:42'),
@@ -639,7 +654,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (139, 'KINGSTON FURY BEAST 16GB (8GBx2) DDR5 5200MHz', '5990.00', 15, '• 16GB (8GBx2)\r\n• DDR5\r\n• 5200MHz\r\n• CL40\r\n• KF552C40BBAK2-16', '1771244545_1.jpg', 14, '2026-02-16 12:22:25'),
 (140, ' KINGSTON FURY RENEGADE 32GB (16GBx2) DDR5 6400MHz', '13400.00', 13, '• 32GB (16GBx2)\r\n• DDR5\r\n• 6400MHz\r\n• CL32\r\n• KF564C32RSAK2-32', '1771244654_1.jpg', 14, '2026-02-16 12:24:14'),
 (141, 'SSD SAMSUNG 980 PRO 1 TB PCIe 4x4/NVMe M.2 2280 ', '3290.00', 7, '• 1 TB\r\n• Sequential Read (up to) 7,000 MB/s\r\n• Sequential Write (up to) 5,000 MB/s\r\n• PCIe Gen 4 x 4', '1771245521_1.jpg', 15, '2026-02-16 12:38:41'),
-(142, 'SSD WD BLACK SN770 500 GB PCIe 4x4/NVMe M.2 2280', '1290.00', 11, '• 500 GB\r\n• Sequential Read (up to) 5,000 MB/s\r\n• Sequential Write (up to) 4,000 MB/s\r\n• PCIe Gen 4 x 4', '1771245802_1.jpg', 15, '2026-02-16 12:43:22'),
+(142, 'SSD WD BLACK SN770 500 GB PCIe 4x4/NVMe M.2 2280', '1290.00', 12, '• 500 GB\r\n• Sequential Read (up to) 5,000 MB/s\r\n• Sequential Write (up to) 4,000 MB/s\r\n• PCIe Gen 4 x 4', '1771245802_1.jpg', 15, '2026-02-16 12:43:22'),
 (143, 'SSD HIKSEMI FUTURE 1 TB PCIe 4x4/NVMe M.2 2280', '5450.00', 17, '• 1 TB\r\n• Up to 7,450 MB/s Read\r\n• Up to 6,600 MB/s Write\r\n• PCIe Gen 4 x 4', '1771245911_1.jpg', 15, '2026-02-16 12:45:11'),
 (144, 'SSD KINGSTON NV2 500 GB PCIe 4/NVMe M.2 2280', '1290.00', 14, '• 500 GB\r\n• Up to 3,500 MB/s Read\r\n• Up to 2,100 MB/s Write\r\n• PCIe 4.0', '1771246021_1.jpg', 15, '2026-02-16 12:47:01'),
 (145, 'SSD KINGSTON FURY RENEGADE 1 TB  PCIe 4x4/NVMe M.2 2280 (SFYRS/1000G)', '3990.00', 14, '• 1 TB\r\n• Sequential Read (up to) 7,300 MB/s\r\n• Sequential Write (up to) 6,000 MB/s\r\n• PCIe Gen 4 x 4', '1771246155_1.jpg', 15, '2026-02-16 12:49:15'),
@@ -664,7 +679,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (164, 'SILVERSTONE STRIDER ESSENTIAL 500W 80 PLUS BLACK ATX (SST-ST50F-ES230)', '1390.00', 16, '• 500 Watt\r\n• 80 Plus', '1771257786_1.jpg', 17, '2026-02-16 16:03:06'),
 (165, 'ASUS TUF GAMING 650B - 650W 80 PLUS BRONZE (BLACK) (ATX)', '2490.00', 12, '• Capacitors and chokes pass demanding tests to achieve Military-grade Certification.\r\n• Dual ball fan bearings can last up to twice as long as sleeve bearing designs.\r\n• A protective PCB coating protects against moisture, dust, and extreme temperatures.\r\n• An 80 Plus Bronze Certification is earned with high-quality components that pass rigorous testing.\r\n• Axial-tech fan design features a smaller fan hub that facilitates longer blades and a barrier ring that increases downward air pressure.\r\n• 0dB technology lets you enjoy light gaming in relative silence.\r\n• Sleeved cables leave your rig looking tactically clean.\r\n• 80cm 8-pin CPU connector (EPS 12V)', '1771257924_1.jpg', 17, '2026-02-16 16:05:24'),
 (166, 'ASUS ROG-THOR-1600T-GAMING - 1600W 80 PLUS TITANIUM BLACK-SILVER ATX', '21900.00', 12, '• 1600 Watt\r\n• 80 Plus Titanium\r\n• Fully Modular\r\n• ATX\r\n• Aura Sync RGB\r\n• OLED Display\r\n• PCIe 5.0 12VHPWR (16 Pin) Connector', '1771258044_1.jpg', 17, '2026-02-16 16:07:24'),
-(167, 'GAMDIAS AURA GP550 - 550W BLACK ATX', '990.00', 12, '• 550 Watt\r\n• NON Modular\r\n• ATX', '1771258231_1.jpg', 17, '2026-02-16 16:10:31'),
+(167, 'GAMDIAS AURA GP550 - 550W BLACK ATX', '990.00', 11, '• 550 Watt\r\n• NON Modular\r\n• ATX', '1771258231_1.jpg', 17, '2026-02-16 16:10:31'),
 (168, 'CORSAIR CX650 - 650W 80 PLUS BRONZE BLACK ATX (CP-9020278-NA)', '1690.00', 15, '• 650 Watt\r\n• 80 Plus Bronze\r\n• NON Modular\r\n• ATX', '1771258400_1.jpg', 17, '2026-02-16 16:13:20'),
 (169, 'SUPER FLOWER LEADEX III GOLD ATX 3.1 850W - 850W 80 PLUS GOLD BLACK ATX', '3690.00', 12, '• 850 Watt\r\n• 80 Plus Gold\r\n• Fully Modular\r\n• ATX\r\n• 16 Pin Connector (12V-2x6)', '1771258527_1.jpg', 17, '2026-02-16 16:15:27'),
 (170, 'ASUS ROG STRIX 1000W PLATINUM BLACK ATX', '7900.00', 13, '• กำลังไฟ : 1000 วัตต์\r\n• ประสิทธิภาพ : 80 Plus Platinum\r\n• มอดุลาร์ : Fully Modular\r\n• ฟอร์มแฟกเตอร์ : ATX', '1771258726_1.jpg', 17, '2026-02-16 16:18:46'),
@@ -672,7 +687,7 @@ INSERT INTO `product` (`p_id`, `p_name`, `p_price`, `p_stock`, `p_description`, 
 (172, 'RAZER GOLIATHUS CHROMA', '1290.00', 15, 'DIMENSION 355 X 255 X 3 MM', '1771261365_1.jpg', 18, '2026-02-16 17:02:45'),
 (173, 'SIGNO MT-310 CORVUS', '100.00', 11, '• Speed Edition\r\n• Medium Size 320 x 240 x 4 mm', '1771261558_1.jpg', 18, '2026-02-16 17:05:58'),
 (174, 'RAZER GIGANTUS V2 LARGE', '590.00', 17, 'Dimension 450 x 400 x 3 mm', '1771261648_1.jpg', 18, '2026-02-16 17:07:28'),
-(175, 'SIGNO MT-300', '50.00', 13, 'Dimension 270 x 230 x 3 mm', '1771261763_1.jpg', 18, '2026-02-16 17:08:59'),
+(175, 'SIGNO MT-300', '50.00', 10, 'Dimension 270 x 230 x 3 mm', '1771261763_1.jpg', 18, '2026-02-16 17:08:59'),
 (176, 'SIGNO MT-309', '170.00', 21, 'Dimension 770 x 295 x 3 mm', '1771261846_1.jpg', 18, '2026-02-16 17:10:46'),
 (177, 'NUBWO NP021', '120.00', 12, 'Dimension 780 x 300 x 3 mm', '1771261942_1.jpg', 18, '2026-02-16 17:12:22'),
 (178, 'NUBWO NP020', '120.00', 8, 'Dimension 780 x 300 x 3 mm', '1771262046_1.jpg', 18, '2026-02-16 17:14:06'),
@@ -764,19 +779,19 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=196;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=204;
 
 --
 -- AUTO_INCREMENT for table `product`
