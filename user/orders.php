@@ -90,17 +90,31 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
       box-shadow: 0 4px 10px rgba(255, 193, 7, 0.2);
     }
 
-    /* 🔹 Badges */
+    /* 🔹 Badges - ปรับปรุงสีให้เข้มขึ้นตามคำขอ */
     .badge {
       font-size: 0.85rem;
       padding: 6px 12px;
       font-weight: 500;
       border-radius: 8px;
     }
-    .bg-soft-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-    .bg-soft-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .bg-soft-danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    .bg-soft-info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    
+    /* 🎨 ปรับสี badge ให้เข้มขึ้นสดใส (ไม่อ่อน) */
+    .badge.bg-warning {
+      background-color: #ff9800 !important; /* ส้มสด */
+      color: #fff !important;
+    }
+    .badge.bg-success {
+      background-color: #28a745 !important; /* เขียวสด */
+      color: #fff !important;
+    }
+    .badge.bg-danger {
+      background-color: #dc3545 !important; /* แดงเข้ม (ยกเลิก) */
+      color: #fff !important;
+    }
+    .badge.bg-info {
+      background-color: #17a2b8 !important; /* น้ำเงินเข้ม (เตรียมของ) */
+      color: #fff !important;
+    }
 
     /* ยกเลิกแถว */
     .row-cancelled td { opacity: 0.6; }
@@ -137,9 +151,8 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <div class="container mt-5">
     
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="text-center mb-4">
       <h2 class="fw-bold mb-0" style="color: #D10024;"><i class="bi bi-box-seam me-2"></i>ประวัติคำสั่งซื้อ</h2>
-      <a href="index.php" class="btn btn-outline-secondary btn-sm rounded-pill px-3"><i class="bi bi-shop me-1"></i>กลับหน้าร้าน</a>
     </div>
 
     <?php if (empty($orders)): ?>
@@ -173,16 +186,16 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $order_status = $o['order_status'] ?? 'รอดำเนินการ';
                 $admin_verified = $o['admin_verified'] ?? 'รอตรวจสอบ';
 
-                /* ===== สีสถานะการชำระเงิน ===== */
-                $payBadge = 'bg-soft-warning';
-                if ($status === 'ชำระเงินแล้ว') $payBadge = 'bg-soft-success';
-                if ($status === 'ยกเลิก') $payBadge = 'bg-soft-danger';
+                /* ===== สีสถานะการชำระเงิน (ปรับให้เข้มขึ้น) ===== */
+                $payBadge = 'bg-warning'; // ส้มสด
+                if ($status === 'ชำระเงินแล้ว') $payBadge = 'bg-success'; // เขียวสด
+                if ($status === 'ยกเลิก') $payBadge = 'bg-danger'; // แดงเข้ม
 
-                /* ===== สีสถานะคำสั่งซื้อ ===== */
-                $orderBadge = 'bg-soft-warning';
-                if ($order_status === 'กำลังจัดเตรียม') $orderBadge = 'bg-soft-info';
-                if ($order_status === 'จัดส่งแล้ว' || $order_status === 'สำเร็จ') $orderBadge = 'bg-soft-success';
-                if ($order_status === 'ยกเลิก') $orderBadge = 'bg-soft-danger';
+                /* ===== สีสถานะคำสั่งซื้อ (ปรับให้เข้มขึ้น) ===== */
+                $orderBadge = 'bg-warning'; // ส้มสด
+                if ($order_status === 'กำลังจัดเตรียม') $orderBadge = 'bg-info'; // น้ำเงินเข้ม
+                if ($order_status === 'จัดส่งแล้ว' || $order_status === 'สำเร็จ') $orderBadge = 'bg-success'; // เขียวสด
+                if ($order_status === 'ยกเลิก') $orderBadge = 'bg-danger'; // แดงเข้ม
 
                 /* ===== แปลงวิธีชำระเงิน ===== */
                 $methodText = htmlspecialchars($o['payment_method']);
