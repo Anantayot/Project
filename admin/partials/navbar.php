@@ -1,20 +1,25 @@
-<div class="topbar d-none d-lg-flex">
-  <h4 class="mb-0 text-white fw-bold"><i class="bi bi-speedometer2 me-2 text-success"></i><?= $pageTitle ?? 'Dashboard' ?></h4>
+<aside id="sidebar">
+  <div class="sidebar-brand">
+    <i class="bi bi-laptop"></i> <span class="ms-2">MyCommiss</span>
+  </div>
   
-  <div class="d-flex align-items-center gap-2">
-    <a href="/mycommiss/index.php" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-3">
-      <i class="bi bi-shop me-1"></i> ดูหน้าร้าน
-    </a>
-    <a href="/mycommiss/admin/logout.php" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
-      <i class="bi bi-box-arrow-right me-1"></i> ออกจากระบบ
+  <div class="admin-profile">
+    <img src="/mycommiss/admin/partials/icon_mycommiss.png" alt="Admin" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+    <h6><?= $_SESSION['admin_name'] ?? 'ผู้ดูแลระบบ' ?></h6>
+    <small><i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i>Online</small>
+  </div>
+
+  <ul class="sidebar-menu">
+    <li><a href="/mycommiss/admin/index.php" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class="bi bi-grid-1x2"></i> แดชบอร์ด</a></li>
+    <li><a href="/mycommiss/admin/product/products.php" class="<?= strpos($_SERVER['PHP_SELF'], 'product') !== false ? 'active' : '' ?>"><i class="bi bi-box-seam"></i> จัดการสินค้า</a></li>
+    <li><a href="/mycommiss/admin/categories/categories.php" class="<?= strpos($_SERVER['PHP_SELF'], 'categories') !== false ? 'active' : '' ?>"><i class="bi bi-tags"></i> ประเภทสินค้า</a></li>
+    <li><a href="/mycommiss/admin/customer/customers.php" class="<?= strpos($_SERVER['PHP_SELF'], 'customer') !== false ? 'active' : '' ?>"><i class="bi bi-people"></i> ข้อมูลลูกค้า</a></li>
+    <li><a href="/mycommiss/admin/order/orders.php" class="<?= strpos($_SERVER['PHP_SELF'], 'order') !== false ? 'active' : '' ?>"><i class="bi bi-bag-check"></i> คำสั่งซื้อ</a></li>
+  </ul>
+
+  <div class="sidebar-footer">
+    <a href="/mycommiss/admin/logout.php" class="btn-logout" onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
+      <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
     </a>
   </div>
-</div>
-
-<nav class="mobile-navbar d-lg-none">
-  <button class="btn-menu" id="menuToggle"><i class="bi bi-list"></i></button>
-  <h5 class="brand-mobile text-truncate px-2 mb-0" style="max-width: 70%;"><?= $pageTitle ?? 'MyCommiss' ?></h5>
-  <a href="/mycommiss/admin/logout.php" class="text-danger fs-4" onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
-    <i class="bi bi-box-arrow-right"></i>
-  </a>
-</nav>
+</aside>

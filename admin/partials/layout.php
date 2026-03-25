@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= $pageTitle ?? 'MyCommiss Admin' ?></title>
-  <link rel="icon" type="image/png" href="/admin/partials/icon_mycommiss.png">
+  <link rel="icon" type="image/png" href="/mycommiss/admin/partials/icon_mycommiss.png">
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
