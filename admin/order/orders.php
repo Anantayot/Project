@@ -8,7 +8,8 @@ error_reporting(E_ALL);
 // ✅ ดึงไฟล์เชื่อมต่อฐานข้อมูลจากโฟลเดอร์ partials
 include __DIR__ . "/../partials/connectdb.php";
 
-$pageTitle = "จัดการคำสั่งซื้อ";
+// 👇 1. เปลี่ยนชื่อ Title ตรงนี้ ซึ่งจะไปแสดงที่ Topbar ด้านบนสุด
+$pageTitle = "รายการคำสั่งซื้อ"; 
 
 // บังคับให้ต้องล็อกอิน
 if (!isset($_SESSION['admin_id'])) {
@@ -91,9 +92,9 @@ ob_start();
   /* สี Custom สำหรับป้ายสถานะ */
   .bg-purple { background-color: #8b5cf6 !important; color: #fff; }
   .bg-orange { background-color: #f97316 !important; color: #fff; }
-  .bg-custom-blue { background-color: #3b82f6 !important; color: #fff; } /* สีฟ้า */
-  .bg-custom-success { background-color: #22c55e !important; color: #fff; } /* สีเขียว 22c55e */
-  .bg-custom-yellow { background-color: #facc15 !important; color: #0f172a !important; } /* สีเหลืองสว่าง + ตัวหนังสือสีเข้ม */
+  .bg-custom-blue { background-color: #3b82f6 !important; color: #fff; } 
+  .bg-custom-success { background-color: #22c55e !important; color: #fff; } 
+  .bg-custom-yellow { background-color: #facc15 !important; color: #0f172a !important; } 
 
   /* 📱 ปรับแต่งสำหรับ Mobile */
   @media (max-width: 767px) {
@@ -135,13 +136,7 @@ ob_start();
   }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h4 class="fw-bold text-white mb-0">
-    <i class="bi bi-bag-check me-2 text-success"></i> รายการคำสั่งซื้อ
-  </h4>
-</div>
-
-<div class="card table-card shadow-lg border-0">
+<div class="card table-card shadow-lg border-0 mt-2">
   <div class="card-body p-3 p-md-4">
 
     <?php if (empty($orders)): ?>
@@ -177,8 +172,8 @@ ob_start();
                   <?php
                     $status = $o['order_status'] ?? 'รอดำเนินการ';
                     if ($status == 'สำเร็จ' || $status == 'จัดส่งแล้ว') $badge = 'success';
-                    elseif ($status == 'กำลังจัดเตรียม') $badge = 'custom-blue'; // สีฟ้า
-                    elseif ($status == 'รอดำเนินการ') $badge = 'custom-yellow'; // เพิ่มสีเหลืองตรงนี้
+                    elseif ($status == 'กำลังจัดเตรียม') $badge = 'custom-blue'; 
+                    elseif ($status == 'รอดำเนินการ') $badge = 'custom-yellow'; 
                     elseif ($status == 'ยกเลิก') $badge = 'danger';
                     else $badge = 'secondary';
                   ?>
@@ -190,7 +185,7 @@ ob_start();
                 <td data-label="การโอน" class="text-center text-md-start">
                   <?php
                     $verify = $o['admin_verified'] ?? 'รอตรวจสอบ';
-                    if ($verify == 'อนุมัติ') $vbadge = 'custom-success'; // สีเขียว
+                    if ($verify == 'อนุมัติ') $vbadge = 'custom-success'; 
                     elseif ($verify == 'ปฏิเสธ') $vbadge = 'danger';
                     elseif ($verify == 'กำลังตรวจสอบ') $vbadge = 'purple';
                     else $vbadge = 'warning text-dark';
@@ -232,7 +227,7 @@ ob_start();
           language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
           pageLength: 10,
           responsive: false,
-          order: [[0, "desc"]], // บังคับให้คอลัมน์แรก (ID) เรียงจากมากไปน้อย
+          order: [[0, "desc"]],
           dom: '<"d-flex flex-wrap justify-content-between align-items-center mb-3"lf>rt<"d-flex flex-wrap justify-content-between align-items-center mt-3"ip><"clear">',
         });
 
