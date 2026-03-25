@@ -3,6 +3,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// ✅ นับจำนวนสินค้าในตะกร้า (แยกตามรายการสินค้า)
+$cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 ?>
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top main-navbar">
     <div class="container">
@@ -17,6 +20,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center py-3 py-lg-0">
+                
                 <li class="nav-item">
                     <a href="index.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
                         <i class="bi bi-house-door me-1"></i> หน้าร้าน
@@ -26,6 +30,9 @@ if (session_status() === PHP_SESSION_NONE) {
                 <li class="nav-item">
                     <a href="cart.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
                         <i class="bi bi-cart3 me-1"></i> ตะกร้า
+                        <?php if ($cart_count > 0): ?>
+                            <span class="badge rounded-pill bg-danger ms-1 animate-pop"><?= $cart_count ?></span>
+                        <?php endif; ?>
                     </a>
                 </li>
 
@@ -60,6 +67,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </a>
                     </li>
                 <?php endif; ?>
+                
             </ul>
         </div>
     </div>
@@ -104,8 +112,9 @@ function confirmLogout(e) {
             width: 0;
             height: 2px;
             background: #D10024;
-            transition: width 0.3s;
+            transition: width 0.3s ease-in-out;
             margin: 2px auto 0;
+            border-radius: 2px;
         }
         .nav-link.active::after { width: 80%; }
         .nav-link.active { color: #D10024 !important; }
@@ -116,7 +125,7 @@ function confirmLogout(e) {
 
     /* 💎 Logout Hover Effect */
     .btn-logout-hover:hover {
-        background-color: rgba(220, 53, 69, 0.05);
+        background-color: rgba(209, 0, 36, 0.08);
     }
 
     /* 💎 Register Button */
@@ -133,6 +142,15 @@ function confirmLogout(e) {
         border-color: #a5001b !important;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(209, 0, 36, 0.25) !important;
+    }
+
+    /* 💎 Animation สำหรับ Badge ตะกร้า */
+    .animate-pop {
+        animation: pop 0.3s ease-out forwards;
+    }
+    @keyframes pop {
+        0% { transform: scale(0.5); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
     }
 
     /* 📱 Mobile Adjustments */
