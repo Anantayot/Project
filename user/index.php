@@ -124,13 +124,13 @@ if (empty($search) && empty($cat_id)) {
             }
         }
 
-        /* 🔧 Swiper Fix - ป้องกันการ์ดล้นขอบและให้ความสูงเท่ากัน */
+        /* 🔧 Swiper Fix */
         .swiper-slide {
             height: auto;
             display: flex;
         }
 
-        /* 📦 Product Card - ปรับปรุงให้ปุ่มเท่ากัน และพอดีกรอบ */
+        /* 📦 Product Card */
         .product-card {
             border: 1px solid #f0f0f0;
             border-radius: 15px;
@@ -149,7 +149,6 @@ if (empty($search) && empty($cat_id)) {
             border-color: #D10024;
         }
 
-        /* โซนรูปภาพ - ล็อคความสูงไว้ที่ 200px ให้รูปใหญ่กำลังดีและไม่ล้น */
         .product-card .img-wrapper {
             height: 200px;
             display: flex;
@@ -166,12 +165,10 @@ if (empty($search) && empty($cat_id)) {
             transition: transform 0.4s ease;
         }
 
-        /* เอฟเฟกต์ซูมรูปเบาๆ */
         .product-card:hover img {
             transform: scale(1.05);
         }
 
-        /* เนื้อหาภายใน - ใช้ Flex ดันราคาและปุ่มลงล่างสุด */
         .product-card .card-body {
             display: flex;
             flex-direction: column;
@@ -198,11 +195,10 @@ if (empty($search) && empty($cat_id)) {
             font-size: 1.25rem;
             font-weight: 700;
             color: #D10024;
-            margin-top: auto; /* พระเอกที่ทำให้ปุ่มตรงกัน */
+            margin-top: auto;
             margin-bottom: 12px;
         }
 
-        /* Swiper Arrows - ไม่ให้ทับสินค้า */
         .swiper-button-next,
         .swiper-button-prev {
             color: #D10024;
@@ -220,17 +216,9 @@ if (empty($search) && empty($cat_id)) {
         }
 
         @media (max-width: 768px) {
-            .product-card .img-wrapper {
-                height: 160px;
-            }
-
-            .card-title {
-                font-size: 0.85rem;
-            }
-
-            .product-price {
-                font-size: 1.1rem;
-            }
+            .product-card .img-wrapper { height: 160px; }
+            .card-title { font-size: 0.85rem; }
+            .product-price { font-size: 1.1rem; }
         }
 
         .section-title {
@@ -264,6 +252,20 @@ if (empty($search) && empty($cat_id)) {
 <body>
 
     <?php include("navbar_user.php"); ?>
+
+    <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 3000;">
+        <?php foreach (['success' => 'success', 'error' => 'danger', 'info' => 'info'] as $key => $color): ?>
+            <?php if (isset($_SESSION["toast_{$key}"])): ?>
+                <div class="toast align-items-center text-bg-<?= $color ?> border-0 show shadow-lg" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body fs-6 fw-medium px-3 py-2"><?= $_SESSION["toast_{$key}"] ?></div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+                <?php unset($_SESSION["toast_{$key}"]); ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </div>
 
     <div class="container-fluid container-md">
 
@@ -310,13 +312,10 @@ if (empty($search) && empty($cat_id)) {
                                     </div>
                                     <div class="card-body">
                                         <h6 class="card-title"><?= htmlspecialchars($p['p_name']) ?></h6>
-
                                         <?php if (isset($p['total_sold'])): ?>
                                             <span class="badge bg-warning text-dark mb-2 mx-auto" style="width: fit-content;">ขายแล้ว <?= $p['total_sold'] ?> ชิ้น</span>
                                         <?php endif; ?>
-
                                         <p class="product-price"><?= number_format($p['p_price'], 2) ?>.-</p>
-
                                         <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-danger w-100 rounded-pill py-2 fw-bold">
                                             ดูรายละเอียด
                                         </a>
@@ -360,7 +359,7 @@ if (empty($search) && empty($cat_id)) {
                                             <span class="badge bg-warning text-dark mb-2 mx-auto">ขายแล้ว <?= $p['total_sold'] ?> ชิ้น</span>
                                         <?php endif; ?>
                                         <p class="fw-bold text-danger mt-auto mb-3 fs-5"><?= number_format($p['p_price'], 2) ?>.-</p>
-                                        <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-danger w-100 rounded-pill shadow-sm">ดูรายละเอียด</a>
+                                        <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-danger w-100 rounded-pill shadow-sm py-2 fw-bold">ดูรายละเอียด</a>
                                     </div>
                                 </div>
                             </div>
@@ -373,42 +372,43 @@ if (empty($search) && empty($cat_id)) {
         <?php endif; ?>
     </div>
 
-    <footer class="text-center mt-5">
+    <footer class="text-center mt-5 py-4 border-top">
         <p class="small text-muted mb-0">© <?= date('Y') ?> MyCommiss | ระบบร้านค้าออนไลน์คอมพิวเตอร์</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    
     <script>
-        document.querySelectorAll('.mySwiper').forEach(swiperEl => {
-            new Swiper(swiperEl, {
-                slidesPerView: 2,
-                spaceBetween: 15,
-                autoplay: {
-                    delay: 4000,
-                    disableOnInteraction: false
-                },
-                navigation: {
-                    nextEl: swiperEl.querySelector('.swiper-button-next'),
-                    prevEl: swiperEl.querySelector('.swiper-button-prev'),
-                },
-                breakpoints: {
-                    576: {
-                        slidesPerView: 2
+        document.addEventListener("DOMContentLoaded", () => {
+            const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            toastElList.forEach(toastEl => {
+                const toast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
+                toast.show();
+            });
+
+            // Swiper Initialize
+            document.querySelectorAll('.mySwiper').forEach(swiperEl => {
+                new Swiper(swiperEl, {
+                    slidesPerView: 2,
+                    spaceBetween: 15,
+                    autoplay: {
+                        delay: 4000,
+                        disableOnInteraction: false
                     },
-                    768: {
-                        slidesPerView: 3
+                    navigation: {
+                        nextEl: swiperEl.querySelector('.swiper-button-next'),
+                        prevEl: swiperEl.querySelector('.swiper-button-prev'),
                     },
-                    992: {
-                        slidesPerView: 4
+                    breakpoints: {
+                        576: { slidesPerView: 2 },
+                        768: { slidesPerView: 3 },
+                        992: { slidesPerView: 4 },
+                        1200: { slidesPerView: 4 },
                     },
-                    1200: {
-                        slidesPerView: 4
-                    },
-                },
+                });
             });
         });
     </script>
 </body>
-
 </html>
