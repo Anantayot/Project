@@ -6,8 +6,9 @@ ini_set('display_errors', 1);
 $id = $_GET['id'] ?? null;
 if (!$id) die("<div class='alert alert-danger text-center mt-5'>❌ ไม่พบคำสั่งซื้อ</div>");
 
-// ✅ แก้ไข: เอาไอคอนออกเพื่อไม่ให้ซ้อนกับ Navbar หลัก
-$pageTitle = "รายละเอียดคำสั่งซื้อ <span class='text-success'>#" . htmlspecialchars($id) . "</span>";
+// ✅ แก้ไข: เปลี่ยนไอคอนจากใบเสร็จ (bi-receipt-cutoff) เป็นเกจวัดความเร็ว หรือ รูปคน ตามต้องการ 
+// (จากรูปตัวอย่าง ไอคอนคล้ายๆ กับ bi-speedometer2 หรือคุณสามารถเปลี่ยนเป็น bi-person-badge ได้)
+$pageTitle = "<i class='bi bi-speedometer2 me-2 text-success'></i> รายละเอียดคำสั่งซื้อ <span class='text-success'>#" . htmlspecialchars($id) . "</span>";
 
 ob_start();
 
