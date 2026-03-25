@@ -52,70 +52,51 @@ ob_start();
     vertical-align: middle;
   }
 
-  /* 📱 ปรับแต่งสำหรับมือถือ (Mobile Card View) ให้เรียงสวยงาม */
+  /* ✅ เปลี่ยนสีข้อความ DataTables เป็นสีขาวทั้งหมด */
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_processing,
+  .dataTables_wrapper .dataTables_paginate {
+    color: #ffffff !important;
+  }
+  .dataTables_wrapper label {
+    color: #ffffff !important; 
+    font-weight: 500;
+  }
+
+  /* 📱 ปรับแต่งสำหรับมือถือ (Mobile Card View) */
   @media (max-width: 768px) {
-    #dataTable thead { 
-      display: none; 
-    }
+    #dataTable thead { display: none; }
     #dataTable tbody tr {
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       background: rgba(255, 255, 255, 0.03);
-      border-radius: 15px;
-      margin-bottom: 20px;
-      padding: 15px 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 15px; margin-bottom: 20px;
+      padding: 15px 20px; border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
     #dataTable tbody td {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border: none !important;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border: none !important;
       border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important;
       font-size: 0.95rem;
     }
     #dataTable tbody td:last-child {
-      border-bottom: none !important;
-      padding-top: 18px;
-      padding-bottom: 5px;
+      border-bottom: none !important; padding-top: 18px; padding-bottom: 5px;
     }
-    /* หัวข้อ (Label) ฝั่งซ้าย */
     #dataTable tbody td::before {
-      content: attr(data-label);
-      font-weight: 500;
-      color: #94a3b8;
-      text-align: left;
-      min-width: 100px;
-      margin-right: 15px;
-      flex-shrink: 0;
+      content: attr(data-label); font-weight: 500; color: #94a3b8;
+      text-align: left; min-width: 100px; margin-right: 15px; flex-shrink: 0;
     }
-    /* ข้อมูล (Value) ฝั่งขวา */
-    .mobile-value {
-      text-align: right !important;
-      word-break: break-word; /* ป้องกันอีเมลยาวๆ ล้นจอ */
-      flex-grow: 1;
-    }
-    /* ให้ปุ่มจัดการอยู่ฝั่งขวาบนมือถือ */
-    .mobile-actions {
-      display: flex;
-      justify-content: flex-end;
-      width: 100%;
-      gap: 10px;
-    }
+    .mobile-value { text-align: right !important; word-break: break-word; flex-grow: 1; }
+    .mobile-actions { display: flex; justify-content: flex-end; width: 100%; gap: 10px; }
   }
 </style>
 
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-  <h4 class="fw-bold text-white mb-0 d-none d-md-block">
-    <i class="bi bi-people me-2 text-success"></i> จัดการลูกค้า
-  </h4>
-  <div class="ms-auto w-100 w-md-auto text-end">
-    <a href="customer_add.php" class="btn btn-success rounded-pill px-4 py-2 shadow-sm w-100 w-md-auto transition-all hover-scale">
-      <i class="bi bi-plus-circle me-1"></i> เพิ่มลูกค้าใหม่
-    </a>
-  </div>
+<div class="d-flex justify-content-end mb-4">
+  <a href="customer_add.php" class="btn btn-success rounded-pill px-4 py-2 shadow-sm transition-all hover-scale w-100 w-md-auto">
+    <i class="bi bi-plus-circle me-1"></i> เพิ่มลูกค้าใหม่
+  </a>
 </div>
 
 <div class="card table-card shadow-lg">
@@ -143,11 +124,11 @@ ob_start();
           <tbody>
             <?php foreach($customers as $c): ?>
               <tr>
-                <td data-label="รหัสลูกค้า" class="fw-bold text-success mobile-value">#<?= htmlspecialchars($c['customer_id']) ?></td>
+                <td data-label="รหัสลูกค้า" data-sort="<?= $c['customer_id'] ?>" class="fw-bold text-success mobile-value">#<?= htmlspecialchars($c['customer_id']) ?></td>
                 <td data-label="ชื่อ-นามสกุล" class="text-md-start text-white fw-medium mobile-value"><?= htmlspecialchars($c['name']) ?></td>
-                <td data-label="อีเมล" class="text-light mobile-value"><?= htmlspecialchars($c['email'] ?: '-') ?></td>
+                <td data-label="อีเมล" class="text-white mobile-value"><?= htmlspecialchars($c['email'] ?: '-') ?></td>
                 <td data-label="เบอร์โทร" class="text-info fw-semibold mobile-value"><?= htmlspecialchars($c['phone'] ?: '-') ?></td>
-                <td data-label="ที่อยู่จัดส่ง" class="text-light mobile-value">
+                <td data-label="ที่อยู่จัดส่ง" class="text-white mobile-value">
                   <?= htmlspecialchars($c['address'] ?: '-') ?>
                 </td>
 
@@ -155,7 +136,7 @@ ob_start();
                   <?php if ($c['subscribe'] == 1): ?>
                     <span class="badge bg-success bg-opacity-75 rounded-pill px-3 py-2"><i class="bi bi-check-circle me-1"></i> รับข่าวสาร</span>
                   <?php else: ?>
-                    <span class="badge bg-secondary bg-opacity-75 rounded-pill px-3 py-2 text-light"><i class="bi bi-x-circle me-1"></i> ไม่ได้รับ</span>
+                    <span class="badge bg-secondary bg-opacity-75 rounded-pill px-3 py-2 text-white"><i class="bi bi-x-circle me-1"></i> ไม่ได้รับ</span>
                   <?php endif; ?>
                 </td>
 
@@ -196,31 +177,29 @@ ob_start();
           language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
           pageLength: 10,
           responsive: false, 
-          order: [[0, "asc"]], // เรียงตามรหัสลูกค้าจากน้อยไปมาก
+          order: [[0, "asc"]], // ✅ เรียงตามรหัสลูกค้าจากน้อยไปมาก
           columnDefs: [
             { orderable: false, targets: [6] } 
           ],
           dom: '<"d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3"lf>rt<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3"ip>'
         });
 
-        // แต่งกล่องค้นหา
+        // ✅ แต่งกล่องค้นหาและช่อง Dropdown ให้ข้อความเป็นสีขาว
         $(".dataTables_filter input")
-          .addClass("form-control form-control-sm")
+          .addClass("form-control form-control-sm text-white")
           .css({
-            "background": "rgba(255,255,255,0.05)", "color": "#fff",
+            "background": "rgba(255,255,255,0.05)", "color": "#ffffff",
             "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px",
             "padding": "8px 15px", "min-width": "250px"
           });
 
         $(".dataTables_length select")
-          .addClass("form-select form-select-sm")
+          .addClass("form-select form-select-sm text-white")
           .css({
-            "background": "rgba(255,255,255,0.05)", "color": "#fff",
+            "background": "rgba(255,255,255,0.05)", "color": "#ffffff",
             "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px",
             "padding": "6px 30px 6px 15px"
           });
-          
-        $(".dataTables_info, .dataTables_length, .dataTables_filter").addClass("text-light");
       };
     };
   });
