@@ -82,12 +82,6 @@ ob_start();
   }
 </style>
 
-<div class="d-flex justify-content-start mb-4">
-  <a href="categories.php" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2 shadow-sm transition-all hover-scale">
-    <i class="bi bi-arrow-left me-1"></i> ย้อนกลับไปหน้ารายการ
-  </a>
-</div>
-
 <div class="row justify-content-center">
   <div class="col-lg-7 col-xl-6">
     
