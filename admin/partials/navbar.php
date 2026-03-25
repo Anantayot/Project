@@ -13,7 +13,7 @@
   
   <h5 class="brand-mobile text-truncate px-2 mb-0" style="max-width: 70%;"><?= $pageTitle ?? 'MyCommiss' ?></h5>
   
-  <a href="/Project/index.php" class="text-success fs-4">
+  <a href="/Project/user/index.php" class="text-success fs-4">
     <i class="bi bi-shop"></i>
   </a>
 </nav>
