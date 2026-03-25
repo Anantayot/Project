@@ -6,8 +6,8 @@ ini_set('display_errors', 1);
 $id = $_GET['id'] ?? null;
 if (!$id) die("<div class='alert alert-danger text-center mt-5'>❌ ไม่พบคำสั่งซื้อ</div>");
 
-// ✅ เปลี่ยนให้แสดงรหัสออเดอร์บน Topbar (เมนูด้านบน)
-$pageTitle = "<i class='bi bi-receipt-cutoff me-2 text-success'></i> รายละเอียดคำสั่งซื้อ <span class='text-success'>#" . htmlspecialchars($id) . "</span>";
+// ✅ แก้ไข: เอาไอคอนออกเพื่อไม่ให้ซ้อนกับ Navbar หลัก
+$pageTitle = "รายละเอียดคำสั่งซื้อ <span class='text-success'>#" . htmlspecialchars($id) . "</span>";
 
 ob_start();
 
@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (in_array($newPayment, ['รอดำเนินการ','ชำระเงินแล้ว','ยกเลิก'])) {
 
-      // ถ้าเลือก "ชำระเงินแล้ว" → อัปเดต admin_verified = 'อนุมัติ' ด้วย
+      // ถ้าเลือก "ชำระเงินแล้ว" → อัปเดต admin_verified = 'อนุมัติ' และกำลังจัดเตรียม
       if ($newPayment === 'ชำระเงินแล้ว') {
         $stmt = $conn->prepare("UPDATE orders 
                                 SET payment_status=?, 
@@ -56,12 +56,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         echo "<script>alert('💰 ชำระเงินแล้ว → แอดมินอนุมัติ + กำลังจัดเตรียมเรียบร้อย');window.location='order_view.php?id=$id';</script>";
         exit;
       }
+      
+      // ✅ ถ้าเลือก "ยกเลิก" → ยกเลิกทั้งหมด (ชำระเงิน, ตรวจสอบสลิป, จัดส่ง)
+      elseif ($newPayment === 'ยกเลิก') {
+        $stmt = $conn->prepare("UPDATE orders 
+                                SET payment_status=?, 
+                                    admin_verified='ปฏิเสธ',
+                                    order_status='ยกเลิก'
+                                WHERE order_id=?");
+        $stmt->execute([$newPayment, $id]);
+        echo "<script>alert('❌ ยกเลิกคำสั่งซื้อเรียบร้อยแล้ว');window.location='order_view.php?id=$id';</script>";
+        exit;
+      }
 
-      // ถ้าเป็นสถานะอื่น (เช่น ยกเลิก / รอดำเนินการ)
-      $stmt = $conn->prepare("UPDATE orders SET payment_status=? WHERE order_id=?");
-      $stmt->execute([$newPayment, $id]);
-      echo "<script>alert('💰 เปลี่ยนสถานะชำระเงินเรียบร้อยแล้ว');window.location='order_view.php?id=$id';</script>";
-      exit;
+      // ถ้าเป็นสถานะอื่น (เช่น รอดำเนินการ)
+      else {
+        $stmt = $conn->prepare("UPDATE orders SET payment_status=? WHERE order_id=?");
+        $stmt->execute([$newPayment, $id]);
+        echo "<script>alert('💰 เปลี่ยนสถานะชำระเงินเรียบร้อยแล้ว');window.location='order_view.php?id=$id';</script>";
+        exit;
+      }
     }
   }
 
@@ -69,10 +83,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   if ($action === 'update_order_status') {
     $newOrder = $_POST['order_status'] ?? '';
     if (in_array($newOrder, ['รอดำเนินการ','กำลังจัดเตรียม','จัดส่งแล้ว','สำเร็จ','ยกเลิก'])) {
-      $stmt = $conn->prepare("UPDATE orders SET order_status=? WHERE order_id=?");
-      $stmt->execute([$newOrder, $id]);
-      echo "<script>alert('📦 เปลี่ยนสถานะคำสั่งซื้อเรียบร้อยแล้ว');window.location='order_view.php?id=$id';</script>";
-      exit;
+        
+      // ✅ ถ้าเลือก "ยกเลิก" จากสถานะจัดส่ง → ให้ยกเลิกการชำระเงินและปฏิเสธสลิปด้วย
+      if ($newOrder === 'ยกเลิก') {
+          $stmt = $conn->prepare("UPDATE orders 
+                                  SET order_status=?, 
+                                      payment_status='ยกเลิก', 
+                                      admin_verified='ปฏิเสธ' 
+                                  WHERE order_id=?");
+          $stmt->execute([$newOrder, $id]);
+          echo "<script>alert('❌ ยกเลิกคำสั่งซื้อเรียบร้อยแล้ว');window.location='order_view.php?id=$id';</script>";
+          exit;
+      } else {
+          $stmt = $conn->prepare("UPDATE orders SET order_status=? WHERE order_id=?");
+          $stmt->execute([$newOrder, $id]);
+          echo "<script>alert('📦 เปลี่ยนสถานะคำสั่งซื้อเรียบร้อยแล้ว');window.location='order_view.php?id=$id';</script>";
+          exit;
+      }
     }
   }
 }
