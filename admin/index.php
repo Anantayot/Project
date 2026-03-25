@@ -95,4 +95,76 @@ ob_start();
       <div class="card-body p-4 d-flex align-items-center justify-content-between">
         <div>
           <h6 class="text-muted mb-2 fw-normal">ยอดขายรวม (บาท)</h6>
-          <h3 class="fw-bold text-
+          <h3 class="fw-bold text-white mb-0">฿ <?= number_format($total_income, 2) ?></h3>
+        </div>
+        <div class="icon-box bg-gradient-success shadow-success">
+          <i class="bi bi-wallet2"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3 fade-up delay-2">
+    <div class="card stat-card shadow-sm">
+      <div class="card-body p-4 d-flex align-items-center justify-content-between">
+        <div>
+          <h6 class="text-muted mb-2 fw-normal">คำสั่งซื้อทั้งหมด</h6>
+          <h3 class="fw-bold text-white mb-0"><?= number_format($total_orders) ?> <span class="fs-6 text-muted fw-normal">รายการ</span></h3>
+        </div>
+        <div class="icon-box bg-gradient-info">
+          <i class="bi bi-cart-check"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3 fade-up delay-3">
+    <div class="card stat-card shadow-sm">
+      <div class="card-body p-4 d-flex align-items-center justify-content-between">
+        <div>
+          <h6 class="text-muted mb-2 fw-normal">สินค้าในระบบ</h6>
+          <h3 class="fw-bold text-white mb-0"><?= number_format($total_products) ?> <span class="fs-6 text-muted fw-normal">ชิ้น</span></h3>
+        </div>
+        <div class="icon-box bg-gradient-warning">
+          <i class="bi bi-box-seam"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3 fade-up delay-4">
+    <div class="card stat-card shadow-sm">
+      <div class="card-body p-4 d-flex align-items-center justify-content-between">
+        <div>
+          <h6 class="text-muted mb-2 fw-normal">สมาชิกลูกค้า</h6>
+          <h3 class="fw-bold text-white mb-0"><?= number_format($total_customers) ?> <span class="fs-6 text-muted fw-normal">คน</span></h3>
+        </div>
+        <div class="icon-box bg-gradient-primary">
+          <i class="bi bi-people"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="card welcome-banner shadow-sm fade-up delay-4">
+  <div class="card-body p-4 p-md-5">
+    <i class="bi bi-rocket-takeoff welcome-bg-icon"></i>
+    
+    <div class="position-relative z-index-1">
+      <h3 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+        ยินดีต้อนรับสู่ MyCommiss Admin Panel <i class="bi bi-stars text-warning fs-4"></i>
+      </h3>
+      <p class="text-muted mb-0 fs-6" style="max-width: 600px;">
+        คุณสามารถใช้แผงควบคุมนี้ในการจัดการสินค้า ตรวจสอบและอัปเดตสถานะคำสั่งซื้อ รวมถึงดูแลสมาชิกลูกค้าทั้งหมดได้อย่างง่ายดายผ่านเมนูด้านซ้ายมือครับ
+      </p>
+    </div>
+  </div>
+</div>
+
+<?php
+$pageContent = ob_get_clean();
+// ✅ ชี้ไปดึง layout จากโฟลเดอร์ partials
+include __DIR__ . "/partials/layout.php";
+?>
