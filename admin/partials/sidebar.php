@@ -16,10 +16,4 @@
     <li><a href="/Project/admin/customer/customers.php" class="<?= strpos($_SERVER['PHP_SELF'], 'customer') !== false ? 'active' : '' ?>"><i class="bi bi-people"></i> ข้อมูลลูกค้า</a></li>
     <li><a href="/Project/admin/order/orders.php" class="<?= strpos($_SERVER['PHP_SELF'], 'order') !== false ? 'active' : '' ?>"><i class="bi bi-bag-check"></i> คำสั่งซื้อ</a></li>
   </ul>
-
-  <div class="sidebar-footer">
-    <a href="/Project/admin/logout.php" class="btn-logout" onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
-      <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
-    </a>
-  </div>
 </aside>

@@ -2,7 +2,7 @@
   <h4 class="mb-0 text-white fw-bold"><i class="bi bi-speedometer2 me-2 text-success"></i><?= $pageTitle ?? 'Dashboard' ?></h4>
   
   <div class="d-flex align-items-center gap-2">
-    <a href="/Project/index.php" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-3">
+    <a href="/Project/user/index.php" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-3">
       <i class="bi bi-shop me-1"></i> ดูหน้าร้าน
     </a>
     <a href="/Project/admin/logout.php" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('ต้องการออกจากระบบใช่หรือไม่?');">
