@@ -9,7 +9,7 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 ?>
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top main-navbar">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="index.php">
+        <a class="navbar-brand d-flex align-items-center transition-link" href="index.php">
             <img src="icon_mycommiss.png" alt="Logo" class="logo-img me-2">
             <span class="brand-text fw-bold">MyCommiss</span>
         </a>
@@ -22,13 +22,13 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
             <ul class="navbar-nav ms-auto align-items-center py-3 py-lg-0">
                 
                 <li class="nav-item">
-                    <a href="index.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
+                    <a href="index.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
                         <i class="bi bi-house-door me-1"></i> หน้าร้าน
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="cart.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
+                    <a href="cart.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'cart.php' ? 'active' : '' ?>">
                         <i class="bi bi-cart3 me-1"></i> ตะกร้า
                         <?php if ($cart_count > 0): ?>
                             <span class="badge rounded-pill bg-danger ms-1 animate-pop"><?= $cart_count ?></span>
@@ -38,13 +38,13 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 
                 <?php if (isset($_SESSION['customer_id'])): ?>
                     <li class="nav-item">
-                        <a href="orders.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'orders.php' ? 'active' : '' ?>">
+                        <a href="orders.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'orders.php' ? 'active' : '' ?>">
                             <i class="bi bi-box-seam me-1"></i> คำสั่งซื้อ
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="profile.php" class="nav-link user-link <?= basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : '' ?>">
+                        <a href="profile.php" class="nav-link user-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : '' ?>">
                             <i class="bi bi-person-circle me-1"></i> <?= htmlspecialchars($_SESSION['customer_name']) ?>
                         </a>
                     </li>
@@ -57,12 +57,12 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 
                 <?php else: ?>
                     <li class="nav-item">
-                        <a href="login.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'login.php' ? 'active' : '' ?>">
+                        <a href="login.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'login.php' ? 'active' : '' ?>">
                             เข้าสู่ระบบ
                         </a>
                     </li>
                     <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
-                        <a href="register.php" class="nav-link btn-register px-4 py-2 text-white rounded-pill shadow-sm">
+                        <a href="register.php" class="nav-link btn-register transition-link px-4 py-2 text-white rounded-pill shadow-sm">
                             สมัครสมาชิก
                         </a>
                     </li>
@@ -77,12 +77,70 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 function confirmLogout(e) {
     e.preventDefault();
     if (confirm("คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?")) {
-        window.location = "logout.php";
+        // ใช้แอนิเมชันออกก่อนแล้วค่อยเด้งไปหน้า logout
+        document.body.classList.add('fade-out');
+        setTimeout(() => {
+            window.location = "logout.php";
+        }, 300);
     }
 }
+
+// 🌟 ระบบ Page Transition (แอนิเมชันเปลี่ยนหน้า)
+document.addEventListener("DOMContentLoaded", () => {
+    // หาลิงก์ทั้งหมดที่ไม่ใช่แท็บใหม่ และไม่ใช่ลิงก์ # เปล่าๆ
+    const links = document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="#"]):not([onclick])');
+    
+    links.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // ถ้ากดปุ่ม Ctrl หรือ Cmd ค้างไว้ (เปิดแท็บใหม่) ให้ปล่อยผ่าน
+            if (e.ctrlKey || e.metaKey) return;
+            
+            const targetUrl = this.href;
+            const currentUrl = window.location.href;
+
+            // ถ้าเป็นลิงก์หน้าเดียวกันไม่ต้องทำแอนิเมชัน
+            if (targetUrl !== currentUrl) {
+                e.preventDefault();
+                document.body.classList.add('fade-out'); // เล่นแอนิเมชันออก
+                
+                // รอให้แอนิเมชันจบ (300ms) ค่อยเปลี่ยนหน้า
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 300);
+            }
+        });
+    });
+});
+
+// 🌟 แก้ปัญหาหน้าจอดำเวลากดปุ่ม Back (ย้อนกลับ) ของเบราว์เซอร์
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted || document.body.classList.contains('fade-out')) {
+        document.body.classList.remove('fade-out');
+    }
+});
 </script>
 
 <style>
+    /* 🌟 Page Transition Animations */
+    body {
+        opacity: 0;
+        animation: fadePageIn 0.4s ease-out forwards; /* โหลดหน้าเว็บสว่างขึ้น */
+    }
+    
+    body.fade-out {
+        animation: fadePageOut 0.3s ease-in forwards; /* กดลิงก์แล้วจางลง */
+    }
+
+    @keyframes fadePageIn {
+        0% { opacity: 0; transform: translateY(15px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadePageOut {
+        0% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-10px); }
+    }
+
     /* 💎 Navbar Base */
     .main-navbar {
         border-bottom: 2px solid #f8f9fa;
