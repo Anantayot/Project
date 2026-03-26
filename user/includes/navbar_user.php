@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // 🌟 1. กำหนด BASE URL ของโฟลเดอร์ user (แก้ไขให้ตรงกับชื่อโฟลเดอร์ใน localhost ของคุณ)
 // ตัวอย่าง: ถ้าเข้าเว็บผ่าน localhost/myproject/user/ ให้ใส่ '/myproject/user/'
-$BASE_URL = '/user/'; 
+$BASE_URL = 'user/'; 
 
 // ✅ นับจำนวนสินค้าในตะกร้า (แยกตามรายการสินค้า)
 $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
