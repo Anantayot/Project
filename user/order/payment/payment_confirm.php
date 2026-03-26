@@ -9,7 +9,7 @@ session_start();
 $BASE_URL = '/user/'; 
 
 // ✅ ต้องแก้ Path ถอยหลังให้ถูกเพื่อหาไฟล์เชื่อมต่อ
-include __DIR__ . "/../../../includes/connectdb.php";
+include __DIR__ . "../../includes/connectdb.php";
 
 // ✅ ต้องเข้าสู่ระบบก่อน
 if (!isset($_SESSION['customer_id'])) {
