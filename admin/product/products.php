@@ -200,8 +200,8 @@ ob_start();
                 <td data-label="รูปภาพ" class="mobile-value">
                   <div class="mobile-right-content">
                     <?php 
-                      $imagePath = __DIR__ . "/../uploads/product/" . $p['p_image'];
-                      $imageURL  = "../uploads/product/" . htmlspecialchars($p['p_image']);
+                      $imagePath = __DIR__ . "/../uploads/products/" . $p['p_image'];
+                      $imageURL  = "../uploads/products/" . htmlspecialchars($p['p_image']);
                       
                       if (!empty($p['p_image']) && file_exists($imagePath)): 
                     ?>

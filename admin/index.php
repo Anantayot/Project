@@ -358,7 +358,7 @@ ob_start();
           <?php else: ?>
             <?php foreach($low_stock as $ls): ?>
               <div class="list-group-item list-group-item-dark">
-                <img src="/Project/admin/uploads/product/<?= htmlspecialchars($ls['p_image'] ?? 'noimg.png') ?>" class="product-img-sm" alt="product">
+                <img src="/Project/admin/uploads/products/<?= htmlspecialchars($ls['p_image'] ?? 'noimg.png') ?>" class="product-img-sm" alt="product">
                 
                 <div class="flex-grow-1 ms-3 overflow-hidden">
                   <h6 class="mb-1 text-truncate text-white fw-semibold" style="font-size: 0.95rem;"><?= htmlspecialchars($ls['p_name']) ?></h6>
