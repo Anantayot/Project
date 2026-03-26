@@ -5,7 +5,7 @@
   
   <div class="admin-profile">
     <img src="/Project/admin/partials/icon_mycommiss.png" alt="Admin" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-    <h6><?= $_SESSION['admin_name'] ?? 'Administrator' ?></h6>
+    <h6><?= $_SESSION['admin_name'] ?? 'ผู้ดูแลระบบ' ?></h6>
     <small><span class="status-dot"></span>Online</small>
   </div>
 
