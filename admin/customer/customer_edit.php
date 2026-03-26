@@ -5,9 +5,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// ✅ ตรวจสอบการเข้าสู่ระบบ (ป้องกันคนพิมพ์ URL เข้ามาตรงๆ)
+// ✅ ตรวจสอบการเข้าสู่ระบบ
 if (!isset($_SESSION['admin_id'])) { 
-  // หมายเหตุ: เปลี่ยน 'admin_id' เป็นชื่อตัวแปร Session ที่คุณตั้งไว้ตอน Login สำเร็จ
   header("Location: ../login.php"); 
   exit;
 }
@@ -16,21 +15,15 @@ if (!isset($_SESSION['admin_id'])) {
 $timeout_duration = 600;
 
 if (isset($_SESSION['last_activity'])) {
-  // คำนวณว่าไม่ได้ใช้งานมานานกี่วินาทีแล้ว
   $time_inactive = time() - $_SESSION['last_activity'];
-  
   if ($time_inactive >= $timeout_duration) {
-    // ถ้าเกิน 10 นาที ให้ล้างค่า Session ทิ้งทั้งหมด
     session_unset();
     session_destroy();
-    
-    // เด้งกลับไปหน้า login พร้อมส่งค่า ?timeout=1 ไปบอก
     header("Location: ../login.php?timeout=1");
     exit;
   }
 }
 
-// ✅ อัปเดตเวลาล่าสุด ทุกครั้งที่มีการกดรีเฟรชหรือเปลี่ยนหน้า
 $_SESSION['last_activity'] = time();
 $pageTitle = "แก้ไขข้อมูลลูกค้า";
 include __DIR__ . "/../partials/connectdb.php";
@@ -75,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   }
 }
 
-// ✅ เตรียมข้อมูลสำหรับแสดงผลในฟอร์ม (ถ้า Submit แล้ว Error จะได้แสดงค่าที่ผู้ใช้เพิ่งพิมพ์ แทนที่จะดึงจาก DB ใหม่)
+// ✅ เตรียมข้อมูลสำหรับแสดงผลในฟอร์ม
 $val_name = $_POST['name'] ?? $c['name'];
 $val_email = $_POST['email'] ?? $c['email'];
 $val_phone = $_POST['phone'] ?? $c['phone'];
@@ -85,10 +78,9 @@ $val_address = $_POST['address'] ?? $c['address'];
 if (!empty($c['profile_image']) && file_exists($_SERVER['DOCUMENT_ROOT'] . "/Project/admin/uploads/profiles/" . $c['profile_image'])) {
     $profileImg = "/Project/admin/uploads/profiles/" . htmlspecialchars($c['profile_image']);
 } else {
-    $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($c['name']) . "&background=D10024&color=fff&size=100&bold=true";
+    $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($c['name']) . "&background=D10024&color=fff&size=150&bold=true";
 }
 
-// ✅ เริ่มเก็บเนื้อหาเข้า Layout
 ob_start();
 ?>
 
@@ -113,20 +105,23 @@ ob_start();
   }
   .form-control-custom:focus {
     background-color: rgba(255, 255, 255, 0.08);
-    border-color: #facc15; /* เปลี่ยนเป็นสีเหลืองทองให้เข้ากับตีมแก้ไข */
+    border-color: #facc15; 
     box-shadow: 0 0 0 0.25rem rgba(250, 204, 21, 0.25);
     color: #fff;
   }
   .form-control-custom::placeholder {
     color: rgba(255, 255, 255, 0.3);
   }
+  
+  /* ✅ ปรับขนาดรูปโปรไฟล์ให้ใหญ่ขึ้นตรงนี้ */
   .profile-preview {
-    width: 45px;
-    height: 45px;
+    width: 75px;  /* ขยายความกว้าง */
+    height: 75px; /* ขยายความสูง */
     object-fit: cover;
-    border: 2px solid #facc15;
+    border: 3px solid #facc15; /* เพิ่มความหนาของขอบนิดนึงให้รับกับรูปที่ใหญ่ขึ้น */
     border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    background-color: #fff;
   }
 </style>
 
