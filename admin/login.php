@@ -91,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
     }
     
-    /* Header - MODIFIED for Image Logo */
+    /* Header - MODIFIED to make logo LARGER */
     .login-icon { 
       /* font-size: 3.5rem; -- removed, for text icon */
       /* color: #22c55e; -- removed, for text icon */
@@ -99,9 +99,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.4));
     }
     .login-icon img {
-      width: 3.5rem; /* Match previous icon size */
-      height: auto;  /* Maintain aspect ratio */
-      display: block; /* Center within login-icon div */
+      width: 7.0rem; /* ขนาดโลโกที่ใหญ่ขึ้นตามที่ขอ */
+      height: auto;  /* รักษาอัตราส่วนภาพ */
+      display: block; /* จัดกึ่งกลางในlogin-icon div */
       margin-left: auto;
       margin-right: auto;
     }
