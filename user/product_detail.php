@@ -20,7 +20,7 @@ if (!$product) {
 }
 
 // ✅ ตั้ง path รูปสินค้า
-$imgPath = "../admin/uploads/product/" . $product['p_image'];
+$imgPath = "../admin/uploads/products/" . $product['p_image'];
 if (empty($product['p_image']) || !file_exists($imgPath)) {
   $imgPath = "img/default.png";
 }

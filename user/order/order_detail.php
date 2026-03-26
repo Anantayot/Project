@@ -445,7 +445,7 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
             <tbody>
               <?php foreach ($details as $d): 
                 $sum = $d['price'] * $d['quantity'];
-                $imgPath = "../../admin/uploads/product/" . $d['p_image'];
+                $imgPath = "../../admin/uploads/products/" . $d['p_image'];
                 if (!file_exists($imgPath) || empty($d['p_image'])) $imgPath = "img/default.png";
               ?>
                 <tr>

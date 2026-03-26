@@ -366,7 +366,7 @@ $stocks = fetchStocks($conn, $cart);
                   $sum = $item['price'] * $item['qty'];
                   $total += $sum;
 
-                  $imgPath = "../../admin/uploads/product/" . $item['image'];
+                  $imgPath = "../../admin/uploads/products/" . $item['image'];
                   if (empty($item['image']) || !file_exists($imgPath)) {
                     $imgPath = "img/default.png";
                   }
