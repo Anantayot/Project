@@ -16,7 +16,7 @@ if (isset($_SESSION['last_activity'])) {
   if ($time_inactive >= $timeout_duration) {
     session_unset();
     session_destroy();
-    header("Location: ../login.php?timeout=1");
+    header("Location: login.php?timeout=1"); // ✅ แก้ path ให้ถูกต้อง
     exit;
   }
 }
@@ -55,46 +55,24 @@ foreach ($order_statuses as $st) {
 }
 
 // ==========================================
-// 📊 4. ข้อมูลกราฟ 5 สินค้าขายดี
-// ==========================================
-$top_products = $conn->query("
-    SELECT p.p_name, SUM(d.quantity) as total_sold
-    FROM order_details d
-    JOIN product p ON d.p_id = p.p_id
-    GROUP BY d.p_id
-    ORDER BY total_sold DESC
-    LIMIT 5
-")->fetchAll(PDO::FETCH_ASSOC);
-
-$top_labels = []; $top_data = [];
-foreach($top_products as $tp) {
-    $top_labels[] = mb_substr($tp['p_name'], 0, 15) . '..'; 
-    $top_data[] = $tp['total_sold'];
-}
-
-// ==========================================
-// 🛒 5. 5 คำสั่งซื้อล่าสุด
-// ==========================================
-$recent_orders = $conn->query("
-    SELECT o.order_id, o.order_date, o.total_price, o.order_status, c.name AS customer_name 
-    FROM orders o 
-    LEFT JOIN customers c ON o.customer_id = c.customer_id 
-    ORDER BY o.order_id DESC LIMIT 5
-")->fetchAll(PDO::FETCH_ASSOC);
-
-// ==========================================
-// ⚠️ 6. สินค้าใกล้หมดสต็อก
+// ⚠️ 4. สินค้าใกล้หมดสต็อก
 // ==========================================
 $low_stock = $conn->query("
     SELECT p_id, p_name, p_stock, p_image FROM product WHERE p_stock <= 5 ORDER BY p_stock ASC LIMIT 5
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ==========================================
-// 🔔 7. กิจกรรมล่าสุด
+// 🔔 5. กิจกรรมล่าสุด (จำลองดึงลูกค้าใหม่ + ออเดอร์ใหม่)
 // ==========================================
-$recent_customers = $conn->query("SELECT customer_id, name, created_at FROM customers ORDER BY customer_id DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
+// ดึง 3 ออเดอร์ล่าสุดเพื่อมาทำ Timeline
+$recent_orders_timeline = $conn->query("
+    SELECT o.order_id, o.order_date, o.total_price, c.name AS customer_name 
+    FROM orders o 
+    LEFT JOIN customers c ON o.customer_id = c.customer_id 
+    ORDER BY o.order_id DESC LIMIT 3
+")->fetchAll(PDO::FETCH_ASSOC);
 
-$statusColors = ['รอดำเนินการ'=>'warning text-dark', 'กำลังจัดเตรียม'=>'info text-dark', 'จัดส่งแล้ว'=>'primary', 'สำเร็จ'=>'success', 'ยกเลิก'=>'danger'];
+$recent_customers = $conn->query("SELECT customer_id, name, created_at FROM customers ORDER BY customer_id DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = 'แดชบอร์ด';
 ob_start();
@@ -120,15 +98,10 @@ ob_start();
 
   .welcome-banner { background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%); border-left: 5px solid var(--primary, #22c55e); }
   
-  /* ตาราง Recent Orders */
-  .table-dark { --bs-table-bg: transparent; --bs-table-color: #f8fafc; border-color: rgba(255, 255, 255, 0.05); }
-  .table-dark th { color: #94a3b8; font-weight: 500; font-size: 0.9rem; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  .table-dark td { padding: 15px 10px; vertical-align: middle; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  
   /* รายการสินค้าใกล้หมด */
-  .list-group-item-dark { background: transparent; border: none; border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 12px 0; color: #f8fafc; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
+  .list-group-item-dark { background: transparent; border: none; border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 15px 0; color: #f8fafc; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
   .list-group-item-dark:last-child { border-bottom: none; }
-  .list-group-item-dark:hover { background: rgba(255,255,255,0.02); border-radius: 8px; }
+  .list-group-item-dark:hover { background: rgba(255,255,255,0.02); border-radius: 8px; padding-left: 10px; padding-right: 10px; }
   .product-img-sm { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
 
   /* Activity Timeline */
@@ -139,14 +112,6 @@ ob_start();
 
   /* 📱 ปรับแต่งสำหรับมือถือโดยเฉพาะ */
   @media (max-width: 767px) {
-    /* เปลี่ยนตารางคำสั่งซื้อเป็น Card */
-    #recentOrdersTable thead { display: none; }
-    #recentOrdersTable tbody tr { display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.03); border-radius: 12px; margin-bottom: 15px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.08); }
-    #recentOrdersTable tbody td { display: flex; justify-content: space-between; align-items: center; border: none !important; padding: 10px 0; border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important; width: 100%; }
-    #recentOrdersTable tbody td:last-child { border-bottom: none !important; padding-bottom: 0; }
-    #recentOrdersTable tbody td::before { content: attr(data-label); font-weight: 500; color: #94a3b8; white-space: nowrap; margin-right: 15px; }
-    .mobile-right-content { text-align: right; flex: 1; display: flex; flex-direction: column; align-items: flex-end; word-break: break-word; }
-    
     .welcome-banner h4 { font-size: 1.2rem; }
     .chart-container { min-height: 250px; }
   }
@@ -198,64 +163,13 @@ ob_start();
   <div class="col-12 col-xl-8 fade-up delay-1">
     <div class="card custom-card shadow-lg h-100">
       <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-graph-up-arrow text-success me-2"></i> สถิติยอดขาย 7 วันล่าสุด</h6></div>
-      <div class="card-body p-3 chart-container" style="position: relative; height: 300px;"><canvas id="salesChart"></canvas></div>
+      <div class="card-body p-3 chart-container" style="position: relative; height: 320px;"><canvas id="salesChart"></canvas></div>
     </div>
   </div>
   <div class="col-12 col-xl-4 fade-up delay-2">
     <div class="card custom-card shadow-lg h-100">
       <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-pie-chart text-info me-2"></i> สัดส่วนสถานะออเดอร์</h6></div>
-      <div class="card-body p-3 d-flex justify-content-center align-items-center chart-container" style="position: relative; height: 300px;"><canvas id="orderStatusChart"></canvas></div>
-    </div>
-  </div>
-</div>
-
-<div class="row g-4 mb-4">
-  <div class="col-12 col-xl-8 fade-up delay-3">
-    <div class="card custom-card shadow-lg h-100">
-      <div class="card-header border-bottom border-secondary p-4 d-flex justify-content-between align-items-center">
-        <h5 class="fw-bold text-white mb-0"><i class="bi bi-clock-history text-info me-2"></i> 5 คำสั่งซื้อล่าสุด</h5>
-        <a href="order/orders.php" class="btn btn-sm btn-outline-light rounded-pill px-3">ดูทั้งหมด</a>
-      </div>
-      <div class="card-body p-0 p-md-3">
-        <table id="recentOrdersTable" class="table table-dark text-center align-middle mb-0 w-100">
-          <thead>
-            <tr>
-              <th class="text-start ps-4">รหัส</th>
-              <th class="text-start">ลูกค้า</th>
-              <th>วันที่สั่งซื้อ</th>
-              <th class="text-end">ยอดรวม</th>
-              <th class="text-end pe-4">สถานะ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if(empty($recent_orders)): ?>
-              <tr><td colspan="5" class="py-4 text-muted text-center border-0">ยังไม่มีคำสั่งซื้อใหม่</td></tr>
-            <?php else: ?>
-              <?php foreach($recent_orders as $ro): ?>
-                <tr>
-                  <td data-label="รหัสออเดอร์" class="text-start ps-md-4 fw-bold text-success"><div class="mobile-right-content">#<?= htmlspecialchars($ro['order_id']) ?></div></td>
-                  <td data-label="ลูกค้า" class="text-start text-white"><div class="mobile-right-content"><?= htmlspecialchars($ro['customer_name'] ?? 'ไม่ระบุ') ?></div></td>
-                  <td data-label="วันที่สั่งซื้อ" class="text-light"><div class="mobile-right-content"><?= date("d/m/y H:i", strtotime($ro['order_date'])) ?></div></td>
-                  <td data-label="ยอดรวม" class="text-end fw-bold text-info"><div class="mobile-right-content">฿<?= number_format($ro['total_price'], 2) ?></div></td>
-                  <td data-label="สถานะ" class="text-end pe-md-4">
-                    <div class="mobile-right-content">
-                      <?php $status = $ro['order_status'] ?? 'รอดำเนินการ'; $badge = $statusColors[$status] ?? 'secondary'; ?>
-                      <span class="badge bg-<?= $badge ?> rounded-pill px-3 py-2"><?= htmlspecialchars($status) ?></span>
-                    </div>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            <?php endif; ?>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-12 col-xl-4 fade-up delay-4">
-    <div class="card custom-card shadow-lg h-100">
-      <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-bar-chart-fill text-warning me-2"></i> 5 อันดับสินค้าขายดี</h6></div>
-      <div class="card-body p-3 chart-container" style="position: relative; height: 300px;"><canvas id="topProductsChart"></canvas></div>
+      <div class="card-body p-3 d-flex justify-content-center align-items-center chart-container" style="position: relative; height: 320px;"><canvas id="orderStatusChart"></canvas></div>
     </div>
   </div>
 </div>
@@ -266,7 +180,7 @@ ob_start();
       <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-bell-fill text-primary me-2"></i> กิจกรรมล่าสุด</h6></div>
       <div class="card-body p-4">
         <ul class="timeline m-0 p-0">
-          <?php foreach(array_slice($recent_orders, 0, 3) as $ro): ?>
+          <?php foreach($recent_orders_timeline as $ro): ?>
           <li class="timeline-item">
             <div class="timeline-icon bg-success"><i class="bi bi-cart"></i></div>
             <h6 class="text-white mb-1" style="font-size: 0.95rem;">ออเดอร์ใหม่ #<?= $ro['order_id'] ?></h6>
@@ -301,7 +215,7 @@ ob_start();
             <div class="text-center py-5 text-muted"><i class="bi bi-check-circle text-success fs-1 mb-3 d-block"></i>สต็อกสินค้าทั้งหมดปลอดภัยดีครับ</div>
           <?php else: ?>
             <?php foreach($low_stock as $ls): ?>
-              <div class="list-group-item list-group-item-dark p-2 border-bottom">
+              <div class="list-group-item list-group-item-dark">
                 <img src="uploads/<?= htmlspecialchars($ls['p_image'] ?? 'noimg.png') ?>" class="product-img-sm" alt="product">
                 <div class="flex-grow-1 ms-3 overflow-hidden">
                   <h6 class="mb-1 text-truncate text-white" style="font-size: 0.9rem;"><?= htmlspecialchars($ls['p_name']) ?></h6>
@@ -351,19 +265,6 @@ ob_start();
         }]
       },
       options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { padding: 20, font: {size: 12} } } } }
-    });
-
-    // 3. กราฟแท่ง (สินค้าขายดี)
-    new Chart(document.getElementById('topProductsChart').getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: <?= json_encode($top_labels) ?>,
-        datasets: [{
-          label: 'จำนวนที่ขายได้', data: <?= json_encode($top_data) ?>,
-          backgroundColor: 'rgba(245, 158, 11, 0.8)', hoverBackgroundColor: '#f59e0b', borderRadius: 4
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true } } }
     });
   });
 </script>
