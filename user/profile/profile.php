@@ -35,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   } else {
     
-    // 🖼️ 1. รับข้อมูลรูปที่ถูกตัดมาจาก Croppie (Base64)
     $cropped_image = $_POST['cropped_image'] ?? '';
     
     if (!empty($cropped_image)) {
@@ -44,16 +43,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (count($image_parts) == 2 && strpos($image_parts[0], 'image/') !== false) {
             
             $image_base64 = base64_decode($image_parts[1]);
-            $uploadDir = "../admin/uploads/profiles/";
+            
+            // 🌟 แก้ไข: ใช้ Absolute Path (เส้นทางเต็มจาก Server) เพื่อให้หาโฟลเดอร์เจอ 100%
+            $uploadDir = $_SERVER['DOCUMENT_ROOT'] . "/Project/admin/uploads/profiles/";
             
             if (!is_dir($uploadDir)) {
                 @mkdir($uploadDir, 0777, true);
             }
 
-            // สุ่มชื่อไฟล์ใหม่ บันทึกเป็น JPG เสมอเพื่อขนาดไฟล์ที่เล็ก
             $newFileName = "user_" . $customer_id . "_" . uniqid() . ".jpg";
             $targetFile = $uploadDir . $newFileName;
 
+            // บันทึกรูปลง Server
             if (file_put_contents($targetFile, $image_base64)) {
                 // 🗑️ ลบรูปเก่าทิ้ง
                 if (!empty($user['profile_image'])) {
@@ -64,14 +65,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $fileNameToSave = $newFileName;
             } else {
-                $_SESSION['toast_error'] = "❌ ไม่สามารถบันทึกรูปภาพได้";
+                $_SESSION['toast_error'] = "❌ ไม่สามารถบันทึกรูปภาพได้ (เช็ค Permission โฟลเดอร์)";
                 header("Location: profile.php");
                 exit;
             }
         }
     }
 
-    // 💾 2. บันทึกข้อมูลลงฐานข้อมูล
+    // 💾 บันทึกข้อมูลลงฐานข้อมูล
     $stmt = $conn->prepare("UPDATE customers 
                             SET name = ?, email = ?, phone = ?, address = ?, subscribe = ?, profile_image = ? 
                             WHERE customer_id = ?");
@@ -85,8 +86,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // 🎯 ตั้งค่ารูปโปรไฟล์ที่จะแสดง
-if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" . $user['profile_image'])) {
-    $profileImg = "../admin/uploads/profiles/" . htmlspecialchars($user['profile_image']);
+// 🌟 แก้ไข: ใช้เช็คไฟล์จริงบน Server ด้วย $_SERVER['DOCUMENT_ROOT']
+$serverFilePath = $_SERVER['DOCUMENT_ROOT'] . "/Project/admin/uploads/profiles/" . $user['profile_image'];
+
+if (!empty($user['profile_image']) && file_exists($serverFilePath)) {
+    // เวลาแสดงผลบนหน้าเว็บ HTML ให้ใช้ Path ของเว็บปกติ
+    $profileImg = "/Project/admin/uploads/profiles/" . htmlspecialchars($user['profile_image']);
 } else {
     $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($user['name']) . "&background=D10024&color=fff&size=150&bold=true";
 }
@@ -101,7 +106,6 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
 
   <style>
@@ -129,7 +133,6 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
 
     footer { background-color: #fff; color: #6c757d; padding: 20px; font-size: 0.9rem; border-top: 1px solid #eee; text-align: center; }
     
-    /* แต่งกล่อง Croppie */
     #croppie-demo { width: 100%; height: 350px; margin-top: 10px; }
   </style>
 </head>
@@ -269,7 +272,6 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // แจ้งเตือน Toast
     const toastElList = [].slice.call(document.querySelectorAll('.toast'));
     toastElList.forEach(toastEl => {
       const toast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
@@ -293,24 +295,21 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
 
         const reader = new FileReader();
         reader.onload = function (event) {
-          cropModal.show(); // เปิดหน้าต่าง Modal
+          cropModal.show(); 
 
-          // รอให้หน้าต่างเปิดเสร็จก่อน ค่อยสร้างที่ตัดรูป
           cropModalElement.addEventListener('shown.bs.modal', function initCroppie() {
-            // ป้องกันการสร้างซ้อนกัน
             if (croppieInstance) { croppieInstance.destroy(); }
 
             croppieInstance = new Croppie(document.getElementById('croppie-demo'), {
-              viewport: { width: 220, height: 220, type: 'circle' }, // กรอบวงกลมตรงกลาง
-              boundary: { width: '100%', height: 300 }, // ขนาดพื้นที่ทั้งหมด
-              showZoomer: true, // มีแถบเลื่อนซูมด้านล่าง
+              viewport: { width: 220, height: 220, type: 'circle' }, 
+              boundary: { width: '100%', height: 300 }, 
+              showZoomer: true, 
             });
 
             croppieInstance.bind({
               url: event.target.result
             });
             
-            // เอา Event Listener นี้ออกเมื่อทำงานเสร็จ ป้องกันมันทำงานซ้ำรอบหน้า
             cropModalElement.removeEventListener('shown.bs.modal', initCroppie);
           });
         };
@@ -318,7 +317,6 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
       }
     });
 
-    // เมื่อกดยกเลิก หรือปิดหน้าต่าง ให้ล้างค่าที่ตัดรูปทิ้ง
     cropModalElement.addEventListener('hidden.bs.modal', function () {
       if (croppieInstance) {
         croppieInstance.destroy();
@@ -327,25 +325,19 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
       imageInput.value = ''; 
     });
 
-    // เมื่อกดปุ่ม "ตกลง"
     document.getElementById('cropBtn').addEventListener('click', function () {
       if (!croppieInstance) return;
 
-      // ดึงรูปออกมาในรูปแบบ Base64 ขนาด 400x400
       croppieInstance.result({
         type: 'base64',
-        format: 'jpeg', // ใช้ JPEG ให้ไฟล์เบา
+        format: 'jpeg', 
         size: { width: 400, height: 400 },
-        quality: 0.9 // ความชัด 90%
+        quality: 0.9 
       }).then(function (base64) {
         
-        // เอารูปที่ตัดแล้วไปใส่ในพรีวิวหน้าหลัก
         document.getElementById('previewImg').src = base64;
-        
-        // ยัดข้อมูลใส่ Input ซ่อน ไว้เตรียมส่งให้ PHP
         document.getElementById('cropped_image').value = base64;
 
-        // เปลี่ยนปุ่มบันทึกให้เด่นขึ้น
         const btnSubmit = document.getElementById('mainSubmitBtn');
         btnSubmit.innerHTML = "<i class='bi bi-floppy me-2'></i>บันทึกข้อมูลและเปลี่ยนรูป!";
         btnSubmit.classList.add('btn-warning');
