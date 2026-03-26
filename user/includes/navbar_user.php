@@ -4,15 +4,31 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 🌟 1. กำหนด BASE URL ของโฟลเดอร์ user (แก้ไขให้ตรงกับชื่อโฟลเดอร์ใน localhost ของคุณ)
-// ตัวอย่าง: ถ้าเข้าเว็บผ่าน localhost/myproject/user/ ให้ใส่ '/myproject/user/'
+// 🌟 1. กำหนด BASE URL ของโฟลเดอร์ user
 $BASE_URL = '/Project/user/'; 
 
-// ✅ นับจำนวนสินค้าในตะกร้า (แยกตามรายการสินค้า)
+// ✅ นับจำนวนสินค้าในตะกร้า
 $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 
 // 🌟 2. ดึงชื่อไฟล์ปัจจุบันมาเช็คสถานะเมนู (Active)
 $current_file = basename($_SERVER['PHP_SELF']);
+
+// 🌟 3. ดึงรูปโปรไฟล์ของลูกค้ามาแสดงบน Navbar
+$nav_profile_img = "";
+if (isset($_SESSION['customer_id']) && isset($conn)) {
+    $stmt_nav = $conn->prepare("SELECT profile_image, name FROM customers WHERE customer_id = ?");
+    $stmt_nav->execute([$_SESSION['customer_id']]);
+    $nav_user = $stmt_nav->fetch(PDO::FETCH_ASSOC);
+    
+    if ($nav_user && !empty($nav_user['profile_image'])) {
+        // แปลง URL จากฝั่ง user ไปหาฝั่ง admin/uploads
+        $admin_url = str_replace('/user/', '/admin/', $BASE_URL);
+        $nav_profile_img = $admin_url . "uploads/profiles/" . htmlspecialchars($nav_user['profile_image']);
+    } else {
+        $nav_name = $nav_user ? $nav_user['name'] : $_SESSION['customer_name'];
+        $nav_profile_img = "https://ui-avatars.com/api/?name=" . urlencode($nav_name) . "&background=random&color=fff&size=100&bold=true";
+    }
+}
 ?>
 <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top main-navbar">
     <div class="container">
@@ -57,7 +73,8 @@ $current_file = basename($_SERVER['PHP_SELF']);
 
                     <li class="nav-item dropdown d-none d-lg-block">
                         <a class="nav-link user-profile-btn dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle fs-5 me-1"></i> <?= htmlspecialchars($_SESSION['customer_name']) ?>
+                            <img src="<?= $nav_profile_img ?>" class="nav-profile-img" alt="Profile">
+                            <?= htmlspecialchars($_SESSION['customer_name']) ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 custom-dropdown" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item transition-link" href="<?= $BASE_URL ?>profile/profile.php"><i class="bi bi-person-gear me-2"></i> โปรไฟล์ส่วนตัว</a></li>
@@ -71,9 +88,10 @@ $current_file = basename($_SERVER['PHP_SELF']);
                     </li>
 
                     <div class="d-lg-none mobile-user-menu mt-3 pt-3 border-top">
-                        <li class="nav-item">
+                        <li class="nav-item mb-3">
                             <a href="<?= $BASE_URL ?>profile/profile.php" class="nav-link user-link transition-link <?= $current_file == 'profile.php' ? 'active' : '' ?>">
-                                <i class="bi bi-person-circle me-1"></i> <?= htmlspecialchars($_SESSION['customer_name']) ?>
+                                <img src="<?= $nav_profile_img ?>" class="nav-profile-img" alt="Profile">
+                                <?= htmlspecialchars($_SESSION['customer_name']) ?>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -189,6 +207,17 @@ $current_file = basename($_SERVER['PHP_SELF']);
         font-weight: 600;
     }
 
+    /* ✅ สไตล์รูปโปรไฟล์บน Navbar */
+    .nav-profile-img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-right: 8px;
+    }
+
     /* 💎 Active Line Indicator (Desktop) */
     @media (min-width: 992px) {
         .nav-item { position: relative; }
@@ -211,10 +240,10 @@ $current_file = basename($_SERVER['PHP_SELF']);
             background-color: var(--bg-light);
             border: 1px solid #eaeaea;
             border-radius: 50px;
-            padding: 0.4rem 1.2rem !important;
+            padding: 0.3rem 1.2rem 0.3rem 0.4rem !important; /* ปรับ padding ให้พอดีรูป */
             display: flex !important;
             align-items: center;
-            gap: 5px; 
+            gap: 2px; 
         }
         
         .user-profile-btn:hover { 
