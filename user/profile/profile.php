@@ -40,59 +40,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cropped_image = $_POST['cropped_image'] ?? '';
     
     if (!empty($cropped_image)) {
-        // แยกส่วนข้อมูล Base64
+        // แยกระหว่างส่วน Header (data:image/png;base64,) กับส่วนข้อมูล (Data)
         $image_parts = explode(";base64,", $cropped_image);
         
-        // ตรวจสอบว่าเป็นไฟล์รูปภาพจริงไหม
+        // ตรวจสอบว่าเป็นการส่ง Base64 รูปภาพมาจริงๆ
         if (count($image_parts) == 2 && strpos($image_parts[0], 'image/') !== false) {
-            $image_type_aux = explode("image/", $image_parts[0]);
-            $image_type = $image_type_aux[1]; // จะได้ png เสมอจาก Cropper.js
+            
+            // แปลงข้อมูล Base64 กลับเป็นรูปภาพ
             $image_base64 = base64_decode($image_parts[1]);
 
+            // กำหนด Path ที่จะเซฟ (เซฟไว้ที่ฝั่ง Admin)
             $uploadDir = __DIR__ . "/../admin/uploads/profiles/";
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+            
+            // ถ้ายังไม่มีโฟลเดอร์ให้สร้างใหม่
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
 
-            // ตั้งชื่อไฟล์ใหม่
-            $newFileName = "user_" . $customer_id . "_" . time() . ".png";
+            // ตั้งชื่อไฟล์ใหม่ (ใช้ uniqid เพื่อป้องกันชื่อซ้ำกันแบบ 100%)
+            $newFileName = "user_" . $customer_id . "_" . uniqid() . ".png";
             $targetFile = $uploadDir . $newFileName;
 
             // บันทึกไฟล์ใหม่ลง Server
             if (file_put_contents($targetFile, $image_base64)) {
                 
-                // 🗑️ 2. ระบบลบรูปเก่าทิ้ง (ถ้ามีรูปเก่าอยู่ในระบบ)
+                // 🗑️ 2. ระบบลบรูปเก่าทิ้ง (เพื่อไม่ให้เปลืองพื้นที่ Server)
                 if (!empty($user['profile_image'])) {
                     $oldFilePath = $uploadDir . $user['profile_image'];
                     if (file_exists($oldFilePath)) {
-                        unlink($oldFilePath); // สั่งลบไฟล์เก่าทิ้งทันที!
+                        unlink($oldFilePath); // สั่งลบไฟล์เก่าทิ้ง
                     }
                 }
                 
-                $fileNameToSave = $newFileName; // อัปเดตชื่อรูปใหม่เพื่อลง Database
+                $fileNameToSave = $newFileName; // อัปเดตชื่อรูปใหม่เพื่อนำไปบันทึกลง Database
             } else {
-                $_SESSION['toast_error'] = "❌ เกิดข้อผิดพลาดในการบันทึกรูปภาพ";
+                $_SESSION['toast_error'] = "❌ เกิดข้อผิดพลาด ไม่สามารถเซฟรูปลง Server ได้ (ตรวจสอบ Permission โฟลเดอร์)";
                 header("Location: profile.php");
                 exit;
             }
         }
     }
 
-    // 💾 3. บันทึกข้อมูลลงฐานข้อมูล
+    // 💾 3. บันทึกข้อมูลลงฐานข้อมูล (ทั้งข้อมูลส่วนตัว และชื่อรูปภาพใหม่)
     $stmt = $conn->prepare("UPDATE customers 
                             SET name = ?, email = ?, phone = ?, address = ?, subscribe = ?, profile_image = ? 
                             WHERE customer_id = ?");
     $stmt->execute([$name, $email, $phone, $address, $subscribe, $fileNameToSave, $customer_id]);
 
+    // อัปเดต Session ชื่อเผื่อมีการเปลี่ยนชื่อ
     $_SESSION['customer_name'] = $name;
+    
     $_SESSION['toast_success'] = "✅ บันทึกข้อมูลโปรไฟล์เรียบร้อยแล้ว";
-    header("Location: ../index.php"); 
+    header("Location: profile.php"); // ✅ แก้ให้เด้งกลับมาหน้าเดิม จะได้เห็นรูปที่เปลี่ยนทันที!
     exit;
   }
 }
 
-// 🎯 ตั้งค่ารูปโปรไฟล์ที่จะแสดง
+// 🎯 ตั้งค่ารูปโปรไฟล์ที่จะแสดงในหน้านี้
 if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" . $user['profile_image'])) {
+    // ถ้ามีรูปในระบบและไฟล์มีอยู่จริง
     $profileImg = "../admin/uploads/profiles/" . htmlspecialchars($user['profile_image']);
 } else {
+    // ถ้ายังไม่มีรูป ให้สร้างจากชื่อ
     $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($user['name']) . "&background=D10024&color=fff&size=150&bold=true";
 }
 ?>
@@ -167,6 +176,16 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
       </div>
     </div>
     <?php unset($_SESSION['toast_error']); ?>
+  <?php endif; ?>
+
+  <?php if (isset($_SESSION['toast_success'])): ?>
+    <div class="toast align-items-center text-bg-success border-0 show shadow-lg" role="alert">
+      <div class="d-flex">
+        <div class="toast-body fs-6 fw-medium px-3 py-2"><?= $_SESSION['toast_success'] ?></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+    <?php unset($_SESSION['toast_success']); ?>
   <?php endif; ?>
 </div>
 
@@ -303,7 +322,6 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
     if (files && files.length > 0) {
       const file = files[0];
       
-      // เช็คขนาดไฟล์ฝั่ง Front-end (ไม่เกิน 5MB)
       if(file.size > 5 * 1024 * 1024) {
           alert("❌ ขนาดไฟล์รูปภาพใหญ่เกินไป (จำกัดไม่เกิน 5MB)");
           imageInput.value = ''; 
@@ -319,19 +337,19 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
     }
   });
 
-  // 2. เมื่อ Modal เปิดขึ้นมา ให้เริ่มการทำงานของ Cropper.js (ตั้งค่าให้ใช้ง่ายบนมือถือ)
+  // 2. เมื่อ Modal เปิดขึ้นมา ให้เริ่มการทำงานของ Cropper.js
   cropModalElement.addEventListener('shown.bs.modal', function () {
     cropper = new Cropper(imageToCrop, {
-      aspectRatio: 1 / 1, // บังคับอัตราส่วน 1:1
-      viewMode: 1, // ป้องกันไม่ให้ลากรูปหลุดขอบ
-      dragMode: 'move', // ✅ ไฮไลท์: ให้ใช้นิ้ว "เลื่อนรูปภาพ" แทนการวาดกรอบ (เหมาะกับมือถือสุดๆ)
-      autoCropArea: 1, // ซูมกรอบให้ใหญ่เต็มพื้นที่
+      aspectRatio: 1 / 1, 
+      viewMode: 1, 
+      dragMode: 'move', 
+      autoCropArea: 1, 
       restore: false,
-      guides: false, // ปิดเส้นตารางตารางเกะกะ
+      guides: false, 
       center: true,
       highlight: false,
-      cropBoxMovable: false, // ล็อกตำแหน่งกรอบไว้ตรงกลาง
-      cropBoxResizable: false, // ล็อกขนาดกรอบ ห้ามหดห้ามขยาย ให้ใช้วิธีซูมรูปเอา
+      cropBoxMovable: false, 
+      cropBoxResizable: false, 
       toggleDragModeOnDblclick: false,
     });
   });
@@ -349,7 +367,6 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
   document.getElementById('cropBtn').addEventListener('click', function () {
     if (!cropper) return;
 
-    // ตัดรูปออกมาขนาด 400x400 (คมชัดและไฟล์ไม่ใหญ่)
     const canvas = cropper.getCroppedCanvas({
       width: 400,
       height: 400,
@@ -357,11 +374,8 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
 
     const base64Image = canvas.toDataURL('image/png');
 
-    // เอาไปโชว์ให้ลูกค้าดู
     previewImg.src = base64Image;
-
-    // ยัดใส่ Input ซ่อน
-    hiddenCroppedInput.value = base64Image;
+    hiddenCroppedInput.value = base64Image; // ✅ เก็บ Base64 ใส่ Input เตรียมรอการ Submit
 
     cropModal.hide();
   });
