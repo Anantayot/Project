@@ -35,39 +35,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   } else {
     
-    $cropped_image = $_POST['cropped_image'] ?? '';
-    
-    if (!empty($cropped_image)) {
-        $image_parts = explode(";base64,", $cropped_image);
+    // 🖼️ 1. จัดการอัปโหลดไฟล์รูปภาพโดยตรง (ไม่ใช้ Base64 แล้ว)
+    if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
         
-        if (count($image_parts) == 2 && strpos($image_parts[0], 'image/') !== false) {
-            
-            $image_base64 = base64_decode($image_parts[1]);
+        $tmpName = $_FILES['profile_image']['tmp_name'];
+        $fileSize = $_FILES['profile_image']['size'];
+        $ext = strtolower(pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'webp']; 
+
+        // ตรวจสอบขนาด (ไม่เกิน 5MB)
+        if ($fileSize > 5 * 1024 * 1024) {
+            $_SESSION['toast_error'] = "❌ ขนาดรูปภาพใหญ่เกินไป (จำกัด 5MB)";
+            header("Location: profile.php");
+            exit;
+        }
+
+        // ตรวจสอบนามสกุล
+        if (in_array($ext, $allowed)) {
             $uploadDir = "../admin/uploads/profiles/";
             
             if (!is_dir($uploadDir)) {
                 @mkdir($uploadDir, 0777, true);
             }
 
-            $newFileName = "user_" . $customer_id . "_" . uniqid() . ".jpg";
+            // สุ่มชื่อไฟล์ใหม่
+            $newFileName = "user_" . $customer_id . "_" . uniqid() . "." . $ext;
             $targetFile = $uploadDir . $newFileName;
 
-            if (file_put_contents($targetFile, $image_base64)) {
+            // ย้ายไฟล์ลง Server
+            if (move_uploaded_file($tmpName, $targetFile)) {
+                
+                // ลบรูปเก่าทิ้ง
                 if (!empty($user['profile_image'])) {
                     $oldFilePath = $uploadDir . $user['profile_image'];
                     if (file_exists($oldFilePath)) {
                         @unlink($oldFilePath); 
                     }
                 }
+                
                 $fileNameToSave = $newFileName;
             } else {
-                $_SESSION['toast_error'] = "❌ ไม่สามารถบันทึกรูปภาพได้ (ตรวจสอบ Permission ของโฟลเดอร์ admin/uploads)";
+                $_SESSION['toast_error'] = "❌ ไม่สามารถบันทึกรูปภาพได้";
                 header("Location: profile.php");
                 exit;
             }
+        } else {
+            $_SESSION['toast_error'] = "❌ รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG, WEBP) เท่านั้น";
+            header("Location: profile.php");
+            exit;
         }
     }
 
+    // 💾 2. บันทึกข้อมูลลงฐานข้อมูล
     $stmt = $conn->prepare("UPDATE customers 
                             SET name = ?, email = ?, phone = ?, address = ?, subscribe = ?, profile_image = ? 
                             WHERE customer_id = ?");
@@ -80,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 
+// 🎯 ตั้งค่ารูปโปรไฟล์ที่จะแสดง
 if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" . $user['profile_image'])) {
     $profileImg = "../admin/uploads/profiles/" . htmlspecialchars($user['profile_image']);
 } else {
@@ -96,7 +116,6 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 
   <style>
     body { background-color: #f8f9fa; font-family: "Prompt", sans-serif; color: #333; }
@@ -105,7 +124,20 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
     .profile-card { width: 100%; max-width: 650px; background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; border: none; }
     .card-header-custom { background-color: #D10024; color: #fff; padding: 30px 20px 20px; text-align: center; position: relative; }
     
-    .profile-icon { width: 110px; height: 110px; background-color: #fff; border-radius: 50%; margin: 0 auto 10px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.2); object-fit: cover; border: 4px solid #fff; }
+    /* ✅ ให้รูปถูกตัดเป็นวงกลมตรงกลางเสมอ ด้วย object-fit: cover */
+    .profile-icon { 
+      width: 130px; 
+      height: 130px; 
+      background-color: #fff; 
+      border-radius: 50%; 
+      margin: 0 auto 10px auto; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+      object-fit: cover; 
+      object-position: center; /* ให้อยู่ตรงกลางรูปเสมอ */
+      border: 4px solid #fff; 
+      transition: 0.3s;
+    }
+    
     .upload-badge { position: absolute; bottom: 10px; right: -5px; width: 35px; height: 35px; background-color: #ffc107; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #D10024; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     .upload-badge:hover { background-color: #e0a800; transform: scale(1.1); }
 
@@ -122,20 +154,6 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
     .btn-outline-custom:hover { background-color: #f1f1f1; color: #333; }
 
     footer { background-color: #fff; color: #6c757d; padding: 20px; font-size: 0.9rem; border-top: 1px solid #eee; text-align: center; }
-    
-    /* ✅ แก้ปัญหาเรื่องขนาดและการจัดวางบนมือถือ */
-    .img-container { 
-      max-height: 45vh; /* ลดความสูงลงไม่ให้ล้นจอ */
-      width: 100%; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center;
-      background-color: #000; 
-      touch-action: none; 
-      overflow: hidden; /* กันรูปกระเด็นออกนอกกรอบ */
-    }
-    #imageToCrop { max-width: 100%; max-height: 100%; display: block; }
-    .cropper-view-box, .cropper-face { border-radius: 50%; }
   </style>
 </head>
 <body>
@@ -166,18 +184,19 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
 
 <div class="profile-wrapper">
   <div class="profile-card">
-    <form method="POST" enctype="multipart/form-data" id="profileForm">
-      
-      <input type="hidden" name="cropped_image" id="cropped_image">
+    <form method="POST" enctype="multipart/form-data">
       
       <div class="card-header-custom">
         <div class="position-relative d-inline-block">
           <img src="<?= $profileImg ?>" id="previewImg" class="profile-icon" alt="Profile Picture">
+          
           <label for="profile_image" class="upload-badge" title="เปลี่ยนรูปโปรไฟล์">
             <i class="bi bi-camera-fill"></i>
           </label>
         </div>
-        <input type="file" id="profile_image" class="d-none" accept="image/jpeg, image/png, image/webp">
+        
+        <input type="file" name="profile_image" id="profile_image" class="d-none" accept="image/jpeg, image/png, image/webp" onchange="previewFile(this)">
+        
         <h4 class="mt-2 mb-0 fw-bold">ข้อมูลส่วนตัวของฉัน</h4>
         <p class="mb-0 mt-1 fw-normal" style="font-size: 0.9rem; opacity: 0.9;">จัดการข้อมูลส่วนตัวและที่อยู่สำหรับจัดส่งสินค้า</p>
       </div>
@@ -244,107 +263,42 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
   </div>
 </div>
 
-<div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down">
-    <div class="modal-content bg-dark text-white">
-      <div class="modal-header border-0">
-        <h5 class="modal-title"><i class="bi bi-crop me-2"></i>ใช้นิ้วเลื่อนและซูมรูปภาพ</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body p-0 d-flex justify-content-center align-items-center bg-black">
-        <div class="img-container w-100">
-          <img id="imageToCrop" src="" alt="Picture">
-        </div>
-      </div>
-      <div class="modal-footer border-0 d-flex justify-content-between">
-        <button type="button" class="btn btn-outline-light rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
-        <button type="button" class="btn btn-warning rounded-pill px-4 fw-bold" id="cropBtn"><i class="bi bi-check2-circle me-1"></i> ยืนยันรูปนี้</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <footer>
   © <?= date('Y') ?> MyCommiss | ระบบร้านค้าออนไลน์คอมพิวเตอร์
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
 <script>
-  let cropper;
-  const imageInput = document.getElementById('profile_image');
-  const imageToCrop = document.getElementById('imageToCrop');
-  const cropModalElement = document.getElementById('cropModal');
-  const cropModal = new bootstrap.Modal(cropModalElement);
-  const previewImg = document.getElementById('previewImg');
-  const hiddenCroppedInput = document.getElementById('cropped_image');
-
-  imageInput.addEventListener('change', function (e) {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      if(file.size > 5 * 1024 * 1024) {
-          alert("❌ ไฟล์ใหญ่เกินไป (ไม่เกิน 5MB)");
-          imageInput.value = ''; 
-          return;
-      }
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        imageToCrop.src = event.target.result;
-        cropModal.show();
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-
-  cropModalElement.addEventListener('shown.bs.modal', function () {
-    cropper = new Cropper(imageToCrop, {
-      aspectRatio: 1 / 1, 
-      viewMode: 3, 
-      dragMode: 'move', 
-      autoCropArea: 0.7, // ✅ ลดขนาดกรอบเริ่มต้นลง (จาก 0.9 เหลือ 0.7) จะได้เห็นหน้าชัดขึ้น
-      restore: false,
-      guides: false, 
-      center: true, // ✅ บังคับจัดกึ่งกลาง
-      highlight: false,
-      cropBoxMovable: false, 
-      cropBoxResizable: false, 
-      toggleDragModeOnDblclick: false,
-    });
-  });
-
-  cropModalElement.addEventListener('hidden.bs.modal', function () {
-    if (cropper) {
-      cropper.destroy();
-      cropper = null;
-    }
-    imageInput.value = ''; 
-  });
-
-  document.getElementById('cropBtn').addEventListener('click', function () {
-    if (!cropper) return;
-
-    const canvas = cropper.getCroppedCanvas({
-      width: 400,
-      height: 400,
-      imageSmoothingQuality: 'high'
-    });
-
-    const base64Image = canvas.toDataURL('image/jpeg', 0.8);
-
-    previewImg.src = base64Image;
-    hiddenCroppedInput.value = base64Image; 
+  // ✅ โค้ด Preview รูปภาพแบบง่ายๆ เบาหวิว
+  function previewFile(input) {
+    const file = input.files[0];
     
-    const btnSubmit = document.getElementById('mainSubmitBtn');
-    btnSubmit.innerHTML = "<i class='bi bi-floppy me-2'></i>บันทึกเพื่อเปลี่ยนรูปภาพ!";
-    btnSubmit.classList.add('btn-warning');
-    btnSubmit.classList.remove('btn-submit');
-    btnSubmit.style.color = '#000';
+    if (file) {
+        // เช็คขนาดไฟล์เบื้องต้น
+        if(file.size > 5 * 1024 * 1024) {
+            alert("❌ ไฟล์รูปใหญ่เกินไป (ต้องไม่เกิน 5MB)");
+            input.value = '';
+            return;
+        }
 
-    cropModal.hide();
-  });
+        // อ่านไฟล์แล้วโชว์ในแท็ก img
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewImg').src = e.target.result;
+            
+            // แจ้งเตือนให้กดบันทึก
+            const btnSubmit = document.getElementById('mainSubmitBtn');
+            btnSubmit.innerHTML = "<i class='bi bi-floppy me-2'></i>บันทึกเพื่อเปลี่ยนรูปภาพ!";
+            btnSubmit.classList.add('btn-warning');
+            btnSubmit.classList.remove('btn-submit');
+            btnSubmit.style.color = '#000';
+        }
+        reader.readAsDataURL(file);
+    }
+  }
 
+  // Toast Alert
   document.addEventListener("DOMContentLoaded", () => {
     const toastElList = [].slice.call(document.querySelectorAll('.toast'));
     toastElList.forEach(toastEl => {
