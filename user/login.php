@@ -200,10 +200,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <form method="post">
                 <div class="mb-3">
-                    <label class="form-label fw-semibold text-secondary">อีเมล หรือ ชื่อผู้ใช้</label>
+                    <label class="form-label fw-semibold text-secondary">อีเมล</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-person text-muted"></i></span>
-                        <input type="text" name="email" class="form-control border-start-0 ps-0" placeholder="mycommiss@email.com หรือ admin" required>
+                        <input type="text" name="email" class="form-control border-start-0 ps-0" placeholder="mycommiss@email.com" required>
                     </div>
                 </div>
 
