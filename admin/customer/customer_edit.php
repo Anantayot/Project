@@ -187,9 +187,10 @@ ob_start();
     background-color: #eab308;
   }
 
-  /* แต่งกล่อง Croppie */
+  /* แต่งกล่อง Croppie ให้เข้ากับธีม Admin */
   #croppie-demo { width: 100%; height: 350px; margin-top: 10px; }
-  .modal-content-white { background-color: #ffffff; color: #333; border-radius: 15px; }
+  /* ✅ ปรับสไตล์ Modal ให้เป็นโทนสีเว็บ (Dark Tone) */
+  .modal-content-custom { background-color: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; }
 </style>
 
 <div class="row justify-content-center">
@@ -265,16 +266,16 @@ ob_start();
 
 <div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog" style="margin-top: 10vh;">
-    <div class="modal-content modal-content-white shadow-lg border-0">
-      <div class="modal-header border-bottom bg-white" style="border-radius: 15px 15px 0 0;">
-        <h5 class="modal-title text-dark fw-bold"><i class="bi bi-crop text-warning me-2"></i>ปรับขนาดรูปโปรไฟล์ลูกค้า</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content modal-content-custom shadow-lg border-0">
+      <div class="modal-header border-bottom border-secondary" style="border-radius: 15px 15px 0 0;">
+        <h5 class="modal-title text-warning fw-bold"><i class="bi bi-crop me-2"></i>ปรับขนาดรูปโปรไฟล์ลูกค้า</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body text-center bg-white p-0">
+      <div class="modal-body text-center bg-black rounded-bottom p-0">
         <div id="croppie-demo"></div>
       </div>
-      <div class="modal-footer border-0 d-flex justify-content-between px-4 pb-4 bg-white" style="border-radius: 0 0 15px 15px;">
-        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
+      <div class="modal-footer border-0 d-flex justify-content-between px-4 pb-4 bg-black rounded-bottom" style="border-radius: 0 0 15px 15px;">
+        <button type="button" class="btn btn-outline-light rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
         <button type="button" class="btn btn-warning rounded-pill px-4 fw-bold text-dark" id="cropBtn"><i class="bi bi-check2-circle me-1"></i> ยืนยันการตัดรูป</button>
       </div>
     </div>
