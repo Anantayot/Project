@@ -44,6 +44,7 @@ ob_start();
   .table-custom-header th {
     border-bottom: none;
     padding: 15px 10px;
+    cursor: pointer; /* ให้รู้ว่ากดเรียงได้ */
   }
   .table-dark {
     --bs-table-bg: transparent;
@@ -105,21 +106,35 @@ ob_start();
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
     #dataTable tbody td {
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex; justify-content: space-between; align-items: flex-start;
       padding: 12px 0; border: none !important;
       border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important;
-      font-size: 0.95rem;
+      font-size: 0.95rem; width: 100%;
     }
     #dataTable tbody td:last-child {
       border-bottom: none !important; padding-top: 18px; padding-bottom: 5px;
     }
     #dataTable tbody td::before {
       content: attr(data-label); font-weight: 500; color: #94a3b8;
-      text-align: left; min-width: 90px; margin-right: 15px; flex-shrink: 0;
+      text-align: left; min-width: 90px; margin-right: 15px; flex-shrink: 0; white-space: nowrap;
     }
-    .mobile-value { text-align: right !important; word-break: break-word; flex-grow: 1; }
+    
+    /* 📌 คลาสบังคับให้ข้อมูลดันไปชิดขวาสุด */
+    .mobile-right-content {
+      text-align: right;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      word-break: break-word;
+    }
+    
     .mobile-actions { display: flex; justify-content: flex-end; width: 100%; gap: 10px; }
     .truncate-text { max-width: 100%; white-space: normal; text-align: right; }
+  }
+
+  @media (min-width: 768px) {
+    .mobile-right-content { display: contents; }
   }
 </style>
 
@@ -131,7 +146,7 @@ ob_start();
   </div>
 </div>
 
-<div class="card table-card shadow-lg">
+<div class="card table-card shadow-lg mt-2">
   <div class="card-body p-3 p-md-4">
 
     <?php if(empty($products)): ?>
@@ -143,7 +158,7 @@ ob_start();
       <div> 
         <table id="dataTable" class="table table-dark table-striped table-hover text-center align-middle w-100 mb-0">
           <thead>
-            <tr class="table-custom-header">
+            <tr class="table-custom-header text-center">
               <th style="width: 80px;">รหัส</th>
               <th style="width: 100px;">รูปภาพ</th>
               <th class="text-start">ชื่อสินค้า</th>
@@ -157,50 +172,56 @@ ob_start();
             <?php foreach($products as $p): ?>
               <tr>
                 <td data-label="รหัสสินค้า" data-sort="<?= $p['p_id'] ?>" class="fw-bold text-success mobile-value">
-                  #<?= htmlspecialchars($p['p_id']) ?>
+                  <div class="mobile-right-content">#<?= htmlspecialchars($p['p_id']) ?></div>
                 </td>
                 
                 <td data-label="รูปภาพ" class="mobile-value">
-                  <?php 
-                    $imagePath = __DIR__ . "/../uploads/" . $p['p_image'];
-                    $imageURL  = "../uploads/" . htmlspecialchars($p['p_image']);
-                    
-                    if (!empty($p['p_image']) && file_exists($imagePath)): 
-                  ?>
-                    <img src="<?= $imageURL ?>" style="width: 60px; height: 60px; object-fit: cover;" class="rounded border border-secondary shadow-sm" alt="product">
-                  <?php else: ?>
-                    <span class="badge bg-secondary">ไม่มีรูป</span>
-                  <?php endif; ?>
+                  <div class="mobile-right-content">
+                    <?php 
+                      $imagePath = __DIR__ . "/../uploads/" . $p['p_image'];
+                      $imageURL  = "../uploads/" . htmlspecialchars($p['p_image']);
+                      
+                      if (!empty($p['p_image']) && file_exists($imagePath)): 
+                    ?>
+                      <img src="<?= $imageURL ?>" style="width: 60px; height: 60px; object-fit: cover;" class="rounded border border-secondary shadow-sm" alt="product">
+                    <?php else: ?>
+                      <span class="badge bg-secondary">ไม่มีรูป</span>
+                    <?php endif; ?>
+                  </div>
                 </td>
                 
-                <td data-label="ชื่อสินค้า" class="text-md-start text-white fw-medium truncate-text mobile-value" title="<?= htmlspecialchars($p['p_name']) ?>">
-                  <?= htmlspecialchars($p['p_name']) ?>
+                <td data-label="ชื่อสินค้า" data-sort="<?= htmlspecialchars($p['p_name']) ?>" class="text-md-start text-white fw-medium truncate-text mobile-value" title="<?= htmlspecialchars($p['p_name']) ?>">
+                  <div class="mobile-right-content"><?= htmlspecialchars($p['p_name']) ?></div>
                 </td>
                 
-                <td data-label="ราคา" class="text-info fw-bold mobile-value">
-                  ฿<?= number_format($p['p_price'], 2) ?>
+                <td data-label="ราคา" data-sort="<?= $p['p_price'] ?>" class="text-info fw-bold mobile-value">
+                  <div class="mobile-right-content">฿<?= number_format($p['p_price'], 2) ?></div>
                 </td>
                 
-                <td data-label="หมวดหมู่" class="text-light mobile-value">
-                  <?= htmlspecialchars($p['cat_name'] ?? '-') ?>
+                <td data-label="หมวดหมู่" data-sort="<?= htmlspecialchars($p['cat_name'] ?? '') ?>" class="text-light mobile-value">
+                  <div class="mobile-right-content"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></div>
                 </td>
                 
-                <td data-label="สต็อก" class="mobile-value">
-                  <?php if($p['p_stock'] > 0): ?>
-                    <span class="badge bg-success bg-opacity-75 px-3 py-2 rounded-pill"><?= htmlspecialchars($p['p_stock']) ?> ชิ้น</span>
-                  <?php else: ?>
-                    <span class="badge bg-danger px-3 py-2 rounded-pill">หมด</span>
-                  <?php endif; ?>
+                <td data-label="สต็อก" data-sort="<?= $p['p_stock'] ?>" class="mobile-value">
+                  <div class="mobile-right-content">
+                    <?php if($p['p_stock'] > 0): ?>
+                      <span class="badge bg-success bg-opacity-75 px-3 py-2 rounded-pill"><?= htmlspecialchars($p['p_stock']) ?> ชิ้น</span>
+                    <?php else: ?>
+                      <span class="badge bg-danger px-3 py-2 rounded-pill">หมด</span>
+                    <?php endif; ?>
+                  </div>
                 </td>
                 
                 <td data-label="จัดการ" class="mobile-value">
-                  <div class="d-flex justify-content-center mobile-actions">
-                    <a href="product_edit.php?id=<?= $p['p_id'] ?>" class="btn btn-sm btn-outline-warning rounded-circle" data-bs-toggle="tooltip" title="แก้ไขสินค้า">
-                      <i class="bi bi-pencil"></i>
-                    </a>
-                    <a href="product_delete.php?id=<?= $p['p_id'] ?>" class="btn btn-sm btn-outline-danger rounded-circle" data-bs-toggle="tooltip" title="ลบสินค้า" onclick="return confirm('ยืนยันการลบสินค้า #<?= htmlspecialchars($p['p_id']) ?> หรือไม่?');">
-                      <i class="bi bi-trash"></i>
-                    </a>
+                  <div class="mobile-right-content">
+                    <div class="d-flex justify-content-end mobile-actions w-100">
+                      <a href="product_edit.php?id=<?= $p['p_id'] ?>" class="btn btn-sm btn-outline-warning rounded-circle transition-all hover-scale" data-bs-toggle="tooltip" title="แก้ไขสินค้า">
+                        <i class="bi bi-pencil"></i>
+                      </a>
+                      <a href="product_delete.php?id=<?= $p['p_id'] ?>" class="btn btn-sm btn-outline-danger rounded-circle transition-all hover-scale" data-bs-toggle="tooltip" title="ลบสินค้า" onclick="return confirm('ยืนยันการลบสินค้า #<?= htmlspecialchars($p['p_id']) ?> หรือไม่?');">
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    </div>
                   </div>
                 </td>
               </tr>

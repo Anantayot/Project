@@ -126,9 +126,6 @@ ob_start();
 </style>
 
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-  <h4 class="fw-bold text-white mb-0 d-none d-md-block">
-    <i class="bi bi-people me-2 text-success"></i> จัดการลูกค้า
-  </h4>
   <div class="ms-auto w-100 w-md-auto text-end">
     <a href="customer_add.php" class="btn btn-success rounded-pill px-4 py-2 shadow-sm w-100 w-md-auto transition-all hover-scale">
       <i class="bi bi-person-plus me-1"></i> เพิ่มลูกค้าใหม่
