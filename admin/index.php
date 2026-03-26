@@ -118,11 +118,14 @@ ob_start();
     margin: 0 0 0 15px; 
     padding: 0; 
     list-style: none; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* กระจายเนื้อหาให้เต็มกรอบ */
+    min-height: 100%; /* บังคับความสูงเต็ม */
   }
   .timeline-item { 
     position: relative; 
     padding-left: 30px; 
-    margin-bottom: 25px; 
   }
   .timeline-item:last-child { margin-bottom: 0; }
   .timeline-icon { 
