@@ -191,7 +191,9 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
     /* 💎 Active Line Indicator (Desktop) */
     @media (min-width: 992px) {
         .nav-item { position: relative; }
-        .nav-link::after {
+        
+        /* ใส่ :not() เพื่อยกเว้นไม่ให้เส้นแดงไปแสดงที่ปุ่ม Profile และ Cart */
+        .nav-link:not(.user-profile-btn):not(.cart-link)::after {
             content: "";
             position: absolute;
             bottom: 0;
@@ -203,16 +205,28 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 3px 3px 0 0;
         }
-        .nav-link.active::after { width: 70%; }
+        .nav-link.active:not(.user-profile-btn):not(.cart-link)::after { width: 70%; }
         
-        /* User Profile Button */
+        /* User Profile Button Customization */
         .user-profile-btn {
             background-color: var(--bg-light);
             border: 1px solid #eaeaea;
             border-radius: 50px;
             padding: 0.4rem 1.2rem !important;
+            display: flex !important;
+            align-items: center;
+            gap: 5px; /* เพิ่มระยะห่างระหว่างไอคอนกับชื่อนิดหน่อย */
         }
-        .user-profile-btn:hover { background-color: #fff; border-color: var(--primary-color); }
+        
+        .user-profile-btn:hover { 
+            background-color: #fff; 
+            border-color: var(--primary-color); 
+        }
+
+        /* ปิดการแสดงผลลูกศร Dropdown และเศษเส้นแดงที่รบกวน */
+        .user-profile-btn::after {
+            display: none !important;
+        }
     }
 
     /* 💎 Cart Icon & Badge */
