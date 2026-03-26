@@ -94,7 +94,7 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
     $profileImg = "../admin/uploads/profiles/" . htmlspecialchars($user['profile_image']);
 } else {
     // ระบบสร้างรูปอัตโนมัติจากชื่อ
-    $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($user['name']) . "&background=random&color=fff&size=150&bold=true";
+    $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($user['name']) . "&background=D10024&color=fff&size=150&bold=true";
 }
 ?>
 <!DOCTYPE html>

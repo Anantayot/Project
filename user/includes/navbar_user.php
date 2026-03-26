@@ -26,7 +26,8 @@ if (isset($_SESSION['customer_id']) && isset($conn)) {
         $nav_profile_img = $admin_url . "uploads/profiles/" . htmlspecialchars($nav_user['profile_image']);
     } else {
         $nav_name = $nav_user ? $nav_user['name'] : $_SESSION['customer_name'];
-        $nav_profile_img = "https://ui-avatars.com/api/?name=" . urlencode($nav_name) . "&background=random&color=fff&size=100&bold=true";
+        // ✅ เปลี่ยนจาก random เป็น D10024 (สีแดงของเว็บ) เพื่อให้สีตรงกันทุกหน้า
+        $nav_profile_img = "https://ui-avatars.com/api/?name=" . urlencode($nav_name) . "&background=D10024&color=fff&size=100&bold=true";
     }
 }
 ?>
@@ -213,6 +214,7 @@ if (isset($_SESSION['customer_id']) && isset($conn)) {
         height: 32px;
         border-radius: 50%;
         object-fit: cover;
+        background-color: #fff; /* ป้องกันพื้นหลังโปร่งใส */
         border: 2px solid #fff;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         margin-right: 8px;
@@ -240,7 +242,7 @@ if (isset($_SESSION['customer_id']) && isset($conn)) {
             background-color: var(--bg-light);
             border: 1px solid #eaeaea;
             border-radius: 50px;
-            padding: 0.3rem 1.2rem 0.3rem 0.4rem !important; /* ปรับ padding ให้พอดีรูป */
+            padding: 0.3rem 1.2rem 0.3rem 0.4rem !important;
             display: flex !important;
             align-items: center;
             gap: 2px; 
@@ -356,7 +358,6 @@ function confirmLogout(e) {
     if (confirm("คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?")) {
         document.body.classList.add('fade-out');
         setTimeout(() => {
-            // 🌟 แก้ Path ไปหา logout.php โดยใช้ BASE_URL
             window.location = "<?= $BASE_URL ?>logout.php";
         }, 200); 
     }
