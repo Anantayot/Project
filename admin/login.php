@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <meta charset="UTF-8">
   <title>เข้าสู่ระบบ - MyCommiss Admin</title>
   <link rel="icon" type="image/png" href="partials/icon_mycommiss.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <style>
@@ -67,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       justify-content: center; 
       overflow: hidden; 
       margin: 0; 
+      -webkit-font-smoothing: antialiased;
     }
     
     /* Background Animation */
@@ -77,22 +78,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       background: radial-gradient(white, rgba(255,255,255,0) 70%) 0 0 / 3px 3px, 
                   radial-gradient(white, rgba(255,255,255,0) 70%) 50px 50px / 3px 3px; 
       background-repeat: repeat; 
-      animation: moveStars 100s linear infinite; 
+      animation: moveStars 120s linear infinite; 
       opacity: 0.15; 
     }
     @keyframes moveStars { from { transform: translateY(0); } to { transform: translateY(-1000px); } }
     
     /* Login Card Glassmorphism */
+    .login-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 15px;
+    }
+
     .login-card { 
-      position: relative; 
-      z-index: 2; 
       width: 100%; 
-      max-width: 420px; 
-      background: rgba(30, 41, 59, 0.7); 
-      backdrop-filter: blur(15px); 
+      max-width: 400px; 
+      background: rgba(30, 41, 59, 0.65); 
+      backdrop-filter: blur(20px); 
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1); 
-      border-radius: 24px; 
-      padding: 3rem 2.5rem; 
+      border-radius: 28px; 
+      padding: 3rem 2rem; 
       color: #fff; 
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
       animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1); 
@@ -111,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     .login-title { 
       font-weight: 700; 
-      font-size: 1.8rem; 
+      font-size: 1.75rem; 
       letter-spacing: 0.5px;
       margin-bottom: 2rem;
     }
@@ -119,13 +128,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       color: #22c55e;
     }
     
-    /* Custom Inputs */
+    /* Custom Inputs (Pill Shape for Mobile Friendly) */
     .custom-input-group {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
+      border-radius: 50px; /* ทำให้ขอบมนแบบแคปซูล */
       transition: all 0.3s ease;
       overflow: hidden;
+      margin-bottom: 1.2rem !important;
     }
     .custom-input-group:focus-within {
       background: rgba(255, 255, 255, 0.08);
@@ -136,7 +146,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       background: transparent;
       border: none;
       color: #94a3b8;
-      padding-left: 1.2rem;
+      padding-left: 1.5rem;
+      font-size: 1.1rem;
     }
     .custom-input-group:focus-within .input-group-text {
       color: #22c55e;
@@ -146,7 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       border: none; 
       color: #f8fafc; 
       padding: 1rem 1rem 1rem 0.5rem; 
-      font-size: 1rem; 
+      font-size: 16px; /* 16px สำคัญมาก! ช่วยกันไม่ให้ iOS ซูมหน้าจอตอนจิ้มพิมพ์ */
       box-shadow: none !important;
     }
     .form-control::placeholder { 
@@ -158,9 +169,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       background: transparent;
       border: none;
       color: #94a3b8;
-      padding-right: 1.2rem;
+      padding-right: 1.5rem;
+      padding-left: 1rem;
       cursor: pointer;
       transition: 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .btn-toggle-password:hover { color: #f8fafc; }
     
@@ -168,22 +183,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     .btn-login { 
       background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); 
       border: none; 
-      border-radius: 12px; 
-      padding: 1rem; 
+      border-radius: 50px; /* แคปซูล */
+      padding: 0.9rem; 
       color: #fff; 
       font-weight: 600; 
       font-size: 1.1rem;
       letter-spacing: 0.5px;
       transition: all 0.3s ease; 
-      margin-top: 1rem;
+      margin-top: 1.5rem;
     }
     .btn-login:hover { 
-      transform: translateY(-2px); 
+      transform: translateY(-3px); 
       color: #fff; 
       box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.5); 
     }
     .btn-login:active {
       transform: translateY(0);
+      box-shadow: none;
     }
     
     /* Alert */
@@ -191,47 +207,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       background: rgba(239, 68, 68, 0.1); 
       color: #fca5a5; 
       border: 1px solid rgba(239, 68, 68, 0.2); 
-      border-radius: 12px; 
+      border-radius: 16px; 
       font-size: 0.9rem;
       display: flex;
       align-items: center;
       gap: 10px;
+      padding: 12px 15px;
+    }
+
+    /* Media Queries สำหรับหน้าจอมือถือเล็กๆ */
+    @media (max-width: 400px) {
+      .login-card {
+        padding: 2.5rem 1.5rem;
+      }
+      .login-title {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="stars"></div>
   
-  <div class="login-card text-center mx-3 mx-md-0">
-    <div class="login-icon">
-      <i class="bi bi-shield-lock-fill"></i>
-    </div>
-    <h3 class="login-title">เข้าสู่ระบบ<span>แอดมิน</span></h3>
-    
-    <?php if ($error): ?>
-      <div class="alert alert-custom py-2 mb-4 text-start">
-        <i class="bi bi-exclamation-circle-fill"></i> <?= htmlspecialchars($error) ?>
+  <div class="login-wrapper">
+    <div class="login-card text-center">
+      <div class="login-icon">
+        <i class="bi bi-shield-lock-fill"></i>
       </div>
-    <?php endif; ?>
+      <h3 class="login-title">เข้าสู่ระบบ<span>แอดมิน</span></h3>
+      
+      <?php if ($error): ?>
+        <div class="alert alert-custom mb-4 text-start">
+          <i class="bi bi-exclamation-circle-fill fs-5"></i> 
+          <span><?= htmlspecialchars($error) ?></span>
+        </div>
+      <?php endif; ?>
 
-    <form method="post">
-      <div class="input-group mb-4 custom-input-group text-start">
-        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-        <input type="text" name="username" class="form-control" placeholder="ชื่อผู้ใช้งาน" required autocomplete="off">
-      </div>
-      
-      <div class="input-group mb-4 custom-input-group text-start">
-        <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-        <input type="password" name="password" id="passwordInput" class="form-control" placeholder="รหัสผ่าน" required>
-        <button type="button" class="btn-toggle-password" id="togglePassword">
-          <i class="bi bi-eye-slash-fill"></i>
+      <form method="post">
+        <div class="input-group custom-input-group text-start">
+          <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+          <input type="text" name="username" class="form-control" placeholder="ชื่อผู้ใช้งาน" required autocomplete="off">
+        </div>
+        
+        <div class="input-group custom-input-group text-start">
+          <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+          <input type="password" name="password" id="passwordInput" class="form-control" placeholder="รหัสผ่าน" required>
+          <button type="button" class="btn-toggle-password" id="togglePassword">
+            <i class="bi bi-eye-slash-fill fs-5"></i>
+          </button>
+        </div>
+        
+        <button type="submit" class="btn btn-login w-100 shadow-sm">
+          เข้าสู่ระบบ <i class="bi bi-arrow-right ms-1"></i>
         </button>
-      </div>
-      
-      <button type="submit" class="btn btn-login w-100 shadow-sm">
-        เข้าสู่ระบบ <i class="bi bi-arrow-right ms-1"></i>
-      </button>
-    </form>
+      </form>
+    </div>
   </div>
 
   <script>
@@ -247,9 +277,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       if(type === 'text') {
         icon.classList.remove('bi-eye-slash-fill');
         icon.classList.add('bi-eye-fill');
+        icon.style.color = '#22c55e'; // เปลี่ยนสีตาเป็นสีเขียวตอนเปิดดู
       } else {
         icon.classList.remove('bi-eye-fill');
         icon.classList.add('bi-eye-slash-fill');
+        icon.style.color = '#94a3b8'; // เปลี่ยนสีกลับตอนปิดตา
       }
     });
   </script>
