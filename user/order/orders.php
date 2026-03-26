@@ -117,6 +117,13 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .badge.bg-danger { background-color: #dc3545 !important; color: #fff !important; }
     .badge.bg-info { background-color: #17a2b8 !important; color: #fff !important; }
 
+    /* ✅ เพิ่มคลาสนี้เพื่อล็อคความกว้างให้ป้ายสถานะเท่ากันเป๊ะ */
+    .badge-fixed {
+      width: 115px;
+      display: inline-block;
+      text-align: center;
+    }
+
     /* ยกเลิกแถว */
     .row-cancelled td { opacity: 0.6; }
 
@@ -311,13 +318,13 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </td>
                 
                 <td data-label="การชำระเงิน" data-sort="<?= $status ?>">
-                  <span class="badge <?= $payBadge ?>">
+                  <span class="badge <?= $payBadge ?> badge-fixed">
                     <?= htmlspecialchars($status) ?>
                   </span>
                 </td>
                 
                 <td data-label="สถานะจัดส่ง" data-sort="<?= $order_status ?>">
-                  <span class="badge <?= $orderBadge ?>">
+                  <span class="badge <?= $orderBadge ?> badge-fixed">
                     <?= htmlspecialchars($order_status) ?>
                   </span>
                 </td>
