@@ -52,6 +52,21 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
       border-bottom: 2px solid #eee;
       padding: 15px 10px;
     }
+    
+    /* 🌟 เพิ่ม CSS สำหรับหัวตารางที่กด Sort ได้ */
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s;
+    }
+    th.sortable:hover {
+      background-color: #f0f0f0;
+    }
+    th.sortable i {
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
     .table tbody td {
       vertical-align: middle;
       padding: 15px 10px;
@@ -132,7 +147,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
       }
       
       .table-hover tbody tr.row-cancelled {
-        background-color: #fafafa; /* ออเดอร์ยกเลิกให้สีทึมลงนิดนึง */
+        background-color: #fafafa;
       }
       
       .table-hover tbody td {
@@ -169,7 +184,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         border-top: 1px solid #eee;
       }
       .table-hover tbody td:last-child::before {
-        display: none; /* ซ่อน Label การจัดการ */
+        display: none;
       }
       
       /* ขยายปุ่มให้เต็มหน้าจอมือถือ */
@@ -221,15 +236,28 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
     <?php else: ?>
       <div class="card card-table">
-        <div class="table-responsive" style="overflow-x: hidden;"> <table class="table table-hover align-middle text-center">
+        <div class="table-responsive" style="overflow-x: hidden;"> 
+          <table class="table table-hover align-middle text-center" id="ordersTable">
             <thead>
               <tr>
-                <th class="text-start ps-4">หมายเลขคำสั่งซื้อ</th>
-                <th>วันที่สั่งซื้อ</th>
-                <th>วิธีชำระเงิน</th>
-                <th>ยอดชำระสุทธิ</th>
-                <th>การชำระเงิน</th>
-                <th>สถานะจัดส่ง</th>
+                <th class="text-start ps-4 sortable" data-type="numeric">
+                  หมายเลขคำสั่งซื้อ <i class="bi bi-arrow-down-up ms-1 text-muted opacity-50"></i>
+                </th>
+                <th class="sortable" data-type="numeric">
+                  วันที่สั่งซื้อ <i class="bi bi-arrow-down-up ms-1 text-muted opacity-50"></i>
+                </th>
+                <th class="sortable" data-type="string">
+                  วิธีชำระเงิน <i class="bi bi-arrow-down-up ms-1 text-muted opacity-50"></i>
+                </th>
+                <th class="sortable" data-type="numeric">
+                  ยอดชำระสุทธิ <i class="bi bi-arrow-down-up ms-1 text-muted opacity-50"></i>
+                </th>
+                <th class="sortable" data-type="string">
+                  การชำระเงิน <i class="bi bi-arrow-down-up ms-1 text-muted opacity-50"></i>
+                </th>
+                <th class="sortable" data-type="string">
+                  สถานะจัดส่ง <i class="bi bi-arrow-down-up ms-1 text-muted opacity-50"></i>
+                </th>
                 <th class="text-end pe-4">การจัดการ</th>
               </tr>
             </thead>
@@ -265,29 +293,35 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $rowClass = $isCancelled ? 'row-cancelled' : '';
             ?>
               <tr class="<?= $rowClass ?>">
-                <td data-label="หมายเลขคำสั่งซื้อ" class="text-start ps-md-4 fw-bold text-dark">
+                <td data-label="หมายเลขคำสั่งซื้อ" data-sort="<?= $o['order_id'] ?>" class="text-start ps-md-4 fw-bold text-dark">
                   #<?= str_pad($o['order_id'], 5, '0', STR_PAD_LEFT) ?>
                 </td>
-                <td data-label="วันที่สั่งซื้อ" class="text-muted small">
+                
+                <td data-label="วันที่สั่งซื้อ" data-sort="<?= strtotime($o['order_date']) ?>" class="text-muted small">
                   <?= date('d/m/Y', strtotime($o['order_date'])) ?>
                   <span class="d-inline d-md-block"><?= date('H:i', strtotime($o['order_date'])) ?> น.</span>
                 </td>
-                <td data-label="วิธีชำระเงิน">
+                
+                <td data-label="วิธีชำระเงิน" data-sort="<?= $o['payment_method'] ?>">
                   <i class="bi <?= $methodIcon ?> me-1"></i> <?= $methodText ?>
                 </td>
-                <td data-label="ยอดชำระสุทธิ" class="fw-bold text-danger">
+                
+                <td data-label="ยอดชำระสุทธิ" data-sort="<?= $o['total_price'] ?>" class="fw-bold text-danger">
                   <?= number_format($o['total_price'], 2) ?> ฿
                 </td>
-                <td data-label="การชำระเงิน">
+                
+                <td data-label="การชำระเงิน" data-sort="<?= $status ?>">
                   <span class="badge <?= $payBadge ?>">
                     <?= htmlspecialchars($status) ?>
                   </span>
                 </td>
-                <td data-label="สถานะจัดส่ง">
+                
+                <td data-label="สถานะจัดส่ง" data-sort="<?= $order_status ?>">
                   <span class="badge <?= $orderBadge ?>">
                     <?= htmlspecialchars($order_status) ?>
                   </span>
                 </td>
+                
                 <td data-label="การจัดการ" class="text-end pe-md-4">
                   <div class="d-flex justify-content-end gap-2">
                     
@@ -324,10 +358,64 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  // โชว์ Toast แจ้งเตือน
   const toastElList = [].slice.call(document.querySelectorAll('.toast'));
   toastElList.forEach(toastEl => {
     const toast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
     toast.show();
+  });
+
+  // 🌟 ระบบกดหัวตารางเพื่อจัดเรียง (Sorting Table)
+  const headers = document.querySelectorAll('#ordersTable th.sortable');
+  
+  headers.forEach((header, index) => {
+    header.addEventListener('click', () => {
+      const table = header.closest('table');
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      
+      // หาดูว่าปัจจุบันเรียงแบบไหนอยู่ (ถ้ายังไม่มีให้เริ่มจาก asc)
+      let currentOrder = header.dataset.order || 'desc';
+      let newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+      const type = header.dataset.type;
+
+      // รีเซ็ตไอคอนลูกศรทั้งหมด
+      headers.forEach(th => {
+        th.dataset.order = '';
+        const icon = th.querySelector('i');
+        if (icon) {
+          icon.className = 'bi bi-arrow-down-up ms-1 text-muted opacity-50';
+        }
+      });
+
+      // ตั้งค่าสถานะและเปลี่ยนไอคอนคอลัมน์ที่ถูกคลิก
+      header.dataset.order = newOrder;
+      const activeIcon = header.querySelector('i');
+      if (activeIcon) {
+        activeIcon.className = newOrder === 'asc' 
+          ? 'bi bi-arrow-up ms-1 text-primary fw-bold' 
+          : 'bi bi-arrow-down ms-1 text-primary fw-bold';
+      }
+
+      // เรียงลำดับข้อมูล
+      rows.sort((a, b) => {
+        // ดึงค่าซ่อนใน data-sort ของ <td> มาใช้เปรียบเทียบ
+        let aVal = a.querySelectorAll('td')[index].dataset.sort;
+        let bVal = b.querySelectorAll('td')[index].dataset.sort;
+
+        if (type === 'numeric') {
+          aVal = parseFloat(aVal) || 0;
+          bVal = parseFloat(bVal) || 0;
+          return newOrder === 'asc' ? aVal - bVal : bVal - aVal;
+        } else {
+          return newOrder === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        }
+      });
+
+      // ลบข้อมูลเดิมและใส่ข้อมูลที่เรียงแล้วกลับเข้าไป
+      tbody.innerHTML = '';
+      rows.forEach(row => tbody.appendChild(row));
+    });
   });
 });
 </script>
