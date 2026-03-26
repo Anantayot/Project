@@ -35,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   } else {
     
-    // 🖼️ 1. จัดการรูปภาพที่ครอปแล้ว
     $cropped_image = $_POST['cropped_image'] ?? '';
     
     if (!empty($cropped_image)) {
@@ -44,20 +43,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (count($image_parts) == 2 && strpos($image_parts[0], 'image/') !== false) {
             
             $image_base64 = base64_decode($image_parts[1]);
-
-            // ✅ อ้างอิง Path แบบ Relative เข้าใจง่าย
             $uploadDir = "../admin/uploads/profiles/";
             
             if (!is_dir($uploadDir)) {
                 @mkdir($uploadDir, 0777, true);
             }
 
-            // ✅ บันทึกเป็น JPG เสมอเพื่อประหยัดพื้นที่
             $newFileName = "user_" . $customer_id . "_" . uniqid() . ".jpg";
             $targetFile = $uploadDir . $newFileName;
 
             if (file_put_contents($targetFile, $image_base64)) {
-                // ลบรูปเก่าทิ้ง
                 if (!empty($user['profile_image'])) {
                     $oldFilePath = $uploadDir . $user['profile_image'];
                     if (file_exists($oldFilePath)) {
@@ -73,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // 💾 2. บันทึกข้อมูลลงฐานข้อมูล
     $stmt = $conn->prepare("UPDATE customers 
                             SET name = ?, email = ?, phone = ?, address = ?, subscribe = ?, profile_image = ? 
                             WHERE customer_id = ?");
@@ -86,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 
-// 🎯 ตั้งค่ารูปโปรไฟล์ที่จะแสดง
 if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" . $user['profile_image'])) {
     $profileImg = "../admin/uploads/profiles/" . htmlspecialchars($user['profile_image']);
 } else {
@@ -130,15 +123,16 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
 
     footer { background-color: #fff; color: #6c757d; padding: 20px; font-size: 0.9rem; border-top: 1px solid #eee; text-align: center; }
     
-    /* ✅ แก้ปัญหาเรื่องการเลื่อนบนมือถือ */
+    /* ✅ แก้ปัญหาเรื่องขนาดและการจัดวางบนมือถือ */
     .img-container { 
-      height: 60vh; 
+      max-height: 45vh; /* ลดความสูงลงไม่ให้ล้นจอ */
       width: 100%; 
       display: flex; 
       justify-content: center; 
       align-items: center;
       background-color: #000; 
-      touch-action: none; /* 🚫 ป้องกันหน้าเว็บเลื่อนเวลาใช้นิ้วลากรูป */
+      touch-action: none; 
+      overflow: hidden; /* กันรูปกระเด็นออกนอกกรอบ */
     }
     #imageToCrop { max-width: 100%; max-height: 100%; display: block; }
     .cropper-view-box, .cropper-face { border-radius: 50%; }
@@ -209,7 +203,9 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
             <label class="form-label fw-semibold text-secondary mb-1">เบอร์โทรศัพท์</label>
             <div class="input-group shadow-sm">
               <span class="input-group-text"><i class="bi bi-telephone text-muted"></i></span>
-              <input type="text" name="phone" value="<?= htmlspecialchars($user['phone']) ?>" class="form-control" maxlength="10" required>
+              <input type="text" name="phone" value="<?= htmlspecialchars($user['phone']) ?>" 
+                     class="form-control" maxlength="10" pattern="[0-9]{10}" title="กรุณากรอกเฉพาะตัวเลข 10 หลัก"
+                     oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);" required placeholder="08XXXXXXXX">
             </div>
           </div>
 
@@ -255,8 +251,8 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
         <h5 class="modal-title"><i class="bi bi-crop me-2"></i>ใช้นิ้วเลื่อนและซูมรูปภาพ</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body p-0">
-        <div class="img-container">
+      <div class="modal-body p-0 d-flex justify-content-center align-items-center bg-black">
+        <div class="img-container w-100">
           <img id="imageToCrop" src="" alt="Picture">
         </div>
       </div>
@@ -305,15 +301,15 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
   cropModalElement.addEventListener('shown.bs.modal', function () {
     cropper = new Cropper(imageToCrop, {
       aspectRatio: 1 / 1, 
-      viewMode: 3, // ✅ ให้รูปเต็มกรอบเสมอ ป้องกันขอบดำ
-      dragMode: 'move', // ✅ ใช้นิ้วลากรูปภาพอย่างเดียว
-      autoCropArea: 0.9, 
+      viewMode: 3, 
+      dragMode: 'move', 
+      autoCropArea: 0.7, // ✅ ลดขนาดกรอบเริ่มต้นลง (จาก 0.9 เหลือ 0.7) จะได้เห็นหน้าชัดขึ้น
       restore: false,
       guides: false, 
-      center: false,
+      center: true, // ✅ บังคับจัดกึ่งกลาง
       highlight: false,
-      cropBoxMovable: false, // 🚫 ป้องกันไม่ให้เผลอไปเลื่อนกรอบ
-      cropBoxResizable: false, // 🚫 ป้องกันการย่อขยายกรอบ
+      cropBoxMovable: false, 
+      cropBoxResizable: false, 
       toggleDragModeOnDblclick: false,
     });
   });
@@ -329,20 +325,17 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
   document.getElementById('cropBtn').addEventListener('click', function () {
     if (!cropper) return;
 
-    // ✅ ตัดภาพออกมาขนาด 400x400
     const canvas = cropper.getCroppedCanvas({
       width: 400,
       height: 400,
       imageSmoothingQuality: 'high'
     });
 
-    // ✅ แปลงเป็น JPEG (ลดขนาดไฟล์ Base64 ลงมหาศาล ทำให้บันทึกผ่านง่าย)
     const base64Image = canvas.toDataURL('image/jpeg', 0.8);
 
     previewImg.src = base64Image;
     hiddenCroppedInput.value = base64Image; 
     
-    // เปลี่ยนข้อความปุ่มบันทึกเพื่อเตือนให้กด
     const btnSubmit = document.getElementById('mainSubmitBtn');
     btnSubmit.innerHTML = "<i class='bi bi-floppy me-2'></i>บันทึกเพื่อเปลี่ยนรูปภาพ!";
     btnSubmit.classList.add('btn-warning');
