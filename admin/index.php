@@ -16,7 +16,7 @@ if (isset($_SESSION['last_activity'])) {
   if ($time_inactive >= $timeout_duration) {
     session_unset();
     session_destroy();
-    header("Location: login.php?timeout=1"); // ✅ แก้ path ให้ถูกต้อง
+    header("Location: login.php?timeout=1"); 
     exit;
   }
 }
@@ -62,9 +62,8 @@ $low_stock = $conn->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ==========================================
-// 🔔 5. กิจกรรมล่าสุด (จำลองดึงลูกค้าใหม่ + ออเดอร์ใหม่)
+// 🔔 5. กิจกรรมล่าสุด (Timeline)
 // ==========================================
-// ดึง 3 ออเดอร์ล่าสุดเพื่อมาทำ Timeline
 $recent_orders_timeline = $conn->query("
     SELECT o.order_id, o.order_date, o.total_price, c.name AS customer_name 
     FROM orders o 
@@ -104,11 +103,30 @@ ob_start();
   .list-group-item-dark:hover { background: rgba(255,255,255,0.02); border-radius: 8px; padding-left: 10px; padding-right: 10px; }
   .product-img-sm { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
 
-  /* Activity Timeline */
-  .timeline { border-left: 2px solid rgba(255,255,255,0.1); margin-left: 15px; padding-left: 20px; list-style: none; position: relative; }
-  .timeline-item { margin-bottom: 25px; position: relative; }
+  /* ✅ Activity Timeline แก้ไขใหม่ทั้งหมด ✅ */
+  .timeline { 
+    border-left: 2px solid rgba(255, 255, 255, 0.1); 
+    margin: 0 0 0 15px; /* ดันกรอบไทม์ไลน์เข้ามาขวา ไม่ให้ทะลุการ์ด */
+    padding: 0; 
+    list-style: none; 
+  }
+  .timeline-item { 
+    position: relative; 
+    padding-left: 30px; /* ดันข้อความให้ห่างจากเส้น */
+    margin-bottom: 25px; 
+  }
   .timeline-item:last-child { margin-bottom: 0; }
-  .timeline-icon { position: absolute; left: -31px; top: 0; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #fff; box-shadow: 0 0 0 4px var(--bg-card); }
+  .timeline-icon { 
+    position: absolute; 
+    left: -15px; /* กะระยะให้ไอคอนทับเส้นพอดี (ครึ่งนึงของ width 28px) */
+    top: 0; 
+    width: 28px; 
+    height: 28px; 
+    border-radius: 50%; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 0.8rem; color: #fff; 
+    box-shadow: 0 0 0 5px #1e293b; /* สร้างขอบสีเดียวกับพื้นหลัง ให้ดูลอยออกมา */
+  }
 
   /* 📱 ปรับแต่งสำหรับมือถือโดยเฉพาะ */
   @media (max-width: 767px) {
@@ -179,14 +197,15 @@ ob_start();
     <div class="card custom-card shadow-lg h-100">
       <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-bell-fill text-primary me-2"></i> กิจกรรมล่าสุด</h6></div>
       <div class="card-body p-4">
-        <ul class="timeline m-0 p-0">
+        
+        <ul class="timeline">
           <?php foreach($recent_orders_timeline as $ro): ?>
           <li class="timeline-item">
             <div class="timeline-icon bg-success"><i class="bi bi-cart"></i></div>
             <h6 class="text-white mb-1" style="font-size: 0.95rem;">ออเดอร์ใหม่ #<?= $ro['order_id'] ?></h6>
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted"><?= $ro['customer_name'] ?> - ฿<?= number_format($ro['total_price']) ?></small>
-              <small class="text-secondary" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("H:i", strtotime($ro['order_date'])) ?></small>
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+              <span class="text-white-50" style="font-size: 0.85rem;"><?= htmlspecialchars($ro['customer_name'] ?? 'ไม่ระบุ') ?> - <span class="text-info fw-bold">฿<?= number_format($ro['total_price']) ?></span></span>
+              <small class="text-white-50" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("H:i", strtotime($ro['order_date'])) ?></small>
             </div>
           </li>
           <?php endforeach; ?>
@@ -195,10 +214,11 @@ ob_start();
           <li class="timeline-item">
             <div class="timeline-icon bg-info"><i class="bi bi-person"></i></div>
             <h6 class="text-white mb-1" style="font-size: 0.95rem;">สมาชิกลูกค้าใหม่</h6>
-            <small class="text-muted d-block">คุณ <?= htmlspecialchars($recent_customers[0]['name']) ?> ได้สมัครสมาชิก</small>
+            <span class="text-white-50 d-block" style="font-size: 0.85rem;">คุณ <?= htmlspecialchars($recent_customers[0]['name']) ?> ได้สมัครสมาชิก</span>
           </li>
           <?php endif; ?>
         </ul>
+
       </div>
     </div>
   </div>
@@ -206,7 +226,7 @@ ob_start();
   <div class="col-12 col-xl-6 fade-up delay-4">
     <div class="card custom-card shadow-lg h-100">
       <div class="card-header border-bottom border-secondary p-3 d-flex justify-content-between align-items-center">
-        <h6 class="fw-bold text-white mb-0"><i class="bi bi-exclamation-triangle text-danger me-2"></i> สินค้าใกล้หมด</h6>
+        <h6 class="fw-bold text-white mb-0"><i class="bi bi-exclamation-triangle text-warning me-2"></i> สินค้าใกล้หมด</h6>
         <a href="product/products.php" class="btn btn-sm btn-outline-light rounded-pill" style="font-size:0.75rem;">จัดการสต็อก</a>
       </div>
       <div class="card-body p-3">
@@ -216,10 +236,10 @@ ob_start();
           <?php else: ?>
             <?php foreach($low_stock as $ls): ?>
               <div class="list-group-item list-group-item-dark">
-                <img src="uploads/<?= htmlspecialchars($ls['p_image'] ?? 'noimg.png') ?>" class="product-img-sm" alt="product">
+                <img src="product/uploads/<?= htmlspecialchars($ls['p_image'] ?? 'noimg.png') ?>" class="product-img-sm" alt="product">
                 <div class="flex-grow-1 ms-3 overflow-hidden">
                   <h6 class="mb-1 text-truncate text-white" style="font-size: 0.9rem;"><?= htmlspecialchars($ls['p_name']) ?></h6>
-                  <small class="text-muted">รหัสสินค้า: #<?= htmlspecialchars($ls['p_id']) ?></small>
+                  <small class="text-white-50">รหัสสินค้า: #<?= htmlspecialchars($ls['p_id']) ?></small>
                 </div>
                 <div class="text-end ms-2">
                   <span class="badge <?= $ls['p_stock']==0 ? 'bg-danger' : 'bg-warning text-dark' ?> rounded-pill px-3 py-2">
