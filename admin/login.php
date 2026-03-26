@@ -60,10 +60,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     body { 
       font-family: 'Prompt', sans-serif; 
-      /* เปลี่ยนพื้นหลังเป็นสีเทาอ่อนๆ สะอาดตา */
-      background-color: #f1f5f9; 
-      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-      background-size: 24px 24px;
+      /* พื้นหลังสีเข้มดั้งเดิม (ไม่มีดวงดาวขยับ) */
+      background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a); 
       min-height: 100vh; 
       display: flex; 
       align-items: center; 
@@ -72,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       -webkit-font-smoothing: antialiased;
     }
     
-    /* Login Card - สไตล์ Minimal สีขาว */
+    /* Login Card - Glassmorphism แบบสีเข้ม */
     .login-wrapper {
       width: 100%;
       display: flex;
@@ -83,45 +81,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     .login-card { 
       width: 100%; 
       max-width: 400px; 
-      background: #ffffff; 
-      border-radius: 24px; 
+      background: rgba(30, 41, 59, 0.65); 
+      backdrop-filter: blur(20px); 
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      border-radius: 28px; 
       padding: 3rem 2rem; 
-      color: #334155; 
-      /* ใส่เงาให้นูนขึ้นมาดูมีมิติ */
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1); 
-      border: 1px solid #f1f5f9;
+      color: #fff; 
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
     }
     
     /* Header */
     .login-icon { 
       font-size: 3.5rem; 
-      color: #10b981; 
+      color: #22c55e; 
       margin-bottom: 0.5rem; 
+      filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.4));
     }
     .login-title { 
       font-weight: 700; 
       font-size: 1.75rem; 
       letter-spacing: 0.5px;
       margin-bottom: 2rem;
-      color: #0f172a;
     }
     .login-title span {
-      color: #10b981;
+      color: #22c55e;
     }
     
-    /* Custom Inputs (แคปซูล) */
+    /* Custom Inputs (แคปซูลสำหรับมือถือ) */
     .custom-input-group {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 50px; 
       transition: all 0.3s ease;
       overflow: hidden;
       margin-bottom: 1.2rem !important;
     }
     .custom-input-group:focus-within {
-      background: #ffffff;
-      border-color: #10b981;
-      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #22c55e;
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
     }
     .custom-input-group .input-group-text {
       background: transparent;
@@ -131,18 +130,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       font-size: 1.1rem;
     }
     .custom-input-group:focus-within .input-group-text {
-      color: #10b981;
+      color: #22c55e;
     }
     .form-control { 
       background: transparent; 
       border: none; 
-      color: #1e293b; 
+      color: #f8fafc; 
       padding: 1rem 1rem 1rem 0.5rem; 
-      font-size: 16px; /* บังคับ 16px เพื่อไม่ให้ iOS ซูม */
+      font-size: 16px; /* บังคับ 16px ป้องกัน iOS ซูม */
       box-shadow: none !important;
     }
     .form-control::placeholder { 
-      color: #94a3b8; 
+      color: #64748b; 
     }
     
     /* Toggle Password Button */
@@ -158,11 +157,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       align-items: center;
       justify-content: center;
     }
-    .btn-toggle-password:hover { color: #475569; }
+    .btn-toggle-password:hover { color: #f8fafc; }
     
     /* Login Button */
     .btn-login { 
-      background: #10b981; 
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); 
       border: none; 
       border-radius: 50px; 
       padding: 0.9rem; 
@@ -175,9 +174,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     .btn-login:hover { 
       transform: translateY(-3px); 
-      background: #059669;
       color: #fff; 
-      box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4); 
+      box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.5); 
     }
     .btn-login:active {
       transform: translateY(0);
@@ -186,9 +184,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     /* Alert */
     .alert-custom { 
-      background: #fef2f2; 
-      color: #ef4444; 
-      border: 1px solid #fee2e2; 
+      background: rgba(239, 68, 68, 0.1); 
+      color: #fca5a5; 
+      border: 1px solid rgba(239, 68, 68, 0.2); 
       border-radius: 16px; 
       font-size: 0.9rem;
       display: flex;
@@ -197,7 +195,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       padding: 12px 15px;
     }
 
-    /* มือถือเล็กๆ */
+    /* Media Queries สำหรับมือถือเล็ก */
     @media (max-width: 400px) {
       .login-card {
         padding: 2.5rem 1.5rem;
@@ -238,7 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </button>
         </div>
         
-        <button type="submit" class="btn btn-login w-100">
+        <button type="submit" class="btn btn-login w-100 shadow-sm">
           เข้าสู่ระบบ <i class="bi bi-arrow-right ms-1"></i>
         </button>
       </form>
@@ -246,6 +244,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
 
   <script>
+    // สคริปต์สำหรับกดปุ่มรูปตาเพื่อดูรหัสผ่าน
     const togglePassword = document.querySelector('#togglePassword');
     const password = document.querySelector('#passwordInput');
     const icon = togglePassword.querySelector('i');
@@ -257,11 +256,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       if(type === 'text') {
         icon.classList.remove('bi-eye-slash-fill');
         icon.classList.add('bi-eye-fill');
-        icon.style.color = '#10b981'; // สีเขียว
+        icon.style.color = '#22c55e'; // เปลี่ยนสีตาเป็นสีเขียวตอนเปิดดู
       } else {
         icon.classList.remove('bi-eye-fill');
         icon.classList.add('bi-eye-slash-fill');
-        icon.style.color = '#94a3b8'; // สีเทา
+        icon.style.color = '#94a3b8'; // เปลี่ยนสีกลับตอนปิดตา
       }
     });
   </script>
