@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $address = trim($_POST['address']);
   $subscribe = isset($_POST['subscribe']) ? 1 : 0;
   
-  // เก็บชื่อรูปเดิมไว้ก่อน (กรณีไม่ได้อัปโหลดใหม่)
+  // เก็บชื่อรูปเดิมไว้ก่อน
   $fileNameToSave = $user['profile_image'];
 
   if (!preg_match('/^[0-9]{10}$/', $phone)) {
@@ -35,43 +35,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: profile.php");
     exit;
   } else {
-    // 🖼️ 1. จัดการอัปโหลดรูปภาพ
-    if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-        $tmpName = $_FILES['profile_image']['tmp_name'];
-        $fileSize = $_FILES['profile_image']['size'];
-        $ext = strtolower(pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION));
-        $allowed = ['jpg', 'jpeg', 'png', 'webp']; // อนุญาตเฉพาะรูปภาพ
+    
+    // 🖼️ 1. จัดการรูปภาพที่ครอปแล้ว (รับมาเป็น Base64)
+    $cropped_image = $_POST['cropped_image'] ?? '';
+    
+    if (!empty($cropped_image)) {
+        // แยกส่วนข้อมูล Base64
+        $image_parts = explode(";base64,", $cropped_image);
+        
+        // ตรวจสอบว่าเป็นไฟล์รูปภาพจริงไหม
+        if (count($image_parts) == 2 && strpos($image_parts[0], 'image/') !== false) {
+            $image_type_aux = explode("image/", $image_parts[0]);
+            $image_type = $image_type_aux[1]; // จะได้ png
+            $image_base64 = base64_decode($image_parts[1]);
 
-        // เช็คขนาดไฟล์ (ไม่เกิน 2MB)
-        if ($fileSize > 2 * 1024 * 1024) {
-            $_SESSION['toast_error'] = "❌ ขนาดไฟล์รูปภาพใหญ่เกินไป (จำกัดไม่เกิน 2MB)";
-            header("Location: profile.php");
-            exit;
-        }
-
-        // เช็คนามสกุลไฟล์
-        if (in_array($ext, $allowed)) {
             $uploadDir = __DIR__ . "/../admin/uploads/profiles/";
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true); // สร้างโฟลเดอร์ถ้าไม่มี
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
-            $newFileName = "user_" . $customer_id . "_" . time() . "." . $ext;
-            
-            // ย้ายไฟล์ลง Server
-            if (move_uploaded_file($tmpName, $uploadDir . $newFileName)) {
-                // (ถ้ามี) ลบรูปเก่าทิ้งเพื่อประหยัดพื้นที่ Server
+            // บังคับเซฟเป็น .png (เพราะ Cropper.js ส่งมาเป็น PNG)
+            $newFileName = "user_" . $customer_id . "_" . time() . ".png";
+            $targetFile = $uploadDir . $newFileName;
+
+            // บันทึกไฟล์ลง Server
+            if (file_put_contents($targetFile, $image_base64)) {
+                // ลบรูปเก่าทิ้ง (ถ้ามี)
                 if (!empty($user['profile_image']) && file_exists($uploadDir . $user['profile_image'])) {
                     @unlink($uploadDir . $user['profile_image']);
                 }
-                $fileNameToSave = $newFileName; // อัปเดตชื่อรูปใหม่
+                $fileNameToSave = $newFileName;
             } else {
                 $_SESSION['toast_error'] = "❌ เกิดข้อผิดพลาดในการบันทึกรูปภาพ";
                 header("Location: profile.php");
                 exit;
             }
-        } else {
-            $_SESSION['toast_error'] = "❌ รองรับเฉพาะไฟล์ JPG, PNG และ WEBP เท่านั้น";
-            header("Location: profile.php");
-            exit;
         }
     }
 
@@ -83,17 +79,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $_SESSION['customer_name'] = $name;
     $_SESSION['toast_success'] = "✅ บันทึกข้อมูลเรียบร้อยแล้ว";
-    header("Location: ../index.php"); // เด้งกลับไปหน้าแรก
+    header("Location: ../index.php"); 
     exit;
   }
 }
 
 // 🎯 ตั้งค่ารูปโปรไฟล์ที่จะแสดง
-// ถ้ามีรูปในระบบให้ดึงมาโชว์ ถ้าไม่มีให้ดึงรูปตัวอักษรย่อจาก UI-Avatars มาโชว์แทน
 if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" . $user['profile_image'])) {
     $profileImg = "../admin/uploads/profiles/" . htmlspecialchars($user['profile_image']);
 } else {
-    // ระบบสร้างรูปอัตโนมัติจากชื่อ
     $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($user['name']) . "&background=D10024&color=fff&size=150&bold=true";
 }
 ?>
@@ -108,154 +102,41 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+
   <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: "Prompt", sans-serif;
-      color: #333;
-    }
-    
-    .profile-wrapper {
-      min-height: 80vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 15px;
-    }
+    body { background-color: #f8f9fa; font-family: "Prompt", sans-serif; color: #333; }
+    .profile-wrapper { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 40px 15px; }
 
     /* 🔹 Profile Card */
-    .profile-card {
-      width: 100%;
-      max-width: 650px;
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      overflow: hidden;
-      border: none;
-    }
-
-    .card-header-custom {
-      background-color: #D10024;
-      color: #fff;
-      padding: 30px 20px 20px;
-      text-align: center;
-      position: relative;
-    }
+    .profile-card { width: 100%; max-width: 650px; background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; border: none; }
+    .card-header-custom { background-color: #D10024; color: #fff; padding: 30px 20px 20px; text-align: center; position: relative; }
     
     /* 🔹 ไอคอนและรูปโปรไฟล์ */
-    .profile-icon {
-      width: 110px;
-      height: 110px;
-      background-color: #fff;
-      border-radius: 50%;
-      margin: 0 auto 10px auto;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      object-fit: cover;
-      border: 4px solid #fff;
-    }
-
-    .upload-badge {
-      position: absolute;
-      bottom: 10px;
-      right: -5px;
-      width: 35px;
-      height: 35px;
-      background-color: #ffc107;
-      color: #000;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 3px solid #D10024;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    .upload-badge:hover {
-      background-color: #e0a800;
-      transform: scale(1.1);
-    }
+    .profile-icon { width: 110px; height: 110px; background-color: #fff; border-radius: 50%; margin: 0 auto 10px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.2); object-fit: cover; border: 4px solid #fff; }
+    .upload-badge { position: absolute; bottom: 10px; right: -5px; width: 35px; height: 35px; background-color: #ffc107; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #D10024; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .upload-badge:hover { background-color: #e0a800; transform: scale(1.1); }
 
     /* 🔹 Input Fields */
-    .form-control {
-      border-radius: 0 10px 10px 0;
-      padding: 12px 15px;
-      background-color: #fcfcfc;
-      border: 1px solid #e0e0e0;
-    }
-    .form-control:focus {
-      border-color: #D10024;
-      box-shadow: 0 0 0 0.2rem rgba(209, 0, 36, 0.15);
-      background-color: #fff;
-      z-index: 1;
-    }
-    .input-group-text {
-      border-radius: 10px 0 0 10px;
-      background-color: #fff;
-      border: 1px solid #e0e0e0;
-      border-right: none;
-    }
-
-    /* 🔹 Checkbox */
-    .form-check-input:checked {
-      background-color: #D10024;
-      border-color: #D10024;
-    }
+    .form-control { border-radius: 0 10px 10px 0; padding: 12px 15px; background-color: #fcfcfc; border: 1px solid #e0e0e0; }
+    .form-control:focus { border-color: #D10024; box-shadow: 0 0 0 0.2rem rgba(209, 0, 36, 0.15); background-color: #fff; z-index: 1; }
+    .input-group-text { border-radius: 10px 0 0 10px; background-color: #fff; border: 1px solid #e0e0e0; border-right: none; }
+    .form-check-input:checked { background-color: #D10024; border-color: #D10024; }
 
     /* 🔹 Buttons */
-    .btn-submit {
-      background-color: #D10024;
-      color: #fff;
-      border-radius: 50px;
-      font-weight: 600;
-      padding: 12px;
-      border: none;
-      transition: 0.3s;
-    }
-    .btn-submit:hover {
-      background-color: #a5001b;
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(209, 0, 36, 0.2);
-    }
-
-    .btn-password {
-      background-color: #ffc107;
-      color: #000;
-      border-radius: 50px;
-      font-weight: 600;
-      padding: 12px;
-      border: none;
-      transition: 0.3s;
-    }
-    .btn-password:hover {
-      background-color: #e0a800;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2);
-    }
-
-    .btn-outline-custom {
-      border: 1px solid #ddd;
-      color: #555;
-      border-radius: 50px;
-      font-weight: 500;
-      padding: 10px;
-      transition: 0.3s;
-      background: #fff;
-      text-align: center;
-      display: inline-block;
-    }
+    .btn-submit { background-color: #D10024; color: #fff; border-radius: 50px; font-weight: 600; padding: 12px; border: none; transition: 0.3s; }
+    .btn-submit:hover { background-color: #a5001b; color: #fff; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(209, 0, 36, 0.2); }
+    .btn-password { background-color: #ffc107; color: #000; border-radius: 50px; font-weight: 600; padding: 12px; border: none; transition: 0.3s; }
+    .btn-password:hover { background-color: #e0a800; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2); }
+    .btn-outline-custom { border: 1px solid #ddd; color: #555; border-radius: 50px; font-weight: 500; padding: 10px; transition: 0.3s; background: #fff; text-align: center; display: inline-block; }
     .btn-outline-custom:hover { background-color: #f1f1f1; color: #333; }
 
-    /* 🔹 Footer */
-    footer {
-      background-color: #fff;
-      color: #6c757d;
-      padding: 20px;
-      font-size: 0.9rem;
-      border-top: 1px solid #eee;
-      text-align: center;
-    }
+    /* 🔹 Footer & Modal */
+    footer { background-color: #fff; color: #6c757d; padding: 20px; font-size: 0.9rem; border-top: 1px solid #eee; text-align: center; }
+    
+    /* แต่งกรอบตัดรูปใน Modal ให้สวยงาม */
+    .img-container { max-height: 400px; width: 100%; display: flex; justify-content: center; background-color: #000; }
+    #imageToCrop { max-width: 100%; display: block; }
   </style>
 </head>
 <body>
@@ -272,22 +153,14 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
     </div>
     <?php unset($_SESSION['toast_error']); ?>
   <?php endif; ?>
-
-  <?php if (isset($_SESSION['toast_success'])): ?>
-    <div class="toast align-items-center text-bg-success border-0 show shadow-lg" role="alert">
-      <div class="d-flex">
-        <div class="toast-body fs-6 fw-medium px-3 py-2"><?= $_SESSION['toast_success'] ?></div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-      </div>
-    </div>
-    <?php unset($_SESSION['toast_success']); ?>
-  <?php endif; ?>
 </div>
 
 <div class="profile-wrapper">
   <div class="profile-card">
     
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" id="profileForm">
+      
+      <input type="hidden" name="cropped_image" id="cropped_image">
       
       <div class="card-header-custom">
         <div class="position-relative d-inline-block">
@@ -298,7 +171,7 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
           </label>
         </div>
         
-        <input type="file" name="profile_image" id="profile_image" class="d-none" accept="image/jpeg, image/png, image/webp" onchange="previewFile()">
+        <input type="file" id="profile_image" class="d-none" accept="image/jpeg, image/png, image/webp">
         
         <h4 class="mt-2 mb-0 fw-bold">ข้อมูลส่วนตัวของฉัน</h4>
         <p class="mb-0 mt-1 fw-normal" style="font-size: 0.9rem; opacity: 0.9;">จัดการข้อมูลส่วนตัวและที่อยู่สำหรับจัดส่งสินค้า</p>
@@ -372,13 +245,115 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
   </div>
 </div>
 
+<div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title"><i class="bi bi-crop me-2"></i>ตัดและปรับแต่งรูปโปรไฟล์</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="img-container">
+          <img id="imageToCrop" src="" alt="Picture">
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" class="btn btn-primary rounded-pill px-4" id="cropBtn"><i class="bi bi-check2-circle me-1"></i> ยืนยันการตัดรูป</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>
   © <?= date('Y') ?> MyCommiss | ระบบร้านค้าออนไลน์คอมพิวเตอร์
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 <script>
-  // 🟢 แสดงแจ้งเตือน Toast อัตโนมัติ
+  let cropper;
+  const imageInput = document.getElementById('profile_image');
+  const imageToCrop = document.getElementById('imageToCrop');
+  const cropModalElement = document.getElementById('cropModal');
+  const cropModal = new bootstrap.Modal(cropModalElement);
+  const previewImg = document.getElementById('previewImg');
+  const hiddenCroppedInput = document.getElementById('cropped_image');
+
+  // 1. เมื่อผู้ใช้เลือกรูป
+  imageInput.addEventListener('change', function (e) {
+    const files = e.target.files;
+    
+    if (files && files.length > 0) {
+      const file = files[0];
+      
+      // เช็คขนาดไฟล์ฝั่ง Front-end (ไม่เกิน 2MB)
+      if(file.size > 2 * 1024 * 1024) {
+          alert("❌ ขนาดไฟล์รูปภาพใหญ่เกินไป (จำกัดไม่เกิน 2MB)");
+          imageInput.value = ''; // เคลียร์ค่าที่เลือก
+          return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        imageToCrop.src = event.target.result;
+        cropModal.show(); // เปิด Modal
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // 2. เมื่อ Modal เปิดขึ้นมา ให้เริ่มการทำงานของ Cropper.js
+  cropModalElement.addEventListener('shown.bs.modal', function () {
+    cropper = new Cropper(imageToCrop, {
+      aspectRatio: 1 / 1, // บังคับตัดเป็นสี่เหลี่ยมจัตุรัส 1:1 เสมอ
+      viewMode: 1, // ป้องกันไม่ให้ลากกลอบตัดออกนอกพื้นที่รูป
+      dragMode: 'move', // เลื่อนรูปภาพได้
+      autoCropArea: 0.8,
+      restore: false,
+      guides: true,
+      center: true,
+      highlight: false,
+      cropBoxMovable: true,
+      cropBoxResizable: true,
+      toggleDragModeOnDblclick: false,
+    });
+  });
+
+  // 3. เมื่อปิด Modal ให้ล้างค่า Cropper ป้องกันบั๊ก
+  cropModalElement.addEventListener('hidden.bs.modal', function () {
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+    imageInput.value = ''; // เคลียร์ Input ป้องกันบั๊กเลือกรูปเดิมซ้ำไม่ได้
+  });
+
+  // 4. เมื่อกดปุ่ม "ยืนยันการตัดรูป"
+  document.getElementById('cropBtn').addEventListener('click', function () {
+    if (!cropper) return;
+
+    // สั่งให้ดึงรูปที่ตัดแล้วออกมา ขนาด 400x400 px
+    const canvas = cropper.getCroppedCanvas({
+      width: 400,
+      height: 400,
+    });
+
+    // แปลง Canvas เป็น Base64 String
+    const base64Image = canvas.toDataURL('image/png');
+
+    // นำรูปที่ได้ไปโชว์ในวงกลมพรีวิว
+    previewImg.src = base64Image;
+
+    // ยัดข้อมูล Base64 ลงใน Input ซ่อน เพื่อส่งไปให้ PHP ผ่าน POST
+    hiddenCroppedInput.value = base64Image;
+
+    // ปิด Modal
+    cropModal.hide();
+  });
+
+  // 🟢 แสดงแจ้งเตือน Toast อัตโนมัติ (ถ้ามี)
   document.addEventListener("DOMContentLoaded", () => {
     const toastElList = [].slice.call(document.querySelectorAll('.toast'));
     toastElList.forEach(toastEl => {
@@ -386,21 +361,6 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
       toast.show();
     });
   });
-
-  // 🟢 ฟังก์ชันพรีวิวรูปภาพก่อนอัปโหลด
-  function previewFile() {
-    const preview = document.getElementById('previewImg');
-    const file = document.getElementById('profile_image').files[0];
-    const reader = new FileReader();
-
-    reader.addEventListener("load", function () {
-      preview.src = reader.result;
-    }, false);
-
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  }
 </script>
 
 </body>
