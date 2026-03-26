@@ -142,14 +142,10 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--bg-light);
         width: 45px;
         height: 45px;
-        border-radius: 12px;
-        padding: 5px;
-        transition: transform var(--transition-speed);
+        /* เอาพื้นหลัง (background), ขอบ (border-radius), และการขยับ (transition) ออก */
     }
-    .navbar-brand:hover .logo-wrapper { transform: scale(1.05); }
     .logo-img { height: 100%; width: auto; object-fit: contain; }
     
     .brand-text { 
