@@ -91,13 +91,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
     }
     
-    /* Header */
+    /* Header - MODIFIED for Image Logo */
     .login-icon { 
-      font-size: 3.5rem; 
-      color: #22c55e; 
+      /* font-size: 3.5rem; -- removed, for text icon */
+      /* color: #22c55e; -- removed, for text icon */
       margin-bottom: 0.5rem; 
       filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.4));
     }
+    .login-icon img {
+      width: 3.5rem; /* Match previous icon size */
+      height: auto;  /* Maintain aspect ratio */
+      display: block; /* Center within login-icon div */
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     .login-title { 
       font-weight: 700; 
       font-size: 1.75rem; 
@@ -211,7 +219,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <div class="login-wrapper">
     <div class="login-card text-center">
       <div class="login-icon">
-        <i class="bi bi-shield-lock-fill"></i>
+        <img src="partials/icon_mycommiss.png" alt="MyCommiss Logo">
       </div>
       <h3 class="login-title">เข้าสู่ระบบ<span>แอดมิน</span></h3>
       
