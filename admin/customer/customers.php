@@ -204,7 +204,8 @@ ob_start();
                         if (!empty($c['profile_image']) && file_exists($serverFilePath)) {
                             $profileImg = "/Project/admin/uploads/profiles/" . htmlspecialchars($c['profile_image']);
                         } else {
-                            $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($c['name']) . "&background=D10024&color=fff&size=100&bold=true";
+                            // ✅ เปลี่ยนสีพื้นหลังรูปโปรไฟล์ตัวอักษรย่อให้เป็นสีเขียว 22c55e ตรงนี้ครับ
+                            $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($c['name']) . "&background=22c55e&color=fff&size=100&bold=true";
                         }
                       ?>
                       <img src="<?= $profileImg ?>" alt="Profile" class="table-profile-img">
