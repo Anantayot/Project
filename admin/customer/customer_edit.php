@@ -85,15 +85,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // บันทึกไฟล์รูปลง Server
             if (file_put_contents($targetFile, $image_base64)) {
                 
-                // 🗑️ ระบบลบรูปเก่าทิ้ง (เพื่อไม่ให้เปลืองพื้นที่ Server)
+                // 🗑️ ระบบลบรูปเก่าทิ้ง
                 if (!empty($c['profile_image'])) {
                     $oldFilePath = $uploadDir . $c['profile_image'];
                     if (file_exists($oldFilePath)) {
-                        unlink($oldFilePath); // ✅ สั่งลบไฟล์เก่าทิ้งทันที
+                        unlink($oldFilePath); 
                     }
                 }
                 
-                $fileNameToSave = $newFileName; // อัปเดตตัวแปรเพื่อบันทึกชื่อใหม่ลงฐานข้อมูล
+                $fileNameToSave = $newFileName; 
             } else {
                 $error = "❌ ไม่สามารถบันทึกรูปภาพได้ กรุณาตรวจสอบสิทธิ์โฟลเดอร์";
             }
@@ -155,7 +155,6 @@ ob_start();
     color: #fff;
   }
   
-  /* ✅ สไตล์รูปโปรไฟล์และปุ่มกล้องถ่ายรูป */
   .profile-preview {
     width: 75px; 
     height: 75px; 
@@ -187,9 +186,9 @@ ob_start();
     background-color: #eab308;
   }
 
-  /* แต่งกล่อง Croppie ให้เข้ากับธีม Admin */
+  /* แต่งกล่อง Croppie */
   #croppie-demo { width: 100%; height: 350px; margin-top: 10px; }
-  /* ✅ ปรับสไตล์ Modal ให้เป็นโทนสีเว็บ (Dark Tone) */
+  /* ✅ เปลี่ยนพื้นหลังให้เป็นสีน้ำเงินเข้มเหมือนตีมแอดมิน */
   .modal-content-custom { background-color: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; }
 </style>
 
@@ -271,11 +270,11 @@ ob_start();
         <h5 class="modal-title text-warning fw-bold"><i class="bi bi-crop me-2"></i>ปรับขนาดรูปโปรไฟล์ลูกค้า</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body text-center bg-black rounded-bottom p-0">
+      <div class="modal-body text-center p-0">
         <div id="croppie-demo"></div>
       </div>
-      <div class="modal-footer border-0 d-flex justify-content-between px-4 pb-4 bg-black rounded-bottom" style="border-radius: 0 0 15px 15px;">
-        <button type="button" class="btn btn-outline-light rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
+      <div class="modal-footer border-0 d-flex justify-content-between px-4 pb-4" style="border-radius: 0 0 15px 15px;">
+        <button type="button" class="btn btn-outline-secondary rounded-pill px-4 text-white" data-bs-dismiss="modal">ยกเลิก</button>
         <button type="button" class="btn btn-warning rounded-pill px-4 fw-bold text-dark" id="cropBtn"><i class="bi bi-check2-circle me-1"></i> ยืนยันการตัดรูป</button>
       </div>
     </div>
