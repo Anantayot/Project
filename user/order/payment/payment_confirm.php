@@ -79,99 +79,113 @@ function crc16($data) {
 }
 
 /* =======================================================
-    ✅ ยืนยันการชำระเงิน (ระบบป้องกันไฟล์แปลกปลอม)
-   ======================================================= */
+    ✅ ยืนยันการชำระเงิน (อัปโหลดสลิป + อัปเดตสถานะ) มีระบบความปลอดภัย
+    ======================================================= */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $uploadDir = __DIR__ . "/../../../admin/uploads/slips/";
+  $uploadDir = __DIR__ . "/../../../admin/uploads/slips/";
 
-    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-    
-    $fileName = "";
-    if (!empty($_FILES['slip']['name'])) {
-        $file = $_FILES['slip'];
-        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        
-        // 1. ✅ กันนามสกุลไฟล์แปลกๆ (Allowed Extensions)
-        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
-        if (!in_array($ext, $allowed)) {
-            echo "<script>alert('❌ อนุญาตเฉพาะไฟล์รูปภาพ (jpg, png, webp) เท่านั้น'); history.back();</script>";
-            exit;
-        }
+  if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+  if (!is_writable($uploadDir)) die("<script>alert('❌ ระบบ Server ไม่มีสิทธิ์เขียนไฟล์'); window.history.back();</script>");
 
-        // 2. ✅ ตรวจสอบ MIME Type จริง (กันการแก้ชื่อไฟล์ .php เป็น .jpg)
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
-        $allowedMime = ['image/jpeg', 'image/png', 'image/webp'];
-        if (!in_array($mime, $allowedMime)) {
-            echo "<script>alert('❌ รูปภาพไม่ถูกต้องหรือไฟล์ถูกดัดแปลง'); history.back();</script>";
-            exit;
-        }
+  $fileName = "";
+  
+  // 🔒 1. ตรวจสอบว่ามีการอัปโหลดไฟล์มาจริงๆ และไม่มี Error
+  if (isset($_FILES['slip']) && $_FILES['slip']['error'] === UPLOAD_ERR_OK) {
+      $tmpName = $_FILES['slip']['tmp_name'];
+      $fileSize = $_FILES['slip']['size'];
+      
+      // 🔒 2. ตรวจสอบขนาดไฟล์ (จำกัดไว้ที่ไม่เกิน 5MB)
+      $maxSize = 5 * 1024 * 1024; // 5 MB
+      if ($fileSize > $maxSize) {
+          echo "<script>alert('❌ ไฟล์มีขนาดใหญ่เกินไป (จำกัดไม่เกิน 5MB)'); window.history.back();</script>";
+          exit;
+      }
 
-        // 3. ✅ จำกัดขนาดไฟล์ (เช่น ไม่เกิน 5MB)
-        if ($file['size'] > 5 * 1024 * 1024) {
-            echo "<script>alert('❌ ไฟล์มีขนาดใหญ่เกินไป (จำกัดไม่เกิน 5MB)'); history.back();</script>";
-            exit;
-        }
+      // 🔒 3. ตรวจสอบประเภทไฟล์จริงๆ จากเนื้อหา (MIME Type) ป้องกันการเปลี่ยนนามสกุลไฟล์หลอกๆ
+      $finfo = finfo_open(FILEINFO_MIME_TYPE);
+      $mimeType = finfo_file($finfo, $tmpName);
+      finfo_close($finfo);
 
-        // หากผ่านทุกด่าน ให้สร้างชื่อไฟล์ใหม่ (Random) เพื่อป้องกันการทับกัน
-        $fileName = "slip_" . time() . "_" . bin2hex(random_bytes(4)) . "." . $ext;
-        $targetFile = $uploadDir . $fileName;
+      $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!in_array($mimeType, $allowedMimeTypes)) {
+          echo "<script>alert('❌ อนุญาตให้อัปโหลดเฉพาะไฟล์รูปภาพเท่านั้น (JPG, PNG, GIF, WEBP)'); window.history.back();</script>";
+          exit;
+      }
 
-        if (!move_uploaded_file($file['tmp_name'], $targetFile)) {
-            die("<p class='text-danger text-center mt-5'>❌ ไม่สามารถอัปโหลดไฟล์ได้</p>");
-        }
-    } else {
-        echo "<script>alert('❌ กรุณาเลือกไฟล์สลิป'); history.back();</script>";
-        exit;
-    }
+      // 🔒 4. ตรวจสอบนามสกุลไฟล์ (Extension Whitelist)
+      $ext = strtolower(pathinfo($_FILES['slip']['name'], PATHINFO_EXTENSION));
+      $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+      if (!in_array($ext, $allowedExtensions)) {
+          echo "<script>alert('❌ นามสกุลไฟล์ไม่ถูกต้อง'); window.history.back();</script>";
+          exit;
+      }
 
-    // --- ส่วนบันทึกฐานข้อมูลและส่ง Webhook (ใช้โค้ดเดิมของคุณได้เลย) ---
-    $stmt_check = $conn->prepare("SELECT total_price FROM orders WHERE order_id = ? AND customer_id = ?");
-    $stmt_check->execute([$order_id, $customer_id]);
-    $order_data = $stmt_check->fetch(PDO::FETCH_ASSOC);
-    $total_amount = $order_data ? $order_data['total_price'] : 0;
+      // 🔒 5. สุ่มชื่อไฟล์ใหม่ให้เดาได้ยาก ป้องกันการเกิดชื่อซ้ำและช่องโหว่ LFI
+      $fileName = "slip_" . date('YmdHis') . "_" . uniqid() . "." . $ext;
+      $targetFile = $uploadDir . $fileName;
 
-    $stmt = $conn->prepare("UPDATE orders 
-                            SET payment_status = 'รอดำเนินการ',
-                                admin_verified = 'กำลังตรวจสอบ',
-                                slip_image = :slip,
-                                payment_date = NOW()
-                            WHERE order_id = :oid AND customer_id = :cid");
-    $stmt->execute([
-        ':slip' => $fileName,
-        ':oid' => $order_id,
-        ':cid' => $customer_id
-    ]);
+      if (!move_uploaded_file($tmpName, $targetFile)) {
+          echo "<script>alert('❌ ไม่สามารถบันทึกไฟล์ลงเซิร์ฟเวอร์ได้'); window.history.back();</script>";
+          exit;
+      }
+      
+  } else {
+      // กรณีไม่แนบสลิปมา หรือเกิด Error ระหว่างอัปโหลด
+      echo "<script>alert('❌ กรุณาแนบภาพสลิปที่ถูกต้อง'); window.history.back();</script>";
+      exit;
+  }
 
-    // Webhook Section
-    $webhook_url = "http://103.40.119.91:5678/webhook/778284f3-0ba4-473f-9d10-fee5d2416f4f";
-    $payload_data = [
-        'order_id'      => $order_id,
-        'customer_id'   => $customer_id,
-        'customer_name' => $order['name'],
-        'amount'        => $total_amount,
-        'slip_image'    => $fileName,
-        'status'        => 'payment_submitted',
-        'timestamp'     => date('Y-m-d H:i:s')
-    ];
+  // ✅ ต้องดึงยอดเงินจาก DB อีกครั้ง เพื่อให้มีค่าส่งไป Webhook
+  $stmt_check = $conn->prepare("SELECT total_price FROM orders WHERE order_id = ? AND customer_id = ?");
+  $stmt_check->execute([$order_id, $customer_id]);
+  $order_data = $stmt_check->fetch(PDO::FETCH_ASSOC);
+  $total_amount = $order_data ? $order_data['total_price'] : 0;
 
-    if (function_exists('curl_init')) {
-        $ch = curl_init($webhook_url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload_data));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5); 
-        curl_exec($ch);
-        curl_close($ch);
-    }
+  // ✅ อัปเดตสถานะการชำระเงิน
+  $stmt = $conn->prepare("UPDATE orders 
+                          SET payment_status = 'รอดำเนินการ',
+                              admin_verified = 'กำลังตรวจสอบ',
+                              slip_image = :slip,
+                              payment_date = NOW()
+                          WHERE order_id = :oid AND customer_id = :cid");
+  $stmt->execute([
+      ':slip' => $fileName,
+      ':oid' => $order_id,
+      ':cid' => $customer_id
+  ]);
 
-    echo "<script>
-        alert('✅ แจ้งชำระเงินเรียบร้อยแล้ว! ระบบจะทำการตรวจสอบโดยแอดมิน');
-        window.location='../order_detail.php?id=$order_id';
-    </script>";
-    exit;
+  /* =======================================================
+      ✅ ส่งข้อมูลไปยัง Webhook หลังจากบันทึก DB สำเร็จ
+      ======================================================= */
+  $webhook_url = "http://103.40.119.91:5678/webhook/778284f3-0ba4-473f-9d10-fee5d2416f4f";
+
+  $payload_data = [
+      'order_id'      => $order_id,
+      'customer_id'   => $customer_id,
+      'customer_name' => $order['name'],
+      'amount'        => $total_amount, // ใช้ค่าที่ดึงมาใหม่
+      'slip_image'    => $fileName,
+      'status'        => 'payment_submitted',
+      'timestamp'     => date('Y-m-d H:i:s')
+  ];
+
+  // ตรวจสอบว่ามีฟังก์ชัน curl_init ไหม (กัน Error 500 กรณี Server ไม่รองรับ)
+  if (function_exists('curl_init')) {
+      $ch = curl_init($webhook_url);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload_data));
+      curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+      curl_setopt($ch, CURLOPT_TIMEOUT, 5); 
+      curl_exec($ch);
+      curl_close($ch);
+  }
+
+  echo "<script>
+      alert('✅ แจ้งชำระเงินเรียบร้อยแล้ว! ระบบจะทำการตรวจสอบโดยแอดมิน');
+      window.location='../order_detail.php?id=$order_id';
+  </script>";
+  exit;
 }
 ?>
 <!DOCTYPE html>
@@ -335,7 +349,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <i class="bi bi-image me-2 text-muted"></i>แนบหลักฐานการโอนเงิน (สลิป) <span class="text-danger">*</span>
           </label>
           <input type="file" name="slip" id="slip" class="form-control" accept="image/*" required>
-          <div class="form-text mt-2"><i class="bi bi-info-circle me-1"></i>กรุณาแนบภาพสลิปที่เห็นยอดเงินและวันที่ชัดเจน</div>
+          <div class="form-text mt-2"><i class="bi bi-info-circle me-1"></i>กรุณาแนบภาพสลิปที่เห็นยอดเงินและวันที่ชัดเจน (ขนาดไม่เกิน 5MB)</div>
         </div>
 
         <div class="d-grid gap-3 mt-5">
