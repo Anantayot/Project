@@ -139,7 +139,7 @@ ob_start();
 
   /* ✅ คลาสสำหรับให้เลื่อน Scroll ได้เมื่อรายการยาวเกินไป */
   .scrollable-box {
-    max-height: 420px;
+    height: 420px;
     overflow-y: auto;
     padding-right: 10px;
   }
