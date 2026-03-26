@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     exit;
   }
 
-  // ✅ ตรวจสอบรหัสผ่านตรงกันไหม
+  // ✅ ตรวจสอบรหัสผ่านตรงกันไหม (ฝั่งเซิร์ฟเวอร์กันเหนียวอีกรอบ)
   if ($password !== $confirm) {
     $_SESSION['toast_error'] = "❌ รหัสผ่านไม่ตรงกัน";
     header("Location: register.php");
@@ -82,7 +82,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         color: #333;
     }
 
-    /* 🔹 การจัดวางให้กล่องอยู่กึ่งกลาง */
     .register-wrapper {
         min-height: 100vh;
         display: flex;
@@ -97,7 +96,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         padding: 40px 20px;
     }
 
-    /* 🔹 การ์ดสมัครสมาชิก */
     .card-register {
         border: none;
         border-radius: 20px;
@@ -120,17 +118,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         background-color: #fcfcfc;
         border: 1px solid #e0e0e0;
     }
+    
+    /* แก้ไขไม่ให้เกิดขอบสีแดง/ฟ้าตอนคลิกช่องรหัสผ่านแล้วปุ่มตาดูแยกส่วน */
     .form-control:focus {
         border-color: #D10024;
-        box-shadow: 0 0 0 0.2rem rgba(209, 0, 36, 0.15);
+        box-shadow: none;
         background-color: #fff;
         z-index: 1;
     }
+    .input-group:focus-within {
+        box-shadow: 0 0 0 0.2rem rgba(209, 0, 36, 0.15);
+        border-radius: 10px;
+    }
+    .input-group:focus-within .form-control,
+    .input-group:focus-within .input-group-text {
+        border-color: #D10024;
+    }
+
     .input-group-text {
         border-radius: 10px 0 0 10px;
         background-color: #fff;
         border: 1px solid #e0e0e0;
         border-right: none;
+    }
+
+    /* สไตล์สำหรับปุ่มโชว์รหัสผ่าน (เพิ่มเข้ามาใหม่) */
+    .toggle-password {
+        cursor: pointer;
+        background-color: #fcfcfc;
+        border-radius: 0 10px 10px 0 !important; /* บังคับให้ขอบขวาของตาโค้งมน */
+        border-left: none; /* เอาเส้นขอบซ้ายออกจะได้เนียนกับกล่องพิมพ์ */
+        border-right: 1px solid #e0e0e0;
+    }
+    .input-group:focus-within .toggle-password {
+        background-color: #fff;
+    }
+    
+    /* เอาขอบขวาของ form-control ออกถ้ารหัสผ่านมีปุ่มตา */
+    .password-input {
+        border-radius: 0 !important;
+        border-right: none !important;
     }
 
     /* 🔹 ปุ่ม */
@@ -142,13 +169,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         padding: 12px;
         transition: 0.3s;
     }
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
         background-color: #a5001b;
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(209, 0, 36, 0.2);
     }
+    .btn-primary:disabled {
+        background-color: #e58a99;
+        cursor: not-allowed;
+    }
 
-    /* 🔹 ลิงก์ */
     a { color: #D10024; text-decoration: none; font-weight: 500; transition: 0.2s; }
     a:hover { color: #a5001b; text-decoration: underline; }
 
@@ -158,13 +188,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         font-weight: 500;
     }
 
-    /* 🔹 Checkbox Style */
     .form-check-input:checked {
         background-color: #D10024;
         border-color: #D10024;
     }
 
-    /* 🔹 Footer */
     footer {
         background-color: #fff;
         color: #6c757d;
@@ -229,15 +257,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <label class="form-label fw-semibold text-secondary">รหัสผ่าน</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-lock text-muted"></i></span>
-              <input type="password" name="password" class="form-control" placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" required>
+              <input type="password" name="password" id="passwordInput" class="form-control password-input" placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" required>
+              <span class="input-group-text toggle-password" id="togglePasswordBtn1">
+                <i class="bi bi-eye-slash text-muted" id="eyeIcon1"></i>
+              </span>
             </div>
           </div>
           <div class="col-md-6 mb-3">
             <label class="form-label fw-semibold text-secondary">ยืนยันรหัสผ่าน</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-shield-lock text-muted"></i></span>
-              <input type="password" name="confirm" class="form-control" placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" required>
+              <input type="password" name="confirm" id="confirmInput" class="form-control password-input" placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" required>
+              <span class="input-group-text toggle-password" id="togglePasswordBtn2">
+                <i class="bi bi-eye-slash text-muted" id="eyeIcon2"></i>
+              </span>
             </div>
+            <div id="passwordMatchMessage" class="mt-1 small fw-medium"></div>
           </div>
         </div>
 
@@ -267,7 +302,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
 
         <div class="d-grid mb-4">
-          <button type="submit" class="btn btn-primary fs-5">สมัครสมาชิก</button>
+          <button type="submit" id="submitBtn" class="btn btn-primary fs-5">สมัครสมาชิก</button>
         </div>
       </form>
 
@@ -294,6 +329,60 @@ document.addEventListener("DOMContentLoaded", () => {
     const toast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
     toast.show();
   });
+
+  // ระบบสลับโชว์รหัสผ่าน (ช่องแรก)
+  const toggleBtn1 = document.getElementById('togglePasswordBtn1');
+  const passwordInput = document.getElementById('passwordInput');
+  const eyeIcon1 = document.getElementById('eyeIcon1');
+
+  toggleBtn1.addEventListener('click', function () {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      eyeIcon1.classList.toggle('bi-eye');
+      eyeIcon1.classList.toggle('bi-eye-slash');
+  });
+
+  // ระบบสลับโชว์รหัสผ่าน (ช่องยืนยัน)
+  const toggleBtn2 = document.getElementById('togglePasswordBtn2');
+  const confirmInput = document.getElementById('confirmInput');
+  const eyeIcon2 = document.getElementById('eyeIcon2');
+
+  toggleBtn2.addEventListener('click', function () {
+      const type = confirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      confirmInput.setAttribute('type', type);
+      eyeIcon2.classList.toggle('bi-eye');
+      eyeIcon2.classList.toggle('bi-eye-slash');
+  });
+
+  // ระบบเช็ครหัสผ่านตรงกัน Real-time
+  const matchMessage = document.getElementById('passwordMatchMessage');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function checkPasswordMatch() {
+      const pwd = passwordInput.value;
+      const confirm = confirmInput.value;
+
+      // ถ้าช่องยืนยันยังว่างอยู่ ให้ยังไม่แสดงข้อความเตือน
+      if (confirm === '') {
+          matchMessage.innerHTML = '';
+          submitBtn.disabled = false;
+          return;
+      }
+
+      if (pwd === confirm) {
+          matchMessage.innerHTML = '<i class="bi bi-check-circle-fill"></i> รหัสผ่านตรงกัน';
+          matchMessage.className = 'mt-1 small fw-medium text-success';
+          submitBtn.disabled = false; // รหัสตรงกัน กดปุ่มสมัครได้
+      } else {
+          matchMessage.innerHTML = '<i class="bi bi-x-circle-fill"></i> รหัสผ่านไม่ตรงกัน';
+          matchMessage.className = 'mt-1 small fw-medium text-danger';
+          submitBtn.disabled = true; // รหัสไม่ตรงกัน ล็อคปุ่มสมัคร
+      }
+  }
+
+  // ให้ทำงานทุกครั้งที่มีการพิมพ์ในช่องใดช่องหนึ่ง
+  passwordInput.addEventListener('input', checkPasswordMatch);
+  confirmInput.addEventListener('input', checkPasswordMatch);
 });
 </script>
 
