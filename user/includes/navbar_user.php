@@ -24,13 +24,13 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
             <ul class="navbar-nav ms-auto align-items-lg-center py-3 py-lg-0 gap-lg-2">
                 
                 <li class="nav-item">
-                    <a href="../index.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == '../index.php' ? 'active' : '' ?>">
+                    <a href="index.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
                         <i class="bi bi-house-door me-1 nav-icon"></i> หน้าร้าน
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="../cart/cart.php" class="nav-link cart-link transition-link <?= basename($_SERVER['PHP_SELF']) == '../cart/cart.php' ? 'active' : '' ?>">
+                    <a href="cart/cart.php" class="nav-link cart-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'cart/cart.php' ? 'active' : '' ?>">
                         <div class="cart-icon-wrapper">
                             <i class="bi bi-cart3 nav-icon"></i>
                             <?php if ($cart_count > 0): ?>
@@ -43,7 +43,7 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 
                 <?php if (isset($_SESSION['customer_id'])): ?>
                     <li class="nav-item">
-                        <a href="../order/orders.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == '../order/orders.php' ? 'active' : '' ?>">
+                        <a href="order/orders.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'order/orders.php' ? 'active' : '' ?>">
                             <i class="bi bi-box-seam me-1 nav-icon"></i> คำสั่งซื้อ
                         </a>
                     </li>
@@ -53,7 +53,7 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
                             <i class="bi bi-person-circle fs-5 me-1"></i> <?= htmlspecialchars($_SESSION['customer_name']) ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 custom-dropdown" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item transition-link" href="../profile/profile.php"><i class="bi bi-person-gear me-2"></i> โปรไฟล์ส่วนตัว</a></li>
+                            <li><a class="dropdown-item transition-link" href="profile/profile.php"><i class="bi bi-person-gear me-2"></i> โปรไฟล์ส่วนตัว</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item text-danger fw-bold btn-logout" href="#" onclick="confirmLogout(event)">
@@ -65,7 +65,7 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 
                     <div class="d-lg-none mobile-user-menu mt-3 pt-3 border-top">
                         <li class="nav-item">
-                            <a href="../profile/profile.php" class="nav-link user-link transition-link <?= basename($_SERVER['PHP_SELF']) == '../profile/profile.php' ? 'active' : '' ?>">
+                            <a href="profile/profile.php" class="nav-link user-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'profile/profile.php' ? 'active' : '' ?>">
                                 <i class="bi bi-person-circle me-1"></i> <?= htmlspecialchars($_SESSION['customer_name']) ?>
                             </a>
                         </li>
@@ -78,12 +78,12 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 
                 <?php else: ?>
                     <li class="nav-item ms-lg-2">
-                        <a href="../login.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == '../login.php' ? 'active' : '' ?>">
+                        <a href="login.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'login.php' ? 'active' : '' ?>">
                             เข้าสู่ระบบ
                         </a>
                     </li>
                     <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
-                        <a href="../register.php" class="btn btn-register transition-link w-100">
+                        <a href="register.php" class="btn btn-register transition-link w-100">
                             สมัครสมาชิก
                         </a>
                     </li>
