@@ -64,12 +64,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     
     <style>
         body {
-            background-color: #f8f9fa; /* เปลี่ยนพื้นหลังเป็นสีเทาอ่อนให้กล่องล็อกอินเด่นขึ้น */
+            background-color: #f8f9fa;
             font-family: "Prompt", sans-serif;
             color: #333;
         }
 
-        /* 🔹 การจัดวางให้กล่องอยู่กึ่งกลางหน้าจอเสมอ */
         .login-wrapper {
             min-height: 100vh;
             display: flex;
@@ -84,7 +83,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             padding: 20px;
         }
 
-        /* 🔹 การ์ดล็อกอิน */
         .card-login {
             border: none;
             border-radius: 20px;
@@ -100,24 +98,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             margin-bottom: 15px;
         }
 
-        /* 🔹 Input Field */
         .form-control {
             border-radius: 10px;
             padding: 12px 15px;
             background-color: #fcfcfc;
             border: 1px solid #e0e0e0;
         }
+        
+        /* แก้ไขไม่ให้เกิดขอบสีแดง/ฟ้าตอนคลิกช่องรหัสผ่านแล้วปุ่มตาดูแยกส่วน */
         .form-control:focus {
             border-color: #D10024;
-            box-shadow: 0 0 0 0.2rem rgba(209, 0, 36, 0.15);
+            box-shadow: none; /* ปิด box-shadow เดิม */
             background-color: #fff;
         }
+        .input-group:focus-within {
+            box-shadow: 0 0 0 0.2rem rgba(209, 0, 36, 0.15);
+            border-radius: 10px;
+        }
+        .input-group:focus-within .form-control,
+        .input-group:focus-within .input-group-text {
+            border-color: #D10024;
+        }
 
-        /* 🔹 ปุ่มเข้าสู่ระบบ */
         .btn-primary {
             background-color: #D10024;
             border: none;
-            border-radius: 50px; /* ทำให้ปุ่มมนๆ เข้ากับหน้าเว็บ */
+            border-radius: 50px;
             font-weight: 600;
             padding: 12px;
             transition: 0.3s;
@@ -128,7 +134,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             box-shadow: 0 5px 15px rgba(209, 0, 36, 0.2);
         }
 
-        /* 🔹 ลิงก์ */
         a { color: #D10024; text-decoration: none; font-weight: 500; transition: 0.2s; }
         a:hover { color: #a5001b; text-decoration: underline; }
 
@@ -138,13 +143,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             font-weight: 500;
         }
 
-        /* 🔹 Footer */
         footer {
             background-color: #fff;
             color: #6c757d;
             padding: 20px;
             font-size: 0.9rem;
             border-top: 1px solid #eee;
+        }
+        
+        /* สไตล์สำหรับปุ่มโชว์รหัสผ่าน */
+        .toggle-password {
+            cursor: pointer;
+            background-color: #fcfcfc;
+        }
+        .input-group:focus-within .toggle-password {
+            background-color: #fff;
         }
     </style>
 </head>
@@ -187,10 +200,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <form method="post">
                 <div class="mb-3">
-                    <label class="form-label fw-semibold text-secondary">อีเมล</label>
+                    <label class="form-label fw-semibold text-secondary">อีเมล หรือ ชื่อผู้ใช้</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-person text-muted"></i></span>
-                        <input type="text" name="email" class="form-control border-start-0 ps-0" placeholder="mycommiss@email.com" required>
+                        <input type="text" name="email" class="form-control border-start-0 ps-0" placeholder="mycommiss@email.com หรือ admin" required>
                     </div>
                 </div>
 
@@ -198,7 +211,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <label class="form-label fw-semibold text-secondary">รหัสผ่าน</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                        <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="••••••••" minlength="4" required>
+                        <input type="password" name="password" id="loginPassword" class="form-control border-start-0 border-end-0 ps-0" placeholder="••••••••" minlength="4" required>
+                        <span class="input-group-text toggle-password border-start-0" id="togglePasswordBtn">
+                            <i class="bi bi-eye-slash text-muted" id="eyeIcon"></i>
+                        </span>
                     </div>
                 </div>
 
@@ -229,6 +245,21 @@ document.addEventListener("DOMContentLoaded", () => {
     toastElList.forEach(toastEl => {
         const toast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
         toast.show();
+    });
+
+    // ระบบสลับโชว์รหัสผ่าน
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    const passwordInput = document.getElementById('loginPassword');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    togglePasswordBtn.addEventListener('click', function () {
+        // เช็ค type ปัจจุบัน แล้วสลับโหมด
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // สลับไอคอนดวงตา
+        eyeIcon.classList.toggle('bi-eye');
+        eyeIcon.classList.toggle('bi-eye-slash');
     });
 });
 </script>
