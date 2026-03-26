@@ -85,15 +85,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // บันทึกไฟล์รูปลง Server
             if (file_put_contents($targetFile, $image_base64)) {
                 
-                // 🗑️ ระบบลบรูปเก่าทิ้ง (เพื่อไม่ให้เปลืองพื้นที่ Server)
+                // 🗑️ ระบบลบรูปเก่าทิ้ง
                 if (!empty($c['profile_image'])) {
                     $oldFilePath = $uploadDir . $c['profile_image'];
                     if (file_exists($oldFilePath)) {
-                        unlink($oldFilePath); // ✅ สั่งลบไฟล์เก่าทิ้งทันที
+                        @unlink($oldFilePath); 
                     }
                 }
                 
-                $fileNameToSave = $newFileName; // อัปเดตตัวแปรเพื่อบันทึกชื่อใหม่ลงฐานข้อมูล
+                $fileNameToSave = $newFileName; 
             } else {
                 $error = "❌ ไม่สามารถบันทึกรูปภาพได้ กรุณาตรวจสอบสิทธิ์โฟลเดอร์";
             }
@@ -127,7 +127,7 @@ if (!empty($c['profile_image']) && file_exists($_SERVER['DOCUMENT_ROOT'] . "/Pro
 ob_start();
 ?>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 
 <style>
   .custom-card {
@@ -187,9 +187,21 @@ ob_start();
     background-color: #eab308;
   }
 
-  /* แต่งกล่อง Croppie ให้เข้ากับธีม Admin */
-  #croppie-demo { width: 100%; height: 350px; margin-top: 10px; }
   .modal-content-custom { background-color: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; }
+
+  /* ✅ แต่งกรอบตัดรูป (Cropper) ให้รองรับมือถือ */
+  .img-container { 
+    max-height: 45vh; /* ไม่ให้กล่องยาวทะลุจอ */
+    width: 100%; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    background-color: #000; 
+    touch-action: none; 
+    overflow: hidden;
+  }
+  #imageToCrop { max-width: 100%; max-height: 100%; display: block; }
+  .cropper-view-box, .cropper-face { border-radius: 50%; }
 </style>
 
 <div class="row justify-content-center">
@@ -202,7 +214,7 @@ ob_start();
         
         <div class="card-header border-bottom border-secondary p-4 d-flex justify-content-between align-items-center" style="border-color: rgba(255,255,255,0.05) !important;">
           <h4 class="fw-bold text-white mb-0">
-            <i class="bi bi-pencil-square text-warning me-2"></i> แก้ไขข้อมูลลูกค้า <span class="text-warning">#<?= htmlspecialchars($id) ?></span>
+            <i class="bi bi-pencil-square text-warning me-2"></i> แก้ไขลูกค้า <span class="text-warning">#<?= htmlspecialchars($id) ?></span>
           </h4>
           
           <div class="position-relative d-inline-block">
@@ -264,32 +276,38 @@ ob_start();
 </div>
 
 <div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog" style="margin-top: 10vh;">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down">
     <div class="modal-content modal-content-custom shadow-lg">
       <div class="modal-header border-bottom border-secondary">
-        <h5 class="modal-title text-warning fw-bold"><i class="bi bi-crop me-2"></i>ปรับขนาดรูปโปรไฟล์ลูกค้า</h5>
+        <h5 class="modal-title text-warning fw-bold"><i class="bi bi-crop me-2"></i>ใช้นิ้วเลื่อนและซูมรูปภาพ</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body text-center bg-black rounded-bottom p-0">
-        <div id="croppie-demo"></div>
+      <div class="modal-body p-0 d-flex justify-content-center align-items-center bg-black">
+        <div class="img-container w-100">
+          <img id="imageToCrop" src="" alt="Picture">
+        </div>
       </div>
       <div class="modal-footer border-0 d-flex justify-content-between px-4 pb-4 bg-black rounded-bottom">
         <button type="button" class="btn btn-outline-light rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
-        <button type="button" class="btn btn-warning rounded-pill px-4 fw-bold" id="cropBtn"><i class="bi bi-check2-circle me-1"></i> ยืนยันการตัดรูป</button>
+        <button type="button" class="btn btn-warning rounded-pill px-4 fw-bold" id="cropBtn"><i class="bi bi-check2-circle me-1"></i> ยืนยันรูปนี้</button>
       </div>
     </div>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // 🌟 ระบบตัดรูป (Croppie)
-    let croppieInstance = null;
+    // 🌟 ระบบตัดรูป (Cropper.js)
+    let cropper = null;
     const cropModalElement = document.getElementById('cropModal');
+    // ต้องแน่ใจว่าโหลด bootstrap bundle แล้ว
     const cropModal = new bootstrap.Modal(cropModalElement); 
     const imageInput = document.getElementById('profile_image');
+    const imageToCrop = document.getElementById('imageToCrop');
+    const previewImg = document.getElementById('previewImg');
+    const hiddenCroppedInput = document.getElementById('cropped_image');
 
     imageInput.addEventListener('change', function (e) {
       const file = e.target.files[0];
@@ -302,59 +320,60 @@ ob_start();
 
         const reader = new FileReader();
         reader.onload = function (event) {
+          imageToCrop.src = event.target.result;
           cropModal.show(); 
-
-          cropModalElement.addEventListener('shown.bs.modal', function initCroppie() {
-            if (croppieInstance) { croppieInstance.destroy(); }
-
-            croppieInstance = new Croppie(document.getElementById('croppie-demo'), {
-              viewport: { width: 220, height: 220, type: 'circle' }, 
-              boundary: { width: '100%', height: 300 }, 
-              showZoomer: true, 
-            });
-
-            croppieInstance.bind({
-              url: event.target.result
-            });
-            
-            cropModalElement.removeEventListener('shown.bs.modal', initCroppie);
-          });
         };
         reader.readAsDataURL(file);
       }
     });
 
+    cropModalElement.addEventListener('shown.bs.modal', function () {
+      cropper = new Cropper(imageToCrop, {
+        aspectRatio: 1 / 1, 
+        viewMode: 3, 
+        dragMode: 'move', 
+        autoCropArea: 0.7, // ลดขนาดกรอบให้เห็นหน้าชัดๆ
+        restore: false,
+        guides: false, 
+        center: true, 
+        highlight: false,
+        cropBoxMovable: false, 
+        cropBoxResizable: false, 
+        toggleDragModeOnDblclick: false,
+      });
+    });
+
     cropModalElement.addEventListener('hidden.bs.modal', function () {
-      if (croppieInstance) {
-        croppieInstance.destroy();
-        croppieInstance = null;
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
       }
       imageInput.value = ''; 
     });
 
     document.getElementById('cropBtn').addEventListener('click', function () {
-      if (!croppieInstance) return;
+      if (!cropper) return;
 
-      croppieInstance.result({
-        type: 'base64',
-        format: 'jpeg', 
-        size: { width: 400, height: 400 },
-        quality: 0.9 
-      }).then(function (base64) {
-        
-        document.getElementById('previewImg').src = base64;
-        document.getElementById('cropped_image').value = base64;
-
-        // แจ้งแอดมินว่าให้กดบันทึก
-        const btnSubmit = document.getElementById('mainSubmitBtn');
-        btnSubmit.innerHTML = "<i class='bi bi-floppy me-2'></i>บันทึกการแก้ไขและรูปภาพ!";
-        btnSubmit.classList.add('btn-success');
-        btnSubmit.classList.remove('btn-warning');
-        btnSubmit.classList.remove('text-dark');
-        btnSubmit.classList.add('text-white');
-
-        cropModal.hide();
+      const canvas = cropper.getCroppedCanvas({
+        width: 400,
+        height: 400,
+        imageSmoothingQuality: 'high'
       });
+
+      const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+      
+      previewImg.src = base64Image;
+      hiddenCroppedInput.value = base64Image;
+
+      // แจ้งแอดมินว่าให้กดบันทึก
+      const btnSubmit = document.getElementById('mainSubmitBtn');
+      btnSubmit.innerHTML = "<i class='bi bi-floppy me-2'></i>บันทึกการแก้ไขและรูปลูกค้า!";
+      btnSubmit.classList.add('btn-success');
+      btnSubmit.classList.remove('btn-warning');
+      btnSubmit.classList.remove('text-dark');
+      btnSubmit.classList.add('text-white');
+
+      cropModal.hide();
     });
   });
 </script>
