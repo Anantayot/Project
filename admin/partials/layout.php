@@ -406,7 +406,7 @@
 
     <div class="topbar">
       <h4 class="topbar-title"><?= $pageTitle ?? 'จัดการลูกค้า' ?></h4>
-      <a href="#" class="btn-storefront"><i class="bi bi-shop"></i> ดูหน้าร้าน</a>
+      <a href="http://103.40.119.91/Project/user/index.php" class="btn-storefront"><i class="bi bi-shop"></i> ดูหน้าร้าน</a>
     </div>
 
     <div class="mobile-navbar">
