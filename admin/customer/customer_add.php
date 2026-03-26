@@ -173,6 +173,7 @@ $profileImg = "https://ui-avatars.com/api/?name=New&background=22c55e&color=fff&
 
   /* แต่งกล่อง Croppie */
   #croppie-demo { width: 100%; height: 350px; margin-top: 10px; }
+  /* ✅ กำหนดสี Modal ให้เป็นสีเดียวกับ Card (#1e293b) */
   .modal-content-custom { background-color: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; }
 </style>
 
@@ -256,10 +257,10 @@ $profileImg = "https://ui-avatars.com/api/?name=New&background=22c55e&color=fff&
         <h5 class="modal-title text-success fw-bold"><i class="bi bi-crop me-2"></i>ปรับขนาดรูปลูกค้า</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body text-center bg-black p-0">
+      <div class="modal-body text-center p-0">
         <div id="croppie-demo"></div>
       </div>
-      <div class="modal-footer border-0 d-flex justify-content-between px-4 pb-4 bg-black" style="border-radius: 0 0 15px 15px;">
+      <div class="modal-footer border-0 d-flex justify-content-between px-4 pb-4" style="border-radius: 0 0 15px 15px;">
         <button type="button" class="btn btn-outline-secondary rounded-pill px-4 text-white" data-bs-dismiss="modal">ยกเลิก</button>
         <button type="button" class="btn btn-success rounded-pill px-4 fw-bold text-white" id="cropBtn"><i class="bi bi-check2-circle me-1"></i> ยืนยันการตัดรูป</button>
       </div>
