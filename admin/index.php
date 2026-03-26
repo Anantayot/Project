@@ -103,32 +103,31 @@ ob_start();
   .list-group-item-dark:hover { background: rgba(255,255,255,0.02); border-radius: 8px; padding-left: 10px; padding-right: 10px; }
   .product-img-sm { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
 
-  /* ✅ Activity Timeline แก้ไขใหม่ทั้งหมด ✅ */
+  /* Activity Timeline */
   .timeline { 
     border-left: 2px solid rgba(255, 255, 255, 0.1); 
-    margin: 0 0 0 15px; /* ดันกรอบไทม์ไลน์เข้ามาขวา ไม่ให้ทะลุการ์ด */
+    margin: 0 0 0 15px; 
     padding: 0; 
     list-style: none; 
   }
   .timeline-item { 
     position: relative; 
-    padding-left: 30px; /* ดันข้อความให้ห่างจากเส้น */
+    padding-left: 30px; 
     margin-bottom: 25px; 
   }
   .timeline-item:last-child { margin-bottom: 0; }
   .timeline-icon { 
     position: absolute; 
-    left: -15px; /* กะระยะให้ไอคอนทับเส้นพอดี (ครึ่งนึงของ width 28px) */
+    left: -15px; 
     top: 0; 
     width: 28px; 
     height: 28px; 
     border-radius: 50%; 
     display: flex; align-items: center; justify-content: center; 
     font-size: 0.8rem; color: #fff; 
-    box-shadow: 0 0 0 5px #1e293b; /* สร้างขอบสีเดียวกับพื้นหลัง ให้ดูลอยออกมา */
+    box-shadow: 0 0 0 5px #1e293b; 
   }
 
-  /* 📱 ปรับแต่งสำหรับมือถือโดยเฉพาะ */
   @media (max-width: 767px) {
     .welcome-banner h4 { font-size: 1.2rem; }
     .chart-container { min-height: 250px; }
@@ -197,7 +196,6 @@ ob_start();
     <div class="card custom-card shadow-lg h-100">
       <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-bell-fill text-primary me-2"></i> กิจกรรมล่าสุด</h6></div>
       <div class="card-body p-4">
-        
         <ul class="timeline">
           <?php foreach($recent_orders_timeline as $ro): ?>
           <li class="timeline-item">
@@ -218,7 +216,6 @@ ob_start();
           </li>
           <?php endif; ?>
         </ul>
-
       </div>
     </div>
   </div>
@@ -236,7 +233,8 @@ ob_start();
           <?php else: ?>
             <?php foreach($low_stock as $ls): ?>
               <div class="list-group-item list-group-item-dark">
-                <img src="product/uploads/<?= htmlspecialchars($ls['p_image'] ?? 'noimg.png') ?>" class="product-img-sm" alt="product">
+                <img src="/Project/admin/uploads/<?= htmlspecialchars($ls['p_image'] ?? 'noimg.png') ?>" class="product-img-sm border-secondary" alt="product">
+                
                 <div class="flex-grow-1 ms-3 overflow-hidden">
                   <h6 class="mb-1 text-truncate text-white" style="font-size: 0.9rem;"><?= htmlspecialchars($ls['p_name']) ?></h6>
                   <small class="text-white-50">รหัสสินค้า: #<?= htmlspecialchars($ls['p_id']) ?></small>
@@ -260,7 +258,7 @@ ob_start();
     Chart.defaults.color = '#94a3b8';
     Chart.defaults.font.family = "'Prompt', sans-serif";
 
-    // 1. กราฟเส้นยอดขาย
+    // กราฟเส้น
     new Chart(document.getElementById('salesChart').getContext('2d'), {
       type: 'line',
       data: {
@@ -274,7 +272,7 @@ ob_start();
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true } } }
     });
 
-    // 2. กราฟโดนัท
+    // กราฟโดนัท
     new Chart(document.getElementById('orderStatusChart').getContext('2d'), {
       type: 'doughnut',
       data: {
