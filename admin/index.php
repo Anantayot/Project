@@ -89,111 +89,168 @@ ob_start();
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-  /* แอนิเมชันตอนโหลดหน้า */
-  .fade-up { animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(15px); }
+  /* 🌟 แอนิเมชันตอนโหลดหน้า */
+  .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
   .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; } .delay-3 { animation-delay: 0.3s; } .delay-4 { animation-delay: 0.4s; }
   @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
-  /* กล่องการ์ดทั่วไป */
-  .custom-card { background: var(--bg-card, #1e293b); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
-  .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important; border-color: rgba(255, 255, 255, 0.15); }
+  /* 📦 กล่องการ์ดทั่วไป (Modern Glassmorphism Style) */
+  .custom-card { 
+    background: linear-gradient(145deg, #1e293b, #151e2b); 
+    border-radius: 16px; 
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+  }
+  .stat-card:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); 
+    border-color: rgba(255, 255, 255, 0.2); 
+  }
   
-  .icon-box { width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 14px; font-size: 1.5rem; color: #fff; box-shadow: 0 5px 12px rgba(0,0,0,0.2); }
-  .bg-gradient-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
-  .bg-gradient-info { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
-  .bg-gradient-warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-  .bg-gradient-primary { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+  /* 🔮 ไอคอนสถิติแบบมีแสงเรืองรอง */
+  .icon-box { 
+    width: 60px; height: 60px; 
+    display: flex; align-items: center; justify-content: center; 
+    border-radius: 16px; font-size: 1.6rem; color: #fff; 
+    transition: all 0.3s ease;
+  }
+  .stat-card:hover .icon-box { transform: scale(1.1); }
+  
+  .bg-gradient-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3); }
+  .bg-gradient-info { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3); }
+  .bg-gradient-warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3); }
+  .bg-gradient-primary { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
 
-  .welcome-banner { background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%); border-left: 5px solid var(--primary, #22c55e); }
+  /* 🌌 ป้าย Welcome Banner */
+  .welcome-banner { 
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(30, 41, 59, 0.9) 100%); 
+    border-left: 6px solid #22c55e; 
+    position: relative;
+    overflow: hidden;
+  }
+  .welcome-banner::after {
+    content: ''; position: absolute; top: -50%; right: -20%; width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
   
-  /* รายการสินค้าใกล้หมด */
-  .list-group-item-dark { background: transparent; border: none; border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 15px 0; color: #f8fafc; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
+  /* 🛒 รายการสินค้าใกล้หมด */
+  .list-group-item-dark { 
+    background: transparent; border: none; 
+    border-bottom: 1px dashed rgba(255,255,255,0.08); 
+    padding: 16px 12px; color: #f8fafc; display: flex; align-items: center; gap: 15px; 
+    transition: all 0.3s ease; 
+  }
   .list-group-item-dark:last-child { border-bottom: none; }
-  .list-group-item-dark:hover { background: rgba(255,255,255,0.02); border-radius: 8px; padding-left: 10px; padding-right: 10px; }
-  .product-img-sm { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+  .list-group-item-dark:hover { 
+    background: rgba(255,255,255,0.03); 
+    border-radius: 12px; 
+    transform: translateX(8px); /* โฮเวอร์แล้วเลื่อนขวานิดนึง */
+  }
+  .product-img-sm { 
+    width: 50px; height: 50px; object-fit: cover; 
+    border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
 
-  /* ✅ Activity Timeline */
+  /* ⏳ Activity Timeline */
   .timeline { 
-    border-left: 2px solid rgba(255, 255, 255, 0.1); 
-    margin: 0 0 0 15px; 
+    border-left: 2px dashed rgba(255, 255, 255, 0.15); /* เปลี่ยนเส้นเป็น dashed ดูทันสมัย */
+    margin: 0 0 0 20px; 
     padding: 0; 
     list-style: none; 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* กระจายเนื้อหาให้เต็มกรอบ */
-    min-height: 100%; /* บังคับความสูงเต็ม */
+    display: flex; flex-direction: column; justify-content: space-between; 
+    min-height: 100%; 
   }
   .timeline-item { 
     position: relative; 
-    padding-left: 30px; 
+    padding-left: 35px; 
+    transition: transform 0.3s ease;
   }
-  .timeline-item:last-child { margin-bottom: 0; }
+  .timeline-item:hover { transform: translateX(5px); }
   .timeline-icon { 
     position: absolute; 
-    left: -15px; 
+    left: -17px; 
     top: 0; 
-    width: 28px; 
-    height: 28px; 
+    width: 32px; 
+    height: 32px; 
     border-radius: 50%; 
     display: flex; align-items: center; justify-content: center; 
-    font-size: 0.8rem; color: #fff; 
-    box-shadow: 0 0 0 5px #1e293b; 
+    font-size: 0.9rem; color: #fff; 
+    box-shadow: 0 0 0 6px #1e293b, 0 4px 10px rgba(0,0,0,0.3); 
+    z-index: 1;
   }
 
-  /* ✅ บังคับความสูงให้เท่ากันเป๊ะ 100% ไม่ยืดไม่หด */
-  .scrollable-box {
-    height: 400px; 
-    overflow-y: auto;
-    padding-right: 10px;
-  }
-  /* ตกแต่ง Scrollbar ให้ดูหรูหรา */
-  .scrollable-box::-webkit-scrollbar { width: 5px; }
-  .scrollable-box::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+  /* 📜 Custom Scrollbar แบบมินิมอล */
+  .scrollable-box { height: 400px; overflow-y: auto; padding-right: 12px; }
+  .scrollable-box::-webkit-scrollbar { width: 6px; }
+  .scrollable-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
   .scrollable-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
   .scrollable-box::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
 
+  /* แต่งหัวตาราง (Card Header) */
+  .card-header { background: transparent !important; }
+
   @media (max-width: 767px) {
-    .welcome-banner h4 { font-size: 1.2rem; }
+    .welcome-banner h4 { font-size: 1.25rem; }
     .chart-container { min-height: 250px; }
+    .icon-box { width: 45px; height: 45px; font-size: 1.2rem; }
   }
 </style>
 
-<div class="card custom-card welcome-banner shadow-sm fade-up mb-4">
-  <div class="card-body p-3 p-md-4">
-    <h4 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">ยินดีต้อนรับสู่ MyCommiss Admin Panel <i class="bi bi-stars text-warning fs-5"></i></h4>
-    <p class="text-light mb-0 fs-6 d-none d-md-block" style="max-width: 650px;">ตรวจสอบยอดขาย ดูแลคำสั่งซื้อ และจัดการคลังสินค้าของคุณได้จากหน้าแดชบอร์ดนี้ครับ</p>
+<div class="card custom-card welcome-banner fade-up mb-4">
+  <div class="card-body p-4">
+    <h4 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">
+      ยินดีต้อนรับสู่ MyCommiss Admin Panel <i class="bi bi-stars text-warning fs-4 animate__animated animate__pulse animate__infinite"></i>
+    </h4>
+    <p class="text-light opacity-75 mb-0 fs-6 d-none d-md-block" style="max-width: 650px;">
+      ตรวจสอบยอดขาย ดูแลคำสั่งซื้อ และจัดการคลังสินค้าของคุณได้จากหน้าแดชบอร์ดนี้แบบเรียลไทม์
+    </p>
   </div>
 </div>
 
-<div class="row g-3 mb-4"> 
+<div class="row g-4 mb-4"> 
   <div class="col-6 col-xl-3 fade-up delay-1">
-    <div class="card custom-card stat-card shadow-sm h-100">
-      <div class="card-body p-3 d-flex align-items-center justify-content-between"> 
-        <div><h6 class="text-light mb-1 fw-normal" style="font-size:0.85rem;">ยอดขายรวม</h6><h4 class="fw-bold text-white mb-0">฿<?= number_format($total_income) ?></h4></div>
+    <div class="card custom-card stat-card h-100">
+      <div class="card-body p-4 d-flex align-items-center justify-content-between"> 
+        <div>
+          <h6 class="text-white-50 mb-1 fw-medium" style="font-size:0.85rem; letter-spacing: 0.5px;">ยอดขายรวม</h6>
+          <h3 class="fw-bold text-white mb-0">฿<?= number_format($total_income) ?></h3>
+        </div>
         <div class="icon-box bg-gradient-success d-none d-sm-flex"><i class="bi bi-wallet2"></i></div>
       </div>
     </div>
   </div>
   <div class="col-6 col-xl-3 fade-up delay-2">
-    <div class="card custom-card stat-card shadow-sm h-100">
-      <div class="card-body p-3 d-flex align-items-center justify-content-between">
-        <div><h6 class="text-light mb-1 fw-normal" style="font-size:0.85rem;">คำสั่งซื้อทั้งหมด</h6><h4 class="fw-bold text-white mb-0"><?= number_format($total_orders) ?></h4></div>
+    <div class="card custom-card stat-card h-100">
+      <div class="card-body p-4 d-flex align-items-center justify-content-between">
+        <div>
+          <h6 class="text-white-50 mb-1 fw-medium" style="font-size:0.85rem; letter-spacing: 0.5px;">คำสั่งซื้อทั้งหมด</h6>
+          <h3 class="fw-bold text-white mb-0"><?= number_format($total_orders) ?></h3>
+        </div>
         <div class="icon-box bg-gradient-info d-none d-sm-flex"><i class="bi bi-cart-check"></i></div>
       </div>
     </div>
   </div>
   <div class="col-6 col-xl-3 fade-up delay-3">
-    <div class="card custom-card stat-card shadow-sm h-100">
-      <div class="card-body p-3 d-flex align-items-center justify-content-between">
-        <div><h6 class="text-light mb-1 fw-normal" style="font-size:0.85rem;">สินค้าในระบบ</h6><h4 class="fw-bold text-white mb-0"><?= number_format($total_products) ?></h4></div>
+    <div class="card custom-card stat-card h-100">
+      <div class="card-body p-4 d-flex align-items-center justify-content-between">
+        <div>
+          <h6 class="text-white-50 mb-1 fw-medium" style="font-size:0.85rem; letter-spacing: 0.5px;">สินค้าในระบบ</h6>
+          <h3 class="fw-bold text-white mb-0"><?= number_format($total_products) ?></h3>
+        </div>
         <div class="icon-box bg-gradient-warning d-none d-sm-flex"><i class="bi bi-box-seam"></i></div>
       </div>
     </div>
   </div>
   <div class="col-6 col-xl-3 fade-up delay-4">
-    <div class="card custom-card stat-card shadow-sm h-100">
-      <div class="card-body p-3 d-flex align-items-center justify-content-between">
-        <div><h6 class="text-light mb-1 fw-normal" style="font-size:0.85rem;">สมาชิกลูกค้า</h6><h4 class="fw-bold text-white mb-0"><?= number_format($total_customers) ?></h4></div>
+    <div class="card custom-card stat-card h-100">
+      <div class="card-body p-4 d-flex align-items-center justify-content-between">
+        <div>
+          <h6 class="text-white-50 mb-1 fw-medium" style="font-size:0.85rem; letter-spacing: 0.5px;">สมาชิกลูกค้า</h6>
+          <h3 class="fw-bold text-white mb-0"><?= number_format($total_customers) ?></h3>
+        </div>
         <div class="icon-box bg-gradient-primary d-none d-sm-flex"><i class="bi bi-people"></i></div>
       </div>
     </div>
@@ -202,15 +259,27 @@ ob_start();
 
 <div class="row g-4 mb-4">
   <div class="col-12 col-xl-8 fade-up delay-1">
-    <div class="card custom-card shadow-lg h-100">
-      <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-graph-up-arrow text-success me-2"></i> สถิติยอดขาย 7 วันล่าสุด</h6></div>
-      <div class="card-body p-3 chart-container" style="position: relative; height: 320px;"><canvas id="salesChart"></canvas></div>
+    <div class="card custom-card h-100">
+      <div class="card-header border-bottom border-light border-opacity-10 p-4">
+        <h6 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+          <i class="bi bi-graph-up-arrow text-success fs-5"></i> สถิติยอดขาย 7 วันล่าสุด
+        </h6>
+      </div>
+      <div class="card-body p-4 chart-container" style="position: relative; height: 320px;">
+        <canvas id="salesChart"></canvas>
+      </div>
     </div>
   </div>
   <div class="col-12 col-xl-4 fade-up delay-2">
-    <div class="card custom-card shadow-lg h-100">
-      <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-pie-chart text-info me-2"></i> สัดส่วนสถานะออเดอร์</h6></div>
-      <div class="card-body p-3 d-flex justify-content-center align-items-center chart-container" style="position: relative; height: 320px;"><canvas id="orderStatusChart"></canvas></div>
+    <div class="card custom-card h-100">
+      <div class="card-header border-bottom border-light border-opacity-10 p-4">
+        <h6 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+          <i class="bi bi-pie-chart text-info fs-5"></i> สัดส่วนสถานะออเดอร์
+        </h6>
+      </div>
+      <div class="card-body p-4 d-flex justify-content-center align-items-center chart-container" style="position: relative; height: 320px;">
+        <canvas id="orderStatusChart"></canvas>
+      </div>
     </div>
   </div>
 </div>
@@ -218,29 +287,38 @@ ob_start();
 <div class="row g-4 mb-4 d-flex align-items-stretch">
   
   <div class="col-12 col-xl-6 fade-up delay-3 d-flex">
-    <div class="card custom-card shadow-lg w-100 d-flex flex-column h-100">
-      <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-bell-fill text-primary me-2"></i> กิจกรรมล่าสุด</h6></div>
+    <div class="card custom-card w-100 d-flex flex-column h-100">
+      <div class="card-header border-bottom border-light border-opacity-10 p-4">
+        <h6 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+          <i class="bi bi-bell-fill text-primary fs-5"></i> กิจกรรมล่าสุด
+        </h6>
+      </div>
       <div class="card-body p-4 flex-grow-1 scrollable-box">
         <ul class="timeline">
           
           <?php foreach($recent_orders_timeline as $ro): ?>
           <li class="timeline-item">
-            <div class="timeline-icon bg-success"><i class="bi bi-cart"></i></div>
-            <h6 class="text-white mb-1" style="font-size: 0.95rem;">ออเดอร์ใหม่ #<?= $ro['order_id'] ?></h6>
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-              <span class="text-light" style="font-size: 0.85rem;"><?= htmlspecialchars($ro['customer_name'] ?? 'ไม่ระบุ') ?> - <span class="text-info fw-bold">฿<?= number_format($ro['total_price']) ?></span></span>
-              <small class="text-light" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("d/m/y H:i", strtotime($ro['order_date'])) ?></small>
+            <div class="timeline-icon bg-success shadow-sm"><i class="bi bi-cart-plus"></i></div>
+            <h6 class="text-white mb-2 fw-semibold" style="font-size: 1rem;">ออเดอร์ใหม่ #<?= $ro['order_id'] ?></h6>
+            <div class="d-flex justify-content-between align-items-center flex-wrap bg-dark bg-opacity-25 p-2 rounded-3 border border-light border-opacity-10">
+              <span class="text-light" style="font-size: 0.85rem;">
+                <i class="bi bi-person-circle me-1 text-white-50"></i> <?= htmlspecialchars($ro['customer_name'] ?? 'ไม่ระบุ') ?> 
+                <span class="ms-2 badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">฿<?= number_format($ro['total_price']) ?></span>
+              </span>
+              <small class="text-white-50" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("d/m/y H:i", strtotime($ro['order_date'])) ?></small>
             </div>
           </li>
           <?php endforeach; ?>
           
           <?php foreach($recent_customers as $rc): ?>
           <li class="timeline-item">
-            <div class="timeline-icon bg-info"><i class="bi bi-person"></i></div>
-            <h6 class="text-white mb-1" style="font-size: 0.95rem;">สมาชิกลูกค้าใหม่</h6>
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-              <span class="text-light d-block" style="font-size: 0.85rem;">คุณ <?= htmlspecialchars($rc['name']) ?> ได้สมัครสมาชิก</span>
-              <small class="text-light" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("d/m/y", strtotime($rc['created_at'])) ?></small>
+            <div class="timeline-icon bg-info shadow-sm"><i class="bi bi-person-check"></i></div>
+            <h6 class="text-white mb-2 fw-semibold" style="font-size: 1rem;">สมาชิกลูกค้าใหม่</h6>
+            <div class="d-flex justify-content-between align-items-center flex-wrap bg-dark bg-opacity-25 p-2 rounded-3 border border-light border-opacity-10">
+              <span class="text-light d-block" style="font-size: 0.85rem;">
+                <i class="bi bi-stars me-1 text-warning"></i> คุณ <?= htmlspecialchars($rc['name']) ?> ได้สมัครสมาชิก
+              </span>
+              <small class="text-white-50" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("d/m/y", strtotime($rc['created_at'])) ?></small>
             </div>
           </li>
           <?php endforeach; ?>
@@ -251,27 +329,37 @@ ob_start();
   </div>
 
   <div class="col-12 col-xl-6 fade-up delay-4 d-flex">
-    <div class="card custom-card shadow-lg w-100 d-flex flex-column h-100">
-      <div class="card-header border-bottom border-secondary p-3 d-flex justify-content-between align-items-center">
-        <h6 class="fw-bold text-white mb-0"><i class="bi bi-exclamation-triangle text-warning me-2"></i> สินค้าใกล้หมด</h6>
-        <a href="product/products.php" class="btn btn-sm btn-outline-light rounded-pill" style="font-size:0.75rem;">จัดการสต็อก</a>
+    <div class="card custom-card w-100 d-flex flex-column h-100">
+      <div class="card-header border-bottom border-light border-opacity-10 p-4 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+          <i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i> สินค้าใกล้หมด
+        </h6>
+        <a href="product/products.php" class="btn btn-sm btn-outline-light rounded-pill px-3 py-1" style="font-size:0.8rem; transition: 0.3s;">
+          <i class="bi bi-gear-fill me-1"></i> จัดการสต็อก
+        </a>
       </div>
       <div class="card-body p-3 flex-grow-1 scrollable-box"> 
-        <div class="list-group list-group-flush">
+        <div class="list-group list-group-flush gap-2">
           <?php if(empty($low_stock)): ?>
-            <div class="text-center py-5 text-muted"><i class="bi bi-check-circle text-success fs-1 mb-3 d-block"></i>สต็อกสินค้าทั้งหมดปลอดภัยดีครับ</div>
+            <div class="text-center py-5 h-100 d-flex flex-column justify-content-center align-items-center">
+              <div class="icon-box bg-success bg-opacity-10 text-success mb-3" style="width:80px; height:80px; font-size:2.5rem;">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+              <h5 class="text-white">สต็อกสินค้าทั้งหมดปลอดภัยดี</h5>
+              <p class="text-white-50 mb-0">ยังไม่มีสินค้าที่ต้องเติมสต็อกในขณะนี้</p>
+            </div>
           <?php else: ?>
             <?php foreach($low_stock as $ls): ?>
               <div class="list-group-item list-group-item-dark">
-                <img src="/Project/admin/uploads/<?= htmlspecialchars($ls['p_image'] ?? 'noimg.png') ?>" class="product-img-sm border-secondary" alt="product">
+                <img src="/Project/admin/uploads/<?= htmlspecialchars($ls['p_image'] ?? 'noimg.png') ?>" class="product-img-sm" alt="product">
                 
                 <div class="flex-grow-1 ms-3 overflow-hidden">
-                  <h6 class="mb-1 text-truncate text-white" style="font-size: 0.9rem;"><?= htmlspecialchars($ls['p_name']) ?></h6>
-                  <small class="text-light">รหัสสินค้า: #<?= htmlspecialchars($ls['p_id']) ?></small>
+                  <h6 class="mb-1 text-truncate text-white fw-semibold" style="font-size: 0.95rem;"><?= htmlspecialchars($ls['p_name']) ?></h6>
+                  <small class="text-white-50"><i class="bi bi-upc-scan me-1"></i>รหัสสินค้า: #<?= htmlspecialchars($ls['p_id']) ?></small>
                 </div>
                 <div class="text-end ms-2">
-                  <span class="badge <?= $ls['p_stock']==0 ? 'bg-danger' : 'bg-warning text-dark' ?> rounded-pill px-3 py-2">
-                    <?= $ls['p_stock']==0 ? 'หมดชั่วคราว' : 'เหลือ ' . $ls['p_stock'] . ' ชิ้น' ?>
+                  <span class="badge <?= $ls['p_stock']==0 ? 'bg-danger border border-danger' : 'bg-warning text-dark border border-warning' ?> rounded-pill px-3 py-2 fw-bold shadow-sm">
+                    <?= $ls['p_stock']==0 ? '<i class="bi bi-x-circle me-1"></i>หมด' : 'เหลือ ' . $ls['p_stock'] . ' ชิ้น' ?>
                   </span>
                 </div>
               </div>
@@ -285,34 +373,59 @@ ob_start();
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.color = 'rgba(255, 255, 255, 0.6)';
     Chart.defaults.font.family = "'Prompt', sans-serif";
 
-    // กราฟเส้น
+    // กราฟเส้นยอดขาย
     new Chart(document.getElementById('salesChart').getContext('2d'), {
       type: 'line',
       data: {
         labels: <?= json_encode($sales_labels) ?>,
         datasets: [{
           label: 'ยอดขาย (บาท)', data: <?= json_encode($sales_data) ?>,
-          borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)',
-          borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: '#1e293b', pointBorderColor: '#22c55e', pointRadius: 4
+          borderColor: '#22c55e', 
+          backgroundColor: function(context) {
+            const chart = context.chart;
+            const {ctx, chartArea} = chart;
+            if (!chartArea) return null;
+            let gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            gradient.addColorStop(0, 'rgba(34, 197, 94, 0)');
+            gradient.addColorStop(1, 'rgba(34, 197, 94, 0.4)');
+            return gradient;
+          },
+          borderWidth: 3, fill: true, tension: 0.4, 
+          pointBackgroundColor: '#1e293b', pointBorderColor: '#22c55e', 
+          pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7
         }]
       },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true } } }
+      options: { 
+        responsive: true, maintainAspectRatio: false, 
+        plugins: { legend: { display: false }, tooltip: { padding: 12, cornerRadius: 8, backgroundColor: 'rgba(15, 23, 42, 0.9)' } }, 
+        scales: { 
+          x: { grid: { display: false, drawBorder: false } }, 
+          y: { grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }, beginAtZero: true } 
+        } 
+      }
     });
 
-    // กราฟโดนัท
+    // กราฟโดนัทสถานะ
     new Chart(document.getElementById('orderStatusChart').getContext('2d'), {
       type: 'doughnut',
       data: {
         labels: <?= json_encode($order_statuses) ?>,
         datasets: [{
           data: <?= json_encode($status_data) ?>,
-          backgroundColor: ['#facc15', '#0ea5e9', '#6366f1', '#22c55e', '#ef4444'], borderWidth: 0, hoverOffset: 5
+          backgroundColor: ['#f59e0b', '#0ea5e9', '#6366f1', '#22c55e', '#ef4444'], 
+          borderWidth: 2, borderColor: '#1e293b', hoverOffset: 8
         }]
       },
-      options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { padding: 20, font: {size: 12} } } } }
+      options: { 
+        responsive: true, maintainAspectRatio: false, cutout: '75%', 
+        plugins: { 
+          legend: { position: 'bottom', labels: { padding: 20, font: {size: 12}, usePointStyle: true, pointStyle: 'circle' } },
+          tooltip: { padding: 12, cornerRadius: 8, backgroundColor: 'rgba(15, 23, 42, 0.9)' }
+        } 
+      }
     });
   });
 </script>
