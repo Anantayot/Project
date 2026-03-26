@@ -55,28 +55,31 @@ foreach ($order_statuses as $st) {
 }
 
 // ==========================================
-// ⚠️ 4. สินค้าใกล้หมดสต็อก
+// ⚠️ 4. สินค้าใกล้หมดสต็อก (ดึงมาทั้งหมดที่ <= 5)
 // ==========================================
 $low_stock = $conn->query("
-    SELECT p_id, p_name, p_stock, p_image FROM product WHERE p_stock <= 5 ORDER BY p_stock ASC LIMIT 5
+    SELECT p_id, p_name, p_stock, p_image 
+    FROM product 
+    WHERE p_stock <= 5 
+    ORDER BY p_stock ASC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ==========================================
-// 🔔 5. กิจกรรมล่าสุด (Timeline) - รวม 8 รายการ
+// 🔔 5. กิจกรรมล่าสุด (Timeline) - รวม 5 รายการ
 // ==========================================
-// ดึง 5 ออเดอร์ล่าสุด
+// ดึง 4 ออเดอร์ล่าสุด
 $recent_orders_timeline = $conn->query("
     SELECT o.order_id, o.order_date, o.total_price, c.name AS customer_name 
     FROM orders o 
     LEFT JOIN customers c ON o.customer_id = c.customer_id 
-    ORDER BY o.order_id DESC LIMIT 5
+    ORDER BY o.order_id DESC LIMIT 4
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-// ดึง 3 ลูกค้าใหม่ล่าสุด
+// ดึง 1 ลูกค้าใหม่ล่าสุด
 $recent_customers = $conn->query("
     SELECT customer_id, name, created_at 
     FROM customers 
-    ORDER BY customer_id DESC LIMIT 3
+    ORDER BY customer_id DESC LIMIT 1
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = 'แดชบอร์ด';
@@ -214,7 +217,8 @@ ob_start();
   <div class="col-12 col-xl-6 fade-up delay-3 d-flex">
     <div class="card custom-card shadow-lg w-100 d-flex flex-column">
       <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-bell-fill text-primary me-2"></i> กิจกรรมล่าสุด</h6></div>
-      <div class="card-body p-4 flex-grow-1 scrollable-box"> <ul class="timeline">
+      <div class="card-body p-4 flex-grow-1 scrollable-box">
+        <ul class="timeline">
           
           <?php foreach($recent_orders_timeline as $ro): ?>
           <li class="timeline-item">
@@ -249,7 +253,8 @@ ob_start();
         <h6 class="fw-bold text-white mb-0"><i class="bi bi-exclamation-triangle text-warning me-2"></i> สินค้าใกล้หมด</h6>
         <a href="product/products.php" class="btn btn-sm btn-outline-light rounded-pill" style="font-size:0.75rem;">จัดการสต็อก</a>
       </div>
-      <div class="card-body p-3 flex-grow-1 scrollable-box"> <div class="list-group list-group-flush">
+      <div class="card-body p-3 flex-grow-1 scrollable-box"> 
+        <div class="list-group list-group-flush">
           <?php if(empty($low_stock)): ?>
             <div class="text-center py-5 text-muted"><i class="bi bi-check-circle text-success fs-1 mb-3 d-block"></i>สต็อกสินค้าทั้งหมดปลอดภัยดีครับ</div>
           <?php else: ?>
