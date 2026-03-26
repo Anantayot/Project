@@ -82,7 +82,8 @@ function crc16($data) {
     ✅ ยืนยันการชำระเงิน (อัปโหลดสลิป + อัปเดตสถานะ)
     ======================================================= */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $uploadDir = dirname(__DIR__) . "../../../admin/uploads/slips/";
+  // ถอยหลัง 3 ขั้น: payment -> order -> user -> เข้า admin/uploads/slips/
+  $uploadDir = __DIR__ . "/../../../admin/uploads/slips/";
 
   if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
   if (!is_writable($uploadDir)) die("<p class='text-danger text-center mt-5'>❌ ไม่มีสิทธิ์เขียนไฟล์ใน: $uploadDir</p>");
