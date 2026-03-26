@@ -62,16 +62,22 @@ $low_stock = $conn->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ==========================================
-// 🔔 5. กิจกรรมล่าสุด (Timeline)
+// 🔔 5. กิจกรรมล่าสุด (Timeline) - รวม 8 รายการ
 // ==========================================
+// ดึง 5 ออเดอร์ล่าสุด
 $recent_orders_timeline = $conn->query("
     SELECT o.order_id, o.order_date, o.total_price, c.name AS customer_name 
     FROM orders o 
     LEFT JOIN customers c ON o.customer_id = c.customer_id 
-    ORDER BY o.order_id DESC LIMIT 3
+    ORDER BY o.order_id DESC LIMIT 5
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-$recent_customers = $conn->query("SELECT customer_id, name, created_at FROM customers ORDER BY customer_id DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
+// ดึง 3 ลูกค้าใหม่ล่าสุด
+$recent_customers = $conn->query("
+    SELECT customer_id, name, created_at 
+    FROM customers 
+    ORDER BY customer_id DESC LIMIT 3
+")->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = 'แดชบอร์ด';
 ob_start();
@@ -103,7 +109,7 @@ ob_start();
   .list-group-item-dark:hover { background: rgba(255,255,255,0.02); border-radius: 8px; padding-left: 10px; padding-right: 10px; }
   .product-img-sm { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
 
-  /* Activity Timeline */
+  /* ✅ Activity Timeline */
   .timeline { 
     border-left: 2px solid rgba(255, 255, 255, 0.1); 
     margin: 0 0 0 15px; 
@@ -127,6 +133,18 @@ ob_start();
     font-size: 0.8rem; color: #fff; 
     box-shadow: 0 0 0 5px #1e293b; 
   }
+
+  /* ✅ คลาสสำหรับให้เลื่อน Scroll ได้เมื่อรายการยาวเกินไป */
+  .scrollable-box {
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+  /* ตกแต่ง Scrollbar ให้ดูหรูหรา */
+  .scrollable-box::-webkit-scrollbar { width: 5px; }
+  .scrollable-box::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+  .scrollable-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+  .scrollable-box::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
 
   @media (max-width: 767px) {
     .welcome-banner h4 { font-size: 1.2rem; }
@@ -196,26 +214,30 @@ ob_start();
   <div class="col-12 col-xl-6 fade-up delay-3 d-flex">
     <div class="card custom-card shadow-lg w-100 d-flex flex-column">
       <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-bell-fill text-primary me-2"></i> กิจกรรมล่าสุด</h6></div>
-      <div class="card-body p-4 flex-grow-1">
-        <ul class="timeline">
+      <div class="card-body p-4 flex-grow-1 scrollable-box"> <ul class="timeline">
+          
           <?php foreach($recent_orders_timeline as $ro): ?>
           <li class="timeline-item">
             <div class="timeline-icon bg-success"><i class="bi bi-cart"></i></div>
             <h6 class="text-white mb-1" style="font-size: 0.95rem;">ออเดอร์ใหม่ #<?= $ro['order_id'] ?></h6>
             <div class="d-flex justify-content-between align-items-center flex-wrap">
               <span class="text-white-50" style="font-size: 0.85rem;"><?= htmlspecialchars($ro['customer_name'] ?? 'ไม่ระบุ') ?> - <span class="text-info fw-bold">฿<?= number_format($ro['total_price']) ?></span></span>
-              <small class="text-white-50" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("H:i", strtotime($ro['order_date'])) ?></small>
+              <small class="text-white-50" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("d/m/y H:i", strtotime($ro['order_date'])) ?></small>
             </div>
           </li>
           <?php endforeach; ?>
           
-          <?php if(!empty($recent_customers)): ?>
+          <?php foreach($recent_customers as $rc): ?>
           <li class="timeline-item">
             <div class="timeline-icon bg-info"><i class="bi bi-person"></i></div>
             <h6 class="text-white mb-1" style="font-size: 0.95rem;">สมาชิกลูกค้าใหม่</h6>
-            <span class="text-white-50 d-block" style="font-size: 0.85rem;">คุณ <?= htmlspecialchars($recent_customers[0]['name']) ?> ได้สมัครสมาชิก</span>
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+              <span class="text-white-50 d-block" style="font-size: 0.85rem;">คุณ <?= htmlspecialchars($rc['name']) ?> ได้สมัครสมาชิก</span>
+              <small class="text-white-50" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("d/m/y", strtotime($rc['created_at'])) ?></small>
+            </div>
           </li>
-          <?php endif; ?>
+          <?php endforeach; ?>
+
         </ul>
       </div>
     </div>
@@ -227,8 +249,7 @@ ob_start();
         <h6 class="fw-bold text-white mb-0"><i class="bi bi-exclamation-triangle text-warning me-2"></i> สินค้าใกล้หมด</h6>
         <a href="product/products.php" class="btn btn-sm btn-outline-light rounded-pill" style="font-size:0.75rem;">จัดการสต็อก</a>
       </div>
-      <div class="card-body p-3 flex-grow-1">
-        <div class="list-group list-group-flush">
+      <div class="card-body p-3 flex-grow-1 scrollable-box"> <div class="list-group list-group-flush">
           <?php if(empty($low_stock)): ?>
             <div class="text-center py-5 text-muted"><i class="bi bi-check-circle text-success fs-1 mb-3 d-block"></i>สต็อกสินค้าทั้งหมดปลอดภัยดีครับ</div>
           <?php else: ?>
