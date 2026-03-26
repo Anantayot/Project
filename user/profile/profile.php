@@ -243,7 +243,7 @@ if (!empty($user['profile_image']) && file_exists("../admin/uploads/profiles/" .
 </div>
 
 <div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog" style="margin-top: 10vh;">
     <div class="modal-content">
       <div class="modal-header bg-dark text-white border-0">
         <h5 class="modal-title"><i class="bi bi-crop me-2"></i>ปรับขนาดรูปโปรไฟล์</h5>
