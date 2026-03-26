@@ -137,9 +137,9 @@ ob_start();
     box-shadow: 0 0 0 5px #1e293b; 
   }
 
-  /* ✅ คลาสสำหรับให้เลื่อน Scroll ได้เมื่อรายการยาวเกินไป */
+  /* ✅ บังคับความสูงให้เท่ากันเป๊ะ 100% ไม่ยืดไม่หด */
   .scrollable-box {
-    height: 420px;
+    height: 400px; 
     overflow-y: auto;
     padding-right: 10px;
   }
@@ -215,7 +215,7 @@ ob_start();
 <div class="row g-4 mb-4 d-flex align-items-stretch">
   
   <div class="col-12 col-xl-6 fade-up delay-3 d-flex">
-    <div class="card custom-card shadow-lg w-100 d-flex flex-column">
+    <div class="card custom-card shadow-lg w-100 d-flex flex-column h-100">
       <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-bell-fill text-primary me-2"></i> กิจกรรมล่าสุด</h6></div>
       <div class="card-body p-4 flex-grow-1 scrollable-box">
         <ul class="timeline">
@@ -225,8 +225,8 @@ ob_start();
             <div class="timeline-icon bg-success"><i class="bi bi-cart"></i></div>
             <h6 class="text-white mb-1" style="font-size: 0.95rem;">ออเดอร์ใหม่ #<?= $ro['order_id'] ?></h6>
             <div class="d-flex justify-content-between align-items-center flex-wrap">
-              <span class="text-white-50" style="font-size: 0.85rem;"><?= htmlspecialchars($ro['customer_name'] ?? 'ไม่ระบุ') ?> - <span class="text-info fw-bold">฿<?= number_format($ro['total_price']) ?></span></span>
-              <small class="text-white-50" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("d/m/y H:i", strtotime($ro['order_date'])) ?></small>
+              <span class="text-light" style="font-size: 0.85rem;"><?= htmlspecialchars($ro['customer_name'] ?? 'ไม่ระบุ') ?> - <span class="text-info fw-bold">฿<?= number_format($ro['total_price']) ?></span></span>
+              <small class="text-light" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("d/m/y H:i", strtotime($ro['order_date'])) ?></small>
             </div>
           </li>
           <?php endforeach; ?>
@@ -236,8 +236,8 @@ ob_start();
             <div class="timeline-icon bg-info"><i class="bi bi-person"></i></div>
             <h6 class="text-white mb-1" style="font-size: 0.95rem;">สมาชิกลูกค้าใหม่</h6>
             <div class="d-flex justify-content-between align-items-center flex-wrap">
-              <span class="text-white-50 d-block" style="font-size: 0.85rem;">คุณ <?= htmlspecialchars($rc['name']) ?> ได้สมัครสมาชิก</span>
-              <small class="text-white-50" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("d/m/y", strtotime($rc['created_at'])) ?></small>
+              <span class="text-light d-block" style="font-size: 0.85rem;">คุณ <?= htmlspecialchars($rc['name']) ?> ได้สมัครสมาชิก</span>
+              <small class="text-light" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date("d/m/y", strtotime($rc['created_at'])) ?></small>
             </div>
           </li>
           <?php endforeach; ?>
@@ -248,7 +248,7 @@ ob_start();
   </div>
 
   <div class="col-12 col-xl-6 fade-up delay-4 d-flex">
-    <div class="card custom-card shadow-lg w-100 d-flex flex-column">
+    <div class="card custom-card shadow-lg w-100 d-flex flex-column h-100">
       <div class="card-header border-bottom border-secondary p-3 d-flex justify-content-between align-items-center">
         <h6 class="fw-bold text-white mb-0"><i class="bi bi-exclamation-triangle text-warning me-2"></i> สินค้าใกล้หมด</h6>
         <a href="product/products.php" class="btn btn-sm btn-outline-light rounded-pill" style="font-size:0.75rem;">จัดการสต็อก</a>
@@ -264,7 +264,7 @@ ob_start();
                 
                 <div class="flex-grow-1 ms-3 overflow-hidden">
                   <h6 class="mb-1 text-truncate text-white" style="font-size: 0.9rem;"><?= htmlspecialchars($ls['p_name']) ?></h6>
-                  <small class="text-white-50">รหัสสินค้า: #<?= htmlspecialchars($ls['p_id']) ?></small>
+                  <small class="text-light">รหัสสินค้า: #<?= htmlspecialchars($ls['p_id']) ?></small>
                 </div>
                 <div class="text-end ms-2">
                   <span class="badge <?= $ls['p_stock']==0 ? 'bg-danger' : 'bg-warning text-dark' ?> rounded-pill px-3 py-2">
