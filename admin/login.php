@@ -16,6 +16,11 @@ if (isset($_SESSION['admin_id'])) {
 
 $error = '';
 
+// ✅ เพิ่มการเช็คว่าโดนเด้งออกมาเพราะหมดเวลาหรือไม่
+if (isset($_GET['timeout'])) {
+  $error = "หมดเวลาการใช้งาน (10 นาที) กรุณาเข้าสู่ระบบใหม่";
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $username = trim($_POST['username']);
   $password = trim($_POST['password']);
@@ -29,12 +34,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['admin_id'] = $admin['admin_id'];
     $_SESSION['admin_username'] = $admin['username'];
     $_SESSION['admin_name'] = $admin['name']; 
+    
+    // ✅ เพิ่มบรรทัดนี้: บันทึกเวลาล่าสุดที่ล็อกอินสำเร็จ
+    $_SESSION['last_activity'] = time(); 
+    
     header("Location: index.php");
     exit;
   } else {
     $error = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
   }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="th">

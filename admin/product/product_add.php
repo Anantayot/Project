@@ -5,11 +5,26 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// บังคับให้ต้องล็อกอิน
-if (!isset($_SESSION['admin_id'])) {
-  header("Location: ../login.php");
-  exit;
+// 🕒 ระบบจับเวลา Session Timeout (10 นาที = 600 วินาที)
+$timeout_duration = 600;
+
+if (isset($_SESSION['last_activity'])) {
+  // คำนวณว่าไม่ได้ใช้งานมานานกี่วินาทีแล้ว
+  $time_inactive = time() - $_SESSION['last_activity'];
+  
+  if ($time_inactive >= $timeout_duration) {
+    // ถ้าเกิน 10 นาที ให้ล้างค่า Session ทิ้งทั้งหมด
+    session_unset();
+    session_destroy();
+    
+    // เด้งกลับไปหน้า login พร้อมส่งค่า ?timeout=1 ไปบอก
+    header("Location: ../login.php?timeout=1");
+    exit;
+  }
 }
+
+// ✅ อัปเดตเวลาล่าสุด ทุกครั้งที่มีการกดรีเฟรชหรือเปลี่ยนหน้า
+$_SESSION['last_activity'] = time();
 
 $pageTitle = "เพิ่มสินค้าใหม่";
 include __DIR__ . "/../partials/connectdb.php";
