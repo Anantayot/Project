@@ -62,7 +62,7 @@ ob_start();
   .table-custom-header th {
     border-bottom: none;
     padding: 15px 10px;
-    cursor: pointer; /* ให้รู้ว่ากดเรียงได้ */
+    cursor: pointer; 
   }
   .table-dark {
     --bs-table-bg: transparent;
@@ -73,6 +73,17 @@ ob_start();
   .table-dark td {
     padding: 15px 10px;
     vertical-align: middle;
+  }
+
+  /* ✅ สไตล์รูปโปรไฟล์ในตาราง */
+  .table-profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    background-color: #fff;
   }
 
   /* ✅ เปลี่ยนสีข้อความ DataTables เป็นสีขาวทั้งหมด */
@@ -116,7 +127,7 @@ ob_start();
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
     #dataTable tbody td {
-      display: flex; justify-content: space-between; align-items: flex-start; /* เผื่อข้อความยาวให้ชิดบน */
+      display: flex; justify-content: space-between; align-items: flex-start;
       padding: 12px 0; border: none !important;
       border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important;
       font-size: 0.95rem; width: 100%;
@@ -127,9 +138,9 @@ ob_start();
     #dataTable tbody td::before {
       content: attr(data-label); font-weight: 500; color: #94a3b8;
       text-align: left; min-width: 90px; margin-right: 15px; flex-shrink: 0; white-space: nowrap;
+      margin-top: auto; margin-bottom: auto; /* ให้อยู่กึ่งกลางแนวตั้ง */
     }
     
-    /* 📌 คลาสบังคับให้ข้อมูลดันไปชิดขวาสุด เหมือนหน้า Order_view */
     .mobile-right-content {
       text-align: right;
       flex: 1;
@@ -169,7 +180,7 @@ ob_start();
           <thead>
             <tr class="table-custom-header text-center">
               <th style="width: 80px;">รหัส</th>
-              <th class="text-start">ชื่อ-นามสกุล</th>
+              <th class="text-start">ข้อมูลลูกค้า</th>
               <th class="text-start">อีเมล</th>
               <th>เบอร์โทร</th>
               <th class="text-start">ที่อยู่จัดส่ง</th>
@@ -184,8 +195,22 @@ ob_start();
                   <div class="mobile-right-content">#<?= htmlspecialchars($c['customer_id']) ?></div>
                 </td>
                 
-                <td data-label="ชื่อ-นามสกุล" data-sort="<?= htmlspecialchars($c['name']) ?>" class="text-md-start text-white fw-medium mobile-value">
-                  <div class="mobile-right-content"><?= htmlspecialchars($c['name']) ?></div>
+                <td data-label="ข้อมูลลูกค้า" data-sort="<?= htmlspecialchars($c['name']) ?>" class="text-md-start text-white fw-medium mobile-value">
+                  <div class="mobile-right-content">
+                    <div class="d-flex align-items-center justify-content-end justify-content-md-start gap-3">
+                      <?php
+                        // ตรวจสอบรูปภาพ
+                        $serverFilePath = $_SERVER['DOCUMENT_ROOT'] . "/Project/admin/uploads/profiles/" . $c['profile_image'];
+                        if (!empty($c['profile_image']) && file_exists($serverFilePath)) {
+                            $profileImg = "/Project/admin/uploads/profiles/" . htmlspecialchars($c['profile_image']);
+                        } else {
+                            $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($c['name']) . "&background=D10024&color=fff&size=100&bold=true";
+                        }
+                      ?>
+                      <img src="<?= $profileImg ?>" alt="Profile" class="table-profile-img">
+                      <span><?= htmlspecialchars($c['name']) ?></span>
+                    </div>
+                  </div>
                 </td>
                 
                 <td data-label="อีเมล" class="text-md-start text-light mobile-value">
@@ -250,15 +275,14 @@ ob_start();
         $('#dataTable').DataTable({
           language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
           pageLength: 10,
-          responsive: false, // ปิดไว้เพราะเราใช้ CSS Card View บนมือถือ
-          order: [[0, "desc"]], // ✅ เรียงจากลูกค้าใหม่สุดไปเก่า (ถ้าอยากได้เก่าไปใหม่ ให้เปลี่ยน desc เป็น asc)
+          responsive: false, 
+          order: [[0, "desc"]], 
           columnDefs: [
-            { orderable: false, targets: [6] } // ปิด sort ช่องจัดการ
+            { orderable: false, targets: [6] } 
           ],
           dom: '<"d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3"lf>rt<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3"ip>'
         });
 
-        // ✅ แต่งกล่องค้นหาและช่อง Dropdown ให้ข้อความเป็นสีขาวแบบเดียวกับหน้าอื่นๆ
         $(".dataTables_filter input")
           .addClass("form-control form-control-sm text-white")
           .css({
@@ -275,7 +299,6 @@ ob_start();
             "padding": "6px 30px 6px 15px"
           });
           
-        // เปิด Tooltip
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
       };
