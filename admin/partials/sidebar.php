@@ -2,10 +2,10 @@
   <div class="sidebar-brand">
     <i class="bi bi-laptop"></i> <span class="ms-2">MyCommiss</span>
   </div>
-  
+
   <div class="admin-profile">
     <img src="/Project/admin/partials/icon_mycommiss.png" alt="Admin" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-    <h6><?= $_SESSION['admin_name'] ?? 'ผู้ดูแลระบบ' ?></h6>
+    <h6>ผู้ดูแลระบบ</h6>
     <small><span class="status-dot"></span>Online</small>
   </div>
 
