@@ -158,7 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body>
 
-<?php include __DIR__ . "/../../../includes/navbar_user.php"; ?>
+<?php include __DIR__ . "../../includes/navbar_user.php"; ?>
 
 <div class="payment-wrapper">
     <div class="card-payment">
