@@ -3,25 +3,52 @@ session_start();
 include("connectdb.php");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $email = trim($_POST['email']);
+    // รับค่าจากฟอร์ม (อาจจะเป็น username ของแอดมิน หรือ email ของลูกค้า)
+    $login_input = trim($_POST['email']); 
     $password = trim($_POST['password']);
 
-    $stmt = $conn->prepare("SELECT * FROM customers WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    // =======================================
+    // 1. ตรวจสอบว่าเป็น Admin หรือไม่ (เช็คจากตาราง admins)
+    // =======================================
+    $stmt_admin = $conn->prepare("SELECT * FROM admins WHERE username = ?");
+    $stmt_admin->execute([$login_input]);
+    $admin = $stmt_admin->fetch(PDO::FETCH_ASSOC);
 
+    // เนื่องจากรหัสผ่านแอดมินในฐานข้อมูลไม่ได้เข้ารหัส จึงใช้ === เทียบได้เลย
+    if ($admin && $password === $admin['password']) {
+        $_SESSION['admin_id'] = $admin['admin_id'];
+        $_SESSION['admin_name'] = $admin['name'];
+        
+        // เด้งไปหน้า Dashboard ของ Admin
+        header("Location: http://103.40.119.91/Project/admin/index.php");
+        exit;
+    }
+
+    // =======================================
+    // 2. ถ้าไม่ใช่ Admin ให้ตรวจสอบว่าเป็นลูกค้าหรือไม่ (เช็คจากตาราง customers)
+    // =======================================
+    $stmt_customer = $conn->prepare("SELECT * FROM customers WHERE email = ?");
+    $stmt_customer->execute([$login_input]);
+    $user = $stmt_customer->fetch(PDO::FETCH_ASSOC);
+
+    // รหัสผ่านลูกค้ามีการเข้ารหัส ต้องใช้ password_verify
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['customer_id'] = $user['customer_id'];
         $_SESSION['customer_name'] = $user['name'];
 
         $_SESSION['toast_success'] = "✅ เข้าสู่ระบบสำเร็จ ยินดีต้อนรับคุณ " . htmlspecialchars($user['name']);
+        
+        // เด้งไปหน้าร้านค้าปกติ
         header("Location: index.php");
         exit;
-    } else {
-        $_SESSION['toast_error'] = "❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง";
-        header("Location: login.php");
-        exit;
-    }
+    } 
+
+    // =======================================
+    // 3. กรณีไม่พบทั้ง Admin และ ลูกค้า หรือ รหัสผ่านผิด
+    // =======================================
+    $_SESSION['toast_error'] = "❌ อีเมล/ชื่อผู้ใช้ หรือรหัสผ่านไม่ถูกต้อง";
+    header("Location: login.php");
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -160,10 +187,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <form method="post">
                 <div class="mb-3">
-                    <label class="form-label fw-semibold text-secondary">อีเมล</label>
+                    <label class="form-label fw-semibold text-secondary">อีเมล หรือ ชื่อผู้ใช้</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-envelope text-muted"></i></span>
-                        <input type="email" name="email" class="form-control border-start-0 ps-0" placeholder="mycommiss@email.com" required>
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-person text-muted"></i></span>
+                        <input type="text" name="email" class="form-control border-start-0 ps-0" placeholder="อีเมล หรือ ชื่อผู้ใช้แอดมิน" required>
                     </div>
                 </div>
 
@@ -171,7 +198,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <label class="form-label fw-semibold text-secondary">รหัสผ่าน</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                        <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="••••••••" minlength="6" required>
+                        <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="••••••••" minlength="4" required>
                     </div>
                 </div>
 
