@@ -1,10 +1,10 @@
 <?php
 session_start();
-include("connectdb.php");
+include("../includes/connectdb.php");
 
 // ✅ ต้องเข้าสู่ระบบก่อน
 if (!isset($_SESSION['customer_id'])) {
-  header("Location: login.php");
+  header("Location: ../login.php");
   exit;
 }
 
@@ -114,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
       unset($_SESSION['cart']);
       $_SESSION['toast_success'] = "✅ ขอบคุณคุณ " . htmlspecialchars($user['name']) . " 🎉 คำสั่งซื้อของคุณถูกบันทึกแล้ว";
-      header("Location: orders.php");
+      header("Location: ../order/orders.php");
       exit;
 
     } catch (Exception $e) {
@@ -133,7 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ชำระเงิน | MyCommiss</title>
-  <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  <link rel="icon" type="image/png" href="../includes/icon_mycommiss.png">
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -274,7 +274,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body>
 
-<?php include("navbar_user.php"); ?>
+<?php include("../includes/navbar_user.php"); ?>
 
 <div class="checkout-wrapper">
 
@@ -327,7 +327,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                       $total += $sum;
                       
                       // ดึงรูปภาพเล็ก
-                      $imgPath = "../admin/uploads/" . $item['image'];
+                      $imgPath = "../../admin/uploads/" . $item['image'];
                       if (empty($item['image']) || !file_exists($imgPath)) $imgPath = "img/default.png";
                     ?>
                     <tr>

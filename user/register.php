@@ -1,5 +1,5 @@
 <?php
-include("connectdb.php");
+include("includes/connectdb.php");
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>สมัครสมาชิก | MyCommiss</title>
-  <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  <link rel="icon" type="image/png" href="includes/icon_mycommiss.png">
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -230,7 +230,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <div class="register-container">
     <div class="card-register">
       <div class="text-center mb-4">
-        <img src="icon_mycommiss.png" alt="MyCommiss Logo" class="brand-logo">
+        <img src="includes/icon_mycommiss.png" alt="MyCommiss Logo" class="brand-logo">
         <h4 class="fw-bold" style="color: #D10024;">สมัครสมาชิก</h4>
         <p class="text-muted small">สร้างบัญชีเพื่อเริ่มต้นช้อปปิ้งกับเรา</p>
       </div>

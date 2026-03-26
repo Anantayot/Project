@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("connectdb.php");
+include("includes/connectdb.php");
 
 // 🔹 ดึงหมวดหมู่ทั้งหมดมาแสดงใน dropdown
 $cats = $conn->query("SELECT * FROM category ORDER BY cat_name ASC")->fetchAll(PDO::FETCH_ASSOC);
@@ -38,7 +38,7 @@ if (empty($search) && empty($cat_id)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน้าร้าน | MyCommiss</title>
-    <link rel="icon" type="image/png" href="icon_mycommiss.png">
+    <link rel="icon" type="image/png" href="includes/icon_mycommiss.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -273,7 +273,7 @@ if (empty($search) && empty($cat_id)) {
 
 <body>
 
-    <?php include("navbar_user.php"); ?>
+    <?php include("includes/navbar_user.php"); ?>
 
     <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 3000;">
         <?php foreach (['success' => 'success', 'error' => 'danger', 'info' => 'info'] as $key => $color): ?>

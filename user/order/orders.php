@@ -4,10 +4,10 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-include("connectdb.php");
+include("../includes/connectdb.php");
 
 if (!isset($_SESSION['customer_id'])) {
-  header("Location: login.php");
+  header("Location: ../login.php");
   exit;
 }
 
@@ -26,7 +26,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ประวัติคำสั่งซื้อ | MyCommiss</title>
-  <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  <link rel="icon" type="image/png" href="../includes/icon_mycommiss.png">
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -202,7 +202,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
 
-<?php include("navbar_user.php"); ?>
+<?php include("../includes/navbar_user.php"); ?>
 
 <div class="orders-wrapper">
   <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index:3000;">
@@ -231,7 +231,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <h4 class="mt-3 fw-bold text-secondary">ยังไม่มีประวัติคำสั่งซื้อ</h4>
         <p class="text-muted">คุณยังไม่เคยทำการสั่งซื้อสินค้าใดๆ ในระบบ</p>
         <div class="mt-3">
-          <a href="index.php" class="btn btn-custom-outline px-4 py-2"><i class="bi bi-cart me-2"></i>เริ่มช้อปปิ้งเลย</a>
+          <a href="../index.php" class="btn btn-custom-outline px-4 py-2"><i class="bi bi-cart me-2"></i>เริ่มช้อปปิ้งเลย</a>
         </div>
       </div>
     <?php else: ?>
@@ -331,7 +331,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                       !in_array($admin_verified, ['กำลังตรวจสอบ', 'อนุมัติ']) &&
                       !$isCancelled
                     ): ?>
-                      <a href="payment_confirm.php?id=<?= $o['order_id'] ?>" class="btn btn-custom-warning btn-sm" title="แจ้งชำระเงิน">
+                      <a href="payment/payment_confirm.php?id=<?= $o['order_id'] ?>" class="btn btn-custom-warning btn-sm" title="แจ้งชำระเงิน">
                         <i class="bi bi-wallet2 me-1"></i> แจ้งโอน
                       </a>
                     <?php endif; ?>

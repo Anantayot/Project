@@ -1,10 +1,10 @@
 <?php
 session_start();
-include("connectdb.php");
+include("../includes/connectdb.php");
 
 // 🔒 ตรวจสอบการเข้าสู่ระบบ
 if (!isset($_SESSION['customer_id'])) {
-  header("Location: login.php");
+  header("Location: ../login.php");
   exit;
 }
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $_SESSION['customer_name'] = $name;
     $_SESSION['toast_success'] = "✅ บันทึกข้อมูลเรียบร้อยแล้ว";
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit;
   }
 }
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>โปรไฟล์ของฉัน | MyCommiss</title>
-  <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  <link rel="icon" type="image/png" href="../includes/icon_mycommiss.png">
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-<?php include("navbar_user.php"); ?>
+<?php include("../includes/navbar_user.php"); ?>
 
 <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 3000;">
   <?php if (isset($_SESSION['toast_error'])): ?>
@@ -278,7 +278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           
           <div class="row g-2 mt-2">
             <div class="col-sm-6 d-grid">
-              <a href="index.php" class="btn btn-outline-custom">
+              <a href="../index.php" class="btn btn-outline-custom">
                 <i class="bi bi-arrow-left me-2"></i>กลับหน้าร้าน
               </a>
             </div>

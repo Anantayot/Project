@@ -1,10 +1,10 @@
 <?php
 session_start();
-include("connectdb.php");
+include("../includes/connectdb.php");
 
 // ✅ ตรวจสอบการส่งข้อมูล
 if ($_SERVER["REQUEST_METHOD"] !== "POST" || !isset($_POST['id'])) {
-  header("Location: index.php");
+  header("Location: ../index.php");
   exit;
 }
 
@@ -14,7 +14,7 @@ $qty = intval($_POST['qty'] ?? 1);
 // ✅ ถ้ายังไม่ล็อกอิน → ให้ไปหน้า login
 if (!isset($_SESSION['customer_id'])) {
   $_SESSION['toast_error'] = "⚠️ กรุณาเข้าสู่ระบบก่อนสั่งซื้อสินค้า";
-  header("Location: login.php");
+  header("Location: ../login.php");
   exit;
 }
 
@@ -25,14 +25,14 @@ $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$product) {
   $_SESSION['toast_error'] = "❌ ไม่พบสินค้านี้";
-  header("Location: index.php");
+  header("Location: ../index.php");
   exit;
 }
 
 // ✅ ตรวจสอบว่าสินค้าหมดหรือไม่
 if ($product['p_stock'] <= 0) {
   $_SESSION['toast_error'] = "❌ สินค้านี้หมดสต็อกแล้ว";
-  header("Location: index.php");
+  header("Location: ../index.php");
   exit;
 }
 

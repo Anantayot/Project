@@ -4,11 +4,11 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-include("connectdb.php");
+include("../includes/connectdb.php");
 
 // ✅ ตรวจสอบการเข้าสู่ระบบ
 if (!isset($_SESSION['customer_id'])) {
-  header("Location: login.php");
+  header("Location: ../login.php");
   exit;
 }
 
@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['reorder'])) {
   } else {
       $_SESSION['toast_error'] = "❌ ขออภัย สินค้าในคำสั่งซื้อนี้หมดสต็อกทั้งหมด";
   }
-  header("Location: cart.php");
+  header("Location: ../cart/cart.php");
   exit;
 }
 
@@ -137,7 +137,7 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>รายละเอียดคำสั่งซื้อ #<?= str_pad($order_id, 5, '0', STR_PAD_LEFT) ?> | MyCommiss</title>
-  <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  <link rel="icon" type="image/png" href="../includes/icon_mycommiss.png">
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -273,7 +273,7 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
 
-<?php include("navbar_user.php"); ?>
+<?php include("../includes/navbar_user.php"); ?>
 
 <div class="page-wrapper">
   <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index:3000;">
@@ -373,7 +373,7 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
             
             <?php if ($order['payment_method'] === 'QR' && $payment_status === 'รอดำเนินการ' && !in_array($admin_verified, ['กำลังตรวจสอบ', 'อนุมัติ']) && $payment_status !== 'ชำระเงินแล้ว' && !$isCancelled): ?>
               <div class="mt-4 text-center">
-                <a href="payment_confirm.php?id=<?= $order_id ?>" class="btn btn-warning rounded-pill px-5 py-2 fw-bold text-dark shadow-sm">
+                <a href="payment/payment_confirm.php?id=<?= $order_id ?>" class="btn btn-warning rounded-pill px-5 py-2 fw-bold text-dark shadow-sm">
                   <i class="bi bi-wallet2 me-2"></i>แจ้งชำระเงิน
                 </a>
               </div>
@@ -445,7 +445,7 @@ $details = $stmt2->fetchAll(PDO::FETCH_ASSOC);
             <tbody>
               <?php foreach ($details as $d): 
                 $sum = $d['price'] * $d['quantity'];
-                $imgPath = "../admin/uploads/" . $d['p_image'];
+                $imgPath = "../../admin/uploads/" . $d['p_image'];
                 if (!file_exists($imgPath) || empty($d['p_image'])) $imgPath = "img/default.png";
               ?>
                 <tr>

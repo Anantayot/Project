@@ -4,11 +4,11 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-include("connectdb.php");
+include("../../includes/connectdb.php");
 
 // ✅ ต้องเข้าสู่ระบบก่อน
 if (!isset($_SESSION['customer_id'])) {
-  header("Location: login.php");
+  header("Location: ../../login.php");
   exit;
 }
 
@@ -82,7 +82,7 @@ function crc16($data) {
     ✅ ยืนยันการชำระเงิน (อัปโหลดสลิป + อัปเดตสถานะ)
     ======================================================= */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $uploadDir = dirname(__DIR__) . "/admin/uploads/slips/";
+  $uploadDir = dirname(__DIR__) . "../../../admin/uploads/slips/";
 
   if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
   if (!is_writable($uploadDir)) die("<p class='text-danger text-center mt-5'>❌ ไม่มีสิทธิ์เขียนไฟล์ใน: $uploadDir</p>");
@@ -146,7 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   echo "<script>
       alert('✅ แจ้งชำระเงินเรียบร้อยแล้ว! ระบบจะทำการตรวจสอบโดยแอดมิน');
-      window.location='order_detail.php?id=$order_id';
+      window.location='../order_detail.php?id=$order_id';
   </script>";
   exit;
 }
@@ -157,7 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>แจ้งชำระเงิน | MyCommiss</title>
-  <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  <link rel="icon" type="image/png" href="../../includes/icon_mycommiss.png">
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -257,7 +257,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body>
 
-<?php include("navbar_user.php"); ?>
+<?php include("../../includes/navbar_user.php"); ?>
 
 <div class="payment-wrapper">
   <div class="card-payment">
@@ -321,10 +321,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           </button>
           <div class="row g-2">
             <div class="col-6">
-              <a href="orders.php" class="btn btn-outline-custom w-100"><i class="bi bi-clock-history me-2"></i>ประวัติสั่งซื้อ</a>
+              <a href="../orders.php" class="btn btn-outline-custom w-100"><i class="bi bi-clock-history me-2"></i>ประวัติสั่งซื้อ</a>
             </div>
             <div class="col-6">
-              <a href="order_detail.php?id=<?= $order_id ?>" class="btn btn-outline-custom w-100"><i class="bi bi-file-earmark-text me-2"></i>รายละเอียด</a>
+              <a href="../order_detail.php?id=<?= $order_id ?>" class="btn btn-outline-custom w-100"><i class="bi bi-file-earmark-text me-2"></i>รายละเอียด</a>
             </div>
           </div>
         </div>

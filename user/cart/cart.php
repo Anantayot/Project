@@ -3,11 +3,11 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include("connectdb.php");
+include("../includes/connectdb.php");
 
 // ✅ ต้องเข้าสู่ระบบก่อน
 if (!isset($_SESSION['customer_id'])) {
-  header("Location: login.php");
+  header("Location: ../login.php");
   exit;
 }
 
@@ -122,7 +122,7 @@ $stocks = fetchStocks($conn, $cart);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ตะกร้าสินค้า | MyCommiss</title>
-  <link rel="icon" type="image/png" href="icon_mycommiss.png">
+  <link rel="icon" type="image/png" href="../includes/icon_mycommiss.png">
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -309,7 +309,7 @@ $stocks = fetchStocks($conn, $cart);
 </head>
 <body>
 
-<?php include("navbar_user.php"); ?>
+<?php include("../includes/navbar_user.php"); ?>
 
 <div class="cart-wrapper">
   <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 3000;">
@@ -346,7 +346,7 @@ $stocks = fetchStocks($conn, $cart);
         <h4 class="mt-3 fw-bold text-secondary">ไม่มีสินค้าในตะกร้า</h4>
         <p class="text-muted">ดูเหมือนว่าคุณยังไม่ได้เพิ่มสินค้าใดๆ ลงในตะกร้าเลย</p>
         <div class="mt-4">
-          <a href="index.php" class="btn btn-primary-custom"><i class="bi bi-shop me-2"></i>กลับไปเลือกซื้อสินค้า</a>
+          <a href="../index.php" class="btn btn-primary-custom"><i class="bi bi-shop me-2"></i>กลับไปเลือกซื้อสินค้า</a>
         </div>
       </div>
     <?php else: ?>
@@ -366,7 +366,7 @@ $stocks = fetchStocks($conn, $cart);
                   $sum = $item['price'] * $item['qty'];
                   $total += $sum;
 
-                  $imgPath = "../admin/uploads/" . $item['image'];
+                  $imgPath = "../../admin/uploads/" . $item['image'];
                   if (empty($item['image']) || !file_exists($imgPath)) {
                     $imgPath = "img/default.png";
                   }
@@ -419,7 +419,7 @@ $stocks = fetchStocks($conn, $cart);
 
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-4 gap-3">
           <div class="text-center text-md-start">
-             <a href="index.php" class="btn btn-outline-custom w-100 w-md-auto"><i class="bi bi-arrow-left me-2"></i>เลือกซื้อสินค้าต่อ</a>
+             <a href="../index.php" class="btn btn-outline-custom w-100 w-md-auto"><i class="bi bi-arrow-left me-2"></i>เลือกซื้อสินค้าต่อ</a>
           </div>
           
           <div class="d-flex flex-column flex-md-row gap-2">

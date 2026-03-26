@@ -1,10 +1,10 @@
 <?php
 session_start();
-include("connectdb.php");
+include("../includes/connectdb.php");
 
 // ✅ ตรวจสอบว่าผู้ใช้ล็อกอินแล้วหรือยัง
 if (!isset($_SESSION['customer_id'])) {
-  header("Location: login.php");
+  header("Location: ../login.php");
   exit;
 }
 
