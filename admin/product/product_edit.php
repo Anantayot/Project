@@ -5,6 +5,13 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// ✅ ตรวจสอบการเข้าสู่ระบบ (ป้องกันคนพิมพ์ URL เข้ามาตรงๆ)
+if (!isset($_SESSION['admin_id'])) { 
+    // หมายเหตุ: เปลี่ยน 'admin_id' เป็นชื่อตัวแปร Session ที่คุณตั้งไว้ตอน Login สำเร็จ
+    header("Location: ../login.php"); 
+    exit;
+}
+
 // 🕒 ระบบจับเวลา Session Timeout (10 นาที = 600 วินาที)
 $timeout_duration = 600;
 
