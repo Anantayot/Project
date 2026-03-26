@@ -46,46 +46,68 @@ try {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $name   = trim($_POST['name']);
-  $price  = $_POST['price'];
-  $stock  = $_POST['stock'];
-  $cat_id = $_POST['cat_id'];
-  $desc   = trim($_POST['description']);
+    $name   = trim($_POST['name']);
+    $price  = $_POST['price'];
+    $stock  = $_POST['stock'];
+    $cat_id = $_POST['cat_id'];
+    $desc   = trim($_POST['description']);
 
-  $image = "";
-  if (!empty($_FILES['image']['name'])) {
-    // 🔹 สร้างชื่อไฟล์ใหม่ ป้องกันชื่อซ้ำ (ใช้เวลา + ชื่อไฟล์เดิม)
-    $image = time() . "_" . preg_replace("/[^a-zA-Z0-9.]/", "", basename($_FILES['image']['name']));
+    $image = "";
+    // 🔹 ตรวจสอบว่ามีการอัปโหลดไฟล์และไม่มีข้อผิดพลาดจาก PHP
+    if (!empty($_FILES['image']['name']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        
+        $file_tmp  = $_FILES['image']['tmp_name'];
+        $file_name = $_FILES['image']['name'];
+        $file_size = $_FILES['image']['size'];
+        
+        // 1. ตรวจสอบนามสกุลไฟล์
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
 
-    // 🔹 โฟลเดอร์เก็บรูป (อยู่นอก /product/ แต่อยู่ใน /admin/uploads/)
-    $targetDir = __DIR__ . "/../uploads/";
+        // 2. ตรวจสอบประเภทไฟล์จริง (Mime Type) เพื่อความปลอดภัยขั้นสูง
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime_type = finfo_file($finfo, $file_tmp);
+        finfo_close($finfo);
+        $allowed_mime = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-    // 🔹 ถ้าโฟลเดอร์ยังไม่มี ให้สร้าง
-    if (!is_dir($targetDir)) {
-      mkdir($targetDir, 0777, true);
+        if (!in_array($ext, $allowed_ext)) {
+            $error = "❌ นามสกุลไฟล์ไม่ได้รับอนุญาต (ใช้ได้เฉพาะ JPG, PNG, GIF, WEBP)";
+        } elseif (!in_array($mime_type, $allowed_mime)) {
+            $error = "❌ ประเภทไฟล์ไม่ถูกต้อง (ไฟล์ที่คุณอัปโหลดไม่ใช่รูปภาพจริง)";
+        } elseif ($file_size > 2 * 1024 * 1024) { // 2MB
+            $error = "❌ ไฟล์มีขนาดใหญ่เกินไป (จำกัดไม่เกิน 2MB)";
+        } else {
+            // 🔹 ถ้าผ่านทุกด่าน ให้สร้างชื่อไฟล์ใหม่
+            $image = time() . "_" . bin2hex(random_bytes(4)) . "." . $ext;
+            $targetDir = __DIR__ . "/../uploads/products/";
+
+            if (!is_dir($targetDir)) {
+                mkdir($targetDir, 0755, true); // ใช้ 0755 ตามมาตรฐานความปลอดภัย
+            }
+
+            if (!move_uploaded_file($file_tmp, $targetDir . $image)) {
+                $error = "❌ ไม่สามารถย้ายไฟล์ไปยังโฟลเดอร์ปลายทางได้";
+            }
+        }
+    } elseif (!empty($_FILES['image']['name']) && $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+        $error = "❌ เกิดข้อผิดพลาดในการอัปโหลดไฟล์ (Error Code: " . $_FILES['image']['error'] . ")";
     }
 
-    // 🔹 ย้ายไฟล์จาก temp ไปยัง uploads/
-    if (!move_uploaded_file($_FILES['image']['tmp_name'], $targetDir . $image)) {
-      $error = "❌ ไม่สามารถอัปโหลดรูปภาพได้ กรุณาลองใหม่อีกครั้ง";
-    }
-  }
+    // ถ้าไม่มี Error ให้บันทึกลงฐานข้อมูล
+    if (empty($error)) {
+        try {
+            $stmt = $conn->prepare("
+                INSERT INTO product (p_name, p_price, p_stock, p_description, p_image, cat_id)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([$name, $price, $stock, $desc, $image, $cat_id]);
 
-  // ถ้าไม่มี Error เรื่องรูปภาพ ให้บันทึกลงฐานข้อมูล
-  if (empty($error)) {
-    try {
-      $stmt = $conn->prepare("
-        INSERT INTO product (p_name, p_price, p_stock, p_description, p_image, cat_id)
-        VALUES (?, ?, ?, ?, ?, ?)
-      ");
-      $stmt->execute([$name, $price, $stock, $desc, $image, $cat_id]);
-
-      echo "<script>alert('✅ เพิ่มสินค้าสำเร็จ!'); window.location='products.php';</script>";
-      exit;
-    } catch (PDOException $e) {
-      $error = "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " . $e->getMessage();
+            echo "<script>alert('✅ เพิ่มสินค้าสำเร็จ!'); window.location='products.php';</script>";
+            exit;
+        } catch (PDOException $e) {
+            $error = "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " . $e->getMessage();
+        }
     }
-  }
 }
 
 // ✅ เริ่มเก็บเนื้อหาเข้า Layout

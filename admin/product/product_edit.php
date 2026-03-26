@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $deleteImage = isset($_POST['delete_image']) && $_POST['delete_image'] === '1';
 
   // path โฟลเดอร์อัปโหลด
-  $uploadDir = __DIR__ . "/../uploads/";
+  $uploadDir = __DIR__ . "/../uploads/products/";
 
   // ค่า default = รูปเดิมในฐานข้อมูล
   $image = $p['p_image'];
@@ -238,8 +238,8 @@ ob_start();
               <label class="form-label">รูปภาพปัจจุบัน</label>
               <div class="p-3 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);">
                 <?php 
-                  $imagePath = "../uploads/" . htmlspecialchars($p['p_image']);
-                  $fileOnDisk = __DIR__ . "/../uploads/" . $p['p_image'];
+                  $imagePath = "../uploads/products/" . htmlspecialchars($p['p_image']);
+                  $fileOnDisk = __DIR__ . "/../uploads/products/" . $p['p_image'];
                   
                   if (!empty($p['p_image']) && file_exists($fileOnDisk)): 
                 ?>

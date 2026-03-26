@@ -21,7 +21,7 @@ $stmt->execute([$id]);
 
 // 🔹 3. ถ้ามีรูปภาพ ให้ลบออกจากโฟลเดอร์ uploads/
 if (!empty($product['p_image'])) {
-  $imagePath = __DIR__ . "/../uploads/" . $product['p_image'];
+  $imagePath = __DIR__ . "/../uploads/products/" . $product['p_image'];
   if (file_exists($imagePath)) {
     unlink($imagePath); // ✅ ลบไฟล์รูปจริงออกจากเครื่อง
   }

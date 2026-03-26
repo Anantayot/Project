@@ -327,7 +327,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                       $total += $sum;
                       
                       // ดึงรูปภาพเล็ก
-                      $imgPath = "../../admin/uploads/" . $item['image'];
+                      $imgPath = "../../admin/uploads/product/" . $item['image'];
                       if (empty($item['image']) || !file_exists($imgPath)) $imgPath = "img/default.png";
                     ?>
                     <tr>

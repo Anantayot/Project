@@ -325,7 +325,7 @@ if (empty($search) && empty($cat_id)) {
                     <?php if ($catName): ?><h5 class="category-header"><?= htmlspecialchars($catName) ?></h5><?php endif; ?>
                     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-3 mt-1 mb-4">
                         <?php foreach ($products as $p):
-                            $img = "../admin/uploads/" . $p['p_image'];
+                            $img = "../admin/uploads/product/" . $p['p_image'];
                             if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
                         ?>
                             <div class="col" style="padding-bottom: 10px;"> <div class="product-card card border-0 shadow-sm">
@@ -368,7 +368,7 @@ if (empty($search) && empty($cat_id)) {
                 <div class="swiper mySwiper">
                     <div class="swiper-wrapper">
                         <?php foreach ($sec['data'] as $p):
-                            $img = "../admin/uploads/" . $p['p_image'];
+                            $img = "../admin/uploads/product/" . $p['p_image'];
                             if (!file_exists($img) || empty($p['p_image'])) $img = "img/default.png";
                         ?>
                             <div class="swiper-slide h-auto">
