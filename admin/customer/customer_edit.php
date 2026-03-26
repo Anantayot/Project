@@ -7,9 +7,9 @@ error_reporting(E_ALL);
 
 // ✅ ตรวจสอบการเข้าสู่ระบบ (ป้องกันคนพิมพ์ URL เข้ามาตรงๆ)
 if (!isset($_SESSION['admin_id'])) { 
-    // หมายเหตุ: เปลี่ยน 'admin_id' เป็นชื่อตัวแปร Session ที่คุณตั้งไว้ตอน Login สำเร็จ
-    header("Location: ../login.php"); 
-    exit;
+  // หมายเหตุ: เปลี่ยน 'admin_id' เป็นชื่อตัวแปร Session ที่คุณตั้งไว้ตอน Login สำเร็จ
+  header("Location: ../login.php"); 
+  exit;
 }
 
 // 🕒 ระบบจับเวลา Session Timeout (10 นาที = 600 วินาที)
@@ -75,6 +75,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   }
 }
 
+// ✅ เตรียมข้อมูลสำหรับแสดงผลในฟอร์ม (ถ้า Submit แล้ว Error จะได้แสดงค่าที่ผู้ใช้เพิ่งพิมพ์ แทนที่จะดึงจาก DB ใหม่)
+$val_name = $_POST['name'] ?? $c['name'];
+$val_email = $_POST['email'] ?? $c['email'];
+$val_phone = $_POST['phone'] ?? $c['phone'];
+$val_address = $_POST['address'] ?? $c['address'];
+
+// ✅ ดึงรูปโปรไฟล์มาแสดงให้ Admin เห็น
+if (!empty($c['profile_image']) && file_exists($_SERVER['DOCUMENT_ROOT'] . "/Project/admin/uploads/profiles/" . $c['profile_image'])) {
+    $profileImg = "/Project/admin/uploads/profiles/" . htmlspecialchars($c['profile_image']);
+} else {
+    $profileImg = "https://ui-avatars.com/api/?name=" . urlencode($c['name']) . "&background=D10024&color=fff&size=100&bold=true";
+}
+
 // ✅ เริ่มเก็บเนื้อหาเข้า Layout
 ob_start();
 ?>
@@ -107,16 +120,25 @@ ob_start();
   .form-control-custom::placeholder {
     color: rgba(255, 255, 255, 0.3);
   }
+  .profile-preview {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border: 2px solid #facc15;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
 </style>
 
 <div class="row justify-content-center">
   <div class="col-lg-8 col-xl-7">
     
     <div class="card custom-card shadow-lg mb-5">
-      <div class="card-header border-bottom border-secondary p-4" style="border-color: rgba(255,255,255,0.05) !important;">
-        <h4 class="fw-bold text-white mb-0 text-center">
+      <div class="card-header border-bottom border-secondary p-4 d-flex justify-content-between align-items-center" style="border-color: rgba(255,255,255,0.05) !important;">
+        <h4 class="fw-bold text-white mb-0">
           <i class="bi bi-pencil-square text-warning me-2"></i> แก้ไขข้อมูลลูกค้า <span class="text-warning">#<?= htmlspecialchars($id) ?></span>
         </h4>
+        <img src="<?= $profileImg ?>" alt="Customer Profile" class="profile-preview" title="รูปโปรไฟล์ของ <?= htmlspecialchars($c['name']) ?>">
       </div>
       
       <div class="card-body p-4 p-md-5">
@@ -132,22 +154,22 @@ ob_start();
             
             <div class="col-md-12">
               <label class="form-label">ชื่อ-นามสกุล <span class="text-danger">*</span></label>
-              <input type="text" name="name" value="<?= htmlspecialchars($c['name']) ?>" class="form-control form-control-custom" required>
+              <input type="text" name="name" value="<?= htmlspecialchars($val_name) ?>" class="form-control form-control-custom" required>
             </div>
 
             <div class="col-md-6">
               <label class="form-label">อีเมล <span class="text-danger">*</span></label>
-              <input type="email" name="email" value="<?= htmlspecialchars($c['email']) ?>" class="form-control form-control-custom" required>
+              <input type="email" name="email" value="<?= htmlspecialchars($val_email) ?>" class="form-control form-control-custom" required>
             </div>
 
             <div class="col-md-6">
               <label class="form-label">เบอร์โทรติดต่อ <span class="text-danger">*</span></label>
-              <input type="tel" name="phone" value="<?= htmlspecialchars($c['phone']) ?>" class="form-control form-control-custom" required>
+              <input type="tel" name="phone" value="<?= htmlspecialchars($val_phone) ?>" class="form-control form-control-custom" required>
             </div>
 
             <div class="col-12">
               <label class="form-label">ที่อยู่จัดส่ง <span class="text-danger">*</span></label>
-              <textarea name="address" rows="3" class="form-control form-control-custom" required><?= htmlspecialchars($c['address']) ?></textarea>
+              <textarea name="address" rows="3" class="form-control form-control-custom" required><?= htmlspecialchars($val_address) ?></textarea>
             </div>
 
           </div>
