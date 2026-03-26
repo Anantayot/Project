@@ -4,14 +4,21 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// 🌟 1. กำหนด BASE URL ของโฟลเดอร์ user (แก้ไขให้ตรงกับชื่อโฟลเดอร์ใน localhost ของคุณ)
+// ตัวอย่าง: ถ้าเข้าเว็บผ่าน localhost/myproject/user/ ให้ใส่ '/myproject/user/'
+$BASE_URL = '/user/'; 
+
 // ✅ นับจำนวนสินค้าในตะกร้า (แยกตามรายการสินค้า)
 $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
+
+// 🌟 2. ดึงชื่อไฟล์ปัจจุบันมาเช็คสถานะเมนู (Active)
+$current_file = basename($_SERVER['PHP_SELF']);
 ?>
 <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top main-navbar">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center transition-link" href="../index.php">
+        <a class="navbar-brand d-flex align-items-center transition-link" href="<?= $BASE_URL ?>index.php">
             <div class="logo-wrapper">
-                <img src="icon_mycommiss.png" alt="Logo" class="logo-img">
+                <img src="<?= $BASE_URL ?>includes/icon_mycommiss.png" alt="Logo" class="logo-img">
             </div>
             <span class="brand-text fw-bold ms-2">MyCommiss</span>
         </a>
@@ -24,13 +31,13 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
             <ul class="navbar-nav ms-auto align-items-lg-center py-3 py-lg-0 gap-lg-2">
                 
                 <li class="nav-item">
-                    <a href="index.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
+                    <a href="<?= $BASE_URL ?>index.php" class="nav-link transition-link <?= $current_file == 'index.php' ? 'active' : '' ?>">
                         <i class="bi bi-house-door me-1 nav-icon"></i> หน้าร้าน
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="cart/cart.php" class="nav-link cart-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'cart/cart.php' ? 'active' : '' ?>">
+                    <a href="<?= $BASE_URL ?>cart/cart.php" class="nav-link cart-link transition-link <?= $current_file == 'cart.php' ? 'active' : '' ?>">
                         <div class="cart-icon-wrapper">
                             <i class="bi bi-cart3 nav-icon"></i>
                             <?php if ($cart_count > 0): ?>
@@ -43,7 +50,7 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 
                 <?php if (isset($_SESSION['customer_id'])): ?>
                     <li class="nav-item">
-                        <a href="order/orders.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'order/orders.php' ? 'active' : '' ?>">
+                        <a href="<?= $BASE_URL ?>order/orders.php" class="nav-link transition-link <?= $current_file == 'orders.php' ? 'active' : '' ?>">
                             <i class="bi bi-box-seam me-1 nav-icon"></i> คำสั่งซื้อ
                         </a>
                     </li>
@@ -53,7 +60,7 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
                             <i class="bi bi-person-circle fs-5 me-1"></i> <?= htmlspecialchars($_SESSION['customer_name']) ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 custom-dropdown" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item transition-link" href="profile/profile.php"><i class="bi bi-person-gear me-2"></i> โปรไฟล์ส่วนตัว</a></li>
+                            <li><a class="dropdown-item transition-link" href="<?= $BASE_URL ?>profile/profile.php"><i class="bi bi-person-gear me-2"></i> โปรไฟล์ส่วนตัว</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item text-danger fw-bold btn-logout" href="#" onclick="confirmLogout(event)">
@@ -65,7 +72,7 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 
                     <div class="d-lg-none mobile-user-menu mt-3 pt-3 border-top">
                         <li class="nav-item">
-                            <a href="profile/profile.php" class="nav-link user-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'profile/profile.php' ? 'active' : '' ?>">
+                            <a href="<?= $BASE_URL ?>profile/profile.php" class="nav-link user-link transition-link <?= $current_file == 'profile.php' ? 'active' : '' ?>">
                                 <i class="bi bi-person-circle me-1"></i> <?= htmlspecialchars($_SESSION['customer_name']) ?>
                             </a>
                         </li>
@@ -78,12 +85,12 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 
                 <?php else: ?>
                     <li class="nav-item ms-lg-2">
-                        <a href="login.php" class="nav-link transition-link <?= basename($_SERVER['PHP_SELF']) == 'login.php' ? 'active' : '' ?>">
+                        <a href="<?= $BASE_URL ?>login.php" class="nav-link transition-link <?= $current_file == 'login.php' ? 'active' : '' ?>">
                             เข้าสู่ระบบ
                         </a>
                     </li>
                     <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
-                        <a href="register.php" class="btn btn-register transition-link w-100">
+                        <a href="<?= $BASE_URL ?>register.php" class="btn btn-register transition-link w-100">
                             สมัครสมาชิก
                         </a>
                     </li>
@@ -130,7 +137,6 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
         padding: 0.5rem 0;
     }
     
-    /* Glassmorphism on scroll (Requires JS to add 'scrolled' class, optional) */
     .main-navbar.scrolled {
         background: rgba(255, 255, 255, 0.9) !important;
         backdrop-filter: blur(10px);
@@ -144,7 +150,6 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
         justify-content: center;
         width: 45px;
         height: 45px;
-        /* เอาพื้นหลัง (background), ขอบ (border-radius), และการขยับ (transition) ออก */
     }
     .logo-img { height: 100%; width: auto; object-fit: contain; }
     
@@ -188,7 +193,6 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
     @media (min-width: 992px) {
         .nav-item { position: relative; }
         
-        /* ใส่ :not() เพื่อยกเว้นไม่ให้เส้นแดงไปแสดงที่ปุ่ม Profile และ Cart */
         .nav-link:not(.user-profile-btn):not(.cart-link)::after {
             content: "";
             position: absolute;
@@ -203,7 +207,6 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
         }
         .nav-link.active:not(.user-profile-btn):not(.cart-link)::after { width: 70%; }
         
-        /* User Profile Button Customization */
         .user-profile-btn {
             background-color: var(--bg-light);
             border: 1px solid #eaeaea;
@@ -211,7 +214,7 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
             padding: 0.4rem 1.2rem !important;
             display: flex !important;
             align-items: center;
-            gap: 5px; /* เพิ่มระยะห่างระหว่างไอคอนกับชื่อนิดหน่อย */
+            gap: 5px; 
         }
         
         .user-profile-btn:hover { 
@@ -219,7 +222,6 @@ $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
             border-color: var(--primary-color); 
         }
 
-        /* ปิดการแสดงผลลูกศร Dropdown และเศษเส้นแดงที่รบกวน */
         .user-profile-btn::after {
             display: none !important;
         }
@@ -325,7 +327,8 @@ function confirmLogout(e) {
     if (confirm("คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?")) {
         document.body.classList.add('fade-out');
         setTimeout(() => {
-            window.location = "../logout.php";
+            // 🌟 แก้ Path ไปหา logout.php โดยใช้ BASE_URL
+            window.location = "<?= $BASE_URL ?>logout.php";
         }, 200); 
     }
 }
@@ -352,7 +355,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Optional: Add shadow to navbar on scroll
     window.addEventListener('scroll', () => {
         const navbar = document.querySelector('.main-navbar');
         if (window.scrollY > 10) {
