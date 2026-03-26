@@ -191,11 +191,12 @@ ob_start();
   </div>
 </div>
 
-<div class="row g-4 mb-4">
-  <div class="col-12 col-xl-6 fade-up delay-3">
-    <div class="card custom-card shadow-lg h-100">
+<div class="row g-4 mb-4 d-flex align-items-stretch">
+  
+  <div class="col-12 col-xl-6 fade-up delay-3 d-flex">
+    <div class="card custom-card shadow-lg w-100 d-flex flex-column">
       <div class="card-header border-bottom border-secondary p-3"><h6 class="fw-bold text-white mb-0"><i class="bi bi-bell-fill text-primary me-2"></i> กิจกรรมล่าสุด</h6></div>
-      <div class="card-body p-4">
+      <div class="card-body p-4 flex-grow-1">
         <ul class="timeline">
           <?php foreach($recent_orders_timeline as $ro): ?>
           <li class="timeline-item">
@@ -220,13 +221,13 @@ ob_start();
     </div>
   </div>
 
-  <div class="col-12 col-xl-6 fade-up delay-4">
-    <div class="card custom-card shadow-lg h-100">
+  <div class="col-12 col-xl-6 fade-up delay-4 d-flex">
+    <div class="card custom-card shadow-lg w-100 d-flex flex-column">
       <div class="card-header border-bottom border-secondary p-3 d-flex justify-content-between align-items-center">
         <h6 class="fw-bold text-white mb-0"><i class="bi bi-exclamation-triangle text-warning me-2"></i> สินค้าใกล้หมด</h6>
         <a href="product/products.php" class="btn btn-sm btn-outline-light rounded-pill" style="font-size:0.75rem;">จัดการสต็อก</a>
       </div>
-      <div class="card-body p-3">
+      <div class="card-body p-3 flex-grow-1">
         <div class="list-group list-group-flush">
           <?php if(empty($low_stock)): ?>
             <div class="text-center py-5 text-muted"><i class="bi bi-check-circle text-success fs-1 mb-3 d-block"></i>สต็อกสินค้าทั้งหมดปลอดภัยดีครับ</div>
