@@ -40,6 +40,7 @@ ob_start();
   .table-custom-header th {
     border-bottom: none;
     padding: 15px 10px;
+    cursor: pointer; /* ให้รู้ว่ากดเรียงได้ */
   }
   .table-dark {
     --bs-table-bg: transparent;
@@ -64,6 +65,23 @@ ob_start();
     color: #ffffff !important; 
     font-weight: 500;
   }
+  
+  /* 🔸 Pagination เข้าธีม */
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #fff !important;
+    border-radius: 6px;
+    margin: 0 3px;
+    border: 1px solid transparent !important;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: rgba(34, 197, 94, 0.2) !important;
+    border: 1px solid #22c55e !important;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: linear-gradient(145deg, #22c55e, #16a34a) !important;
+    color: #fff !important;
+    border: none !important;
+  }
 
   /* 📱 ปรับแต่งสำหรับมือถือ (Mobile Card View) */
   @media (max-width: 768px) {
@@ -76,30 +94,49 @@ ob_start();
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
     #dataTable tbody td {
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex; justify-content: space-between; align-items: flex-start; /* เผื่อข้อความยาวให้ชิดบน */
       padding: 12px 0; border: none !important;
       border-bottom: 1px dashed rgba(255, 255, 255, 0.1) !important;
-      font-size: 0.95rem;
+      font-size: 0.95rem; width: 100%;
     }
     #dataTable tbody td:last-child {
       border-bottom: none !important; padding-top: 18px; padding-bottom: 5px;
     }
     #dataTable tbody td::before {
       content: attr(data-label); font-weight: 500; color: #94a3b8;
-      text-align: left; min-width: 100px; margin-right: 15px; flex-shrink: 0;
+      text-align: left; min-width: 90px; margin-right: 15px; flex-shrink: 0; white-space: nowrap;
     }
-    .mobile-value { text-align: right !important; word-break: break-word; flex-grow: 1; }
+    
+    /* 📌 คลาสบังคับให้ข้อมูลดันไปชิดขวาสุด เหมือนหน้า Order_view */
+    .mobile-right-content {
+      text-align: right;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      word-break: break-word;
+    }
+    
     .mobile-actions { display: flex; justify-content: flex-end; width: 100%; gap: 10px; }
+  }
+
+  @media (min-width: 768px) {
+    .mobile-right-content { display: contents; }
   }
 </style>
 
-<div class="d-flex justify-content-end mb-4">
-  <a href="customer_add.php" class="btn btn-success rounded-pill px-4 py-2 shadow-sm transition-all hover-scale w-100 w-md-auto">
-    <i class="bi bi-plus-circle me-1"></i> เพิ่มลูกค้าใหม่
-  </a>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <h4 class="fw-bold text-white mb-0 d-none d-md-block">
+    <i class="bi bi-people me-2 text-success"></i> จัดการลูกค้า
+  </h4>
+  <div class="ms-auto w-100 w-md-auto text-end">
+    <a href="customer_add.php" class="btn btn-success rounded-pill px-4 py-2 shadow-sm w-100 w-md-auto transition-all hover-scale">
+      <i class="bi bi-person-plus me-1"></i> เพิ่มลูกค้าใหม่
+    </a>
+  </div>
 </div>
 
-<div class="card table-card shadow-lg">
+<div class="card table-card shadow-lg mt-2">
   <div class="card-body p-3 p-md-4">
 
     <?php if(empty($customers)): ?>
@@ -111,41 +148,59 @@ ob_start();
       <div> 
         <table id="dataTable" class="table table-dark table-striped table-hover text-center align-middle w-100 mb-0">
           <thead>
-            <tr class="table-custom-header">
-              <th style="width: 80px;">รหัสลูกค้า</th>
+            <tr class="table-custom-header text-center">
+              <th style="width: 80px;">รหัส</th>
               <th class="text-start">ชื่อ-นามสกุล</th>
-              <th>อีเมล</th>
+              <th class="text-start">อีเมล</th>
               <th>เบอร์โทร</th>
-              <th>ที่อยู่จัดส่ง</th>
+              <th class="text-start">ที่อยู่จัดส่ง</th>
               <th>รับข่าวสาร</th>
-              <th style="width: 130px;">จัดการ</th>
+              <th style="width: 120px;">จัดการ</th>
             </tr>
           </thead>
           <tbody>
             <?php foreach($customers as $c): ?>
               <tr>
-                <td data-label="รหัสลูกค้า" data-sort="<?= $c['customer_id'] ?>" class="fw-bold text-success mobile-value">#<?= htmlspecialchars($c['customer_id']) ?></td>
-                <td data-label="ชื่อ-นามสกุล" class="text-md-start text-white fw-medium mobile-value"><?= htmlspecialchars($c['name']) ?></td>
-                <td data-label="อีเมล" class="text-white mobile-value"><?= htmlspecialchars($c['email'] ?: '-') ?></td>
-                <td data-label="เบอร์โทร" class="text-info fw-semibold mobile-value"><?= htmlspecialchars($c['phone'] ?: '-') ?></td>
-                <td data-label="ที่อยู่จัดส่ง" class="text-white mobile-value">
-                  <?= htmlspecialchars($c['address'] ?: '-') ?>
+                <td data-label="รหัสลูกค้า" data-sort="<?= $c['customer_id'] ?>" class="fw-bold text-success mobile-value">
+                  <div class="mobile-right-content">#<?= htmlspecialchars($c['customer_id']) ?></div>
+                </td>
+                
+                <td data-label="ชื่อ-นามสกุล" data-sort="<?= htmlspecialchars($c['name']) ?>" class="text-md-start text-white fw-medium mobile-value">
+                  <div class="mobile-right-content"><?= htmlspecialchars($c['name']) ?></div>
+                </td>
+                
+                <td data-label="อีเมล" class="text-md-start text-light mobile-value">
+                  <div class="mobile-right-content"><?= htmlspecialchars($c['email'] ?: '-') ?></div>
+                </td>
+                
+                <td data-label="เบอร์โทร" class="text-info fw-semibold mobile-value">
+                  <div class="mobile-right-content"><?= htmlspecialchars($c['phone'] ?: '-') ?></div>
+                </td>
+                
+                <td data-label="ที่อยู่" class="text-md-start text-light mobile-value">
+                  <div class="mobile-right-content">
+                    <span class="d-inline-block text-truncate" style="max-width: 200px;" title="<?= htmlspecialchars($c['address']) ?>">
+                      <?= htmlspecialchars($c['address'] ?: '-') ?>
+                    </span>
+                  </div>
                 </td>
 
                 <td data-label="รับข่าวสาร" class="mobile-value">
-                  <?php if ($c['subscribe'] == 1): ?>
-                    <span class="badge bg-success bg-opacity-75 rounded-pill px-3 py-2"><i class="bi bi-check-circle me-1"></i> รับข่าวสาร</span>
-                  <?php else: ?>
-                    <span class="badge bg-secondary bg-opacity-75 rounded-pill px-3 py-2 text-white"><i class="bi bi-x-circle me-1"></i> ไม่ได้รับ</span>
-                  <?php endif; ?>
+                  <div class="mobile-right-content">
+                    <?php if ($c['subscribe'] == 1): ?>
+                      <span class="badge bg-success bg-opacity-75 rounded-pill px-3 py-2"><i class="bi bi-check-circle me-1"></i> รับข่าวสาร</span>
+                    <?php else: ?>
+                      <span class="badge bg-secondary bg-opacity-75 rounded-pill px-3 py-2 text-white"><i class="bi bi-x-circle me-1"></i> ไม่ได้รับ</span>
+                    <?php endif; ?>
+                  </div>
                 </td>
 
                 <td data-label="จัดการ" class="mobile-value">
                   <div class="d-flex justify-content-center mobile-actions">
-                    <a href="customer_edit.php?id=<?= $c['customer_id'] ?>" class="btn btn-sm btn-outline-warning rounded-circle" title="แก้ไข">
+                    <a href="customer_edit.php?id=<?= $c['customer_id'] ?>" class="btn btn-sm btn-outline-warning rounded-circle transition-all hover-scale" data-bs-toggle="tooltip" title="แก้ไขข้อมูล">
                       <i class="bi bi-pencil"></i>
                     </a>
-                    <a href="customer_delete.php?id=<?= $c['customer_id'] ?>" class="btn btn-sm btn-outline-danger rounded-circle" title="ลบ" onclick="return confirm('ยืนยันการลบลูกค้ารหัส #<?= htmlspecialchars($c['customer_id']) ?> หรือไม่?');">
+                    <a href="customer_delete.php?id=<?= $c['customer_id'] ?>" class="btn btn-sm btn-outline-danger rounded-circle transition-all hover-scale" data-bs-toggle="tooltip" title="ลบข้อมูล" onclick="return confirm('ยืนยันการลบลูกค้ารหัส #<?= htmlspecialchars($c['customer_id']) ?> หรือไม่?');">
                       <i class="bi bi-trash"></i>
                     </a>
                   </div>
@@ -176,15 +231,15 @@ ob_start();
         $('#dataTable').DataTable({
           language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
           pageLength: 10,
-          responsive: false, 
-          order: [[0, "asc"]], // ✅ เรียงตามรหัสลูกค้าจากน้อยไปมาก
+          responsive: false, // ปิดไว้เพราะเราใช้ CSS Card View บนมือถือ
+          order: [[0, "desc"]], // ✅ เรียงจากลูกค้าใหม่สุดไปเก่า (ถ้าอยากได้เก่าไปใหม่ ให้เปลี่ยน desc เป็น asc)
           columnDefs: [
-            { orderable: false, targets: [6] } 
+            { orderable: false, targets: [6] } // ปิด sort ช่องจัดการ
           ],
           dom: '<"d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3"lf>rt<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3"ip>'
         });
 
-        // ✅ แต่งกล่องค้นหาและช่อง Dropdown ให้ข้อความเป็นสีขาว
+        // ✅ แต่งกล่องค้นหาและช่อง Dropdown ให้ข้อความเป็นสีขาวแบบเดียวกับหน้าอื่นๆ
         $(".dataTables_filter input")
           .addClass("form-control form-control-sm text-white")
           .css({
@@ -200,6 +255,10 @@ ob_start();
             "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "8px",
             "padding": "6px 30px 6px 15px"
           });
+          
+        // เปิด Tooltip
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
       };
     };
   });
