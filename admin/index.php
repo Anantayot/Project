@@ -38,11 +38,12 @@ $total_orders     = $conn->query("SELECT COUNT(*) FROM orders")->fetchColumn();
 $total_income     = $conn->query("SELECT SUM(total_price) FROM orders WHERE payment_status = 'ชำระเงินแล้ว'")->fetchColumn() ?: 0;
 
 // ==========================================
-// 📈 2. ข้อมูลกราฟยอดขายย้อนหลัง 7 วัน
+// 📈 2. ข้อมูลกราฟยอดขายย้อนหลัง 7 วัน (นับจากเมื่อวาน)
 // ==========================================
 $sales_labels = [];
 $sales_data = [];
-for ($i = 6; $i >= 0; $i--) {
+// เปลี่ยนจากการเริ่มที่ 6 จบที่ 0 -> เป็นเริ่มที่ 7 จบที่ 1 (นับถอยหลังไป 1 สัปดาห์ โดยตัดวันนี้ออก)
+for ($i = 7; $i >= 1; $i--) {
     $date = date('Y-m-d', strtotime("-$i days"));
     $sales_labels[] = date('d/m', strtotime($date));
     $stmt = $conn->prepare("SELECT SUM(total_price) FROM orders WHERE DATE(order_date) = ? AND payment_status = 'ชำระเงินแล้ว'");
