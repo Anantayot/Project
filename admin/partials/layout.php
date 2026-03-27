@@ -357,7 +357,7 @@
       background: var(--bg-card);
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
+      padding: 0 15px;
       border-bottom: 1px solid var(--border-color);
       position: sticky;
       top: 0;
@@ -370,6 +370,16 @@
       color: var(--primary);
       font-size: 1.8rem;
       padding: 0;
+    }
+    
+    /* ป้องกันชื่อหน้ายาวเกินจอ */
+    .mobile-navbar .title-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 45%; 
     }
 
     .overlay {
@@ -406,13 +416,19 @@
 
     <div class="topbar">
       <h4 class="topbar-title"><?= $pageTitle ?? 'จัดการลูกค้า' ?></h4>
-      <a href="http://103.40.119.91/Project/user/index.php" class="btn-storefront"><i class="bi bi-shop"></i> ดูหน้าร้าน</a>
+      <a href="http://103.40.119.91/Project/user/index.php" class="btn-storefront">
+        <i class="bi bi-shop"></i> ดูหน้าร้าน
+      </a>
     </div>
 
     <div class="mobile-navbar">
       <button class="btn-menu" id="menuToggle"><i class="bi bi-list"></i></button>
-      <h5 class="m-0 text-white"><?= $pageTitle ?? 'จัดการลูกค้า' ?></h5>
-      <div></div>
+      <h5 class="m-0 text-white title-text text-center"><?= $pageTitle ?? 'จัดการลูกค้า' ?></h5>
+      
+      <a href="http://103.40.119.91/Project/user/index.php" class="btn-storefront px-3 py-1" style="font-size: 0.8rem;">
+        <i class="bi bi-shop m-0"></i>
+        <span class="d-none d-sm-inline ms-1">ดูหน้าร้าน</span>
+      </a>
     </div>
 
     <div class="content-area">
