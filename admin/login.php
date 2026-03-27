@@ -91,17 +91,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
     }
     
-    /* Header - MODIFIED to make logo LARGER */
+    /* Header */
     .login-icon { 
-      /* font-size: 3.5rem; -- removed, for text icon */
-      /* color: #22c55e; -- removed, for text icon */
       margin-bottom: 0.5rem; 
       filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.4));
     }
     .login-icon img {
-      width: 7.0rem; /* ขนาดโลโกที่ใหญ่ขึ้นตามที่ขอ */
-      height: auto;  /* รักษาอัตราส่วนภาพ */
-      display: block; /* จัดกึ่งกลางในlogin-icon div */
+      width: 7.0rem; 
+      height: auto;  
+      display: block; 
       margin-left: auto;
       margin-right: auto;
     }
@@ -116,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       color: #22c55e;
     }
     
-    /* Custom Inputs (แคปซูลสำหรับมือถือ) */
+    /* Custom Inputs */
     .custom-input-group {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -145,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       border: none; 
       color: #f8fafc; 
       padding: 1rem 1rem 1rem 0.5rem; 
-      font-size: 16px; /* บังคับ 16px ป้องกัน iOS ซูม */
+      font-size: 16px; 
       box-shadow: none !important;
     }
     .form-control::placeholder { 
@@ -189,6 +187,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       transform: translateY(0);
       box-shadow: none;
     }
+
+    /* ✅ เพิ่มสไตล์สำหรับปุ่มไปหน้าร้านค้าผู้ใช้ */
+    .btn-go-user {
+      display: inline-block;
+      margin-top: 1.5rem;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 0.6rem 1.5rem;
+      border-radius: 50px;
+      background: rgba(255,255,255,0.02);
+      width: 100%;
+    }
+    .btn-go-user:hover {
+      color: #22c55e;
+      border-color: rgba(34, 197, 94, 0.5);
+      background: rgba(34, 197, 94, 0.05);
+      transform: translateY(-2px);
+    }
     
     /* Alert */
     .alert-custom { 
@@ -203,7 +222,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       padding: 12px 15px;
     }
 
-    /* Media Queries สำหรับมือถือเล็ก */
     @media (max-width: 400px) {
       .login-card {
         padding: 2.5rem 1.5rem;
@@ -248,6 +266,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           เข้าสู่ระบบ <i class="bi bi-arrow-right ms-1"></i>
         </button>
       </form>
+
+      <a href="http://103.40.119.91/Project/user/" class="btn-go-user">
+        <i class="bi bi-shop me-2"></i>ไปยังหน้าร้านค้าสำหรับลูกค้า
+      </a>
+
     </div>
   </div>
 
