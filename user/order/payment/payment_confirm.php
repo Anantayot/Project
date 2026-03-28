@@ -159,11 +159,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       ======================================================= */
   $webhook_url = "http://103.40.119.91:5678/webhook-test/778284f3-0ba4-473f-9d10-fee5d2416f4f";
 
-  // ✅ สร้างรหัสคำสั่งซื้อแบบ #00154
-  $formatted_order_id = "#" . str_pad($order_id, 5, '0', STR_PAD_LEFT);
+  // ✅ ลบเครื่องหมาย # ออก เหลือแค่ตัวเลขเติมศูนย์ เช่น 00154
+  $formatted_order_id = str_pad($order_id, 5, '0', STR_PAD_LEFT);
 
   $payload_data = [
-      'order_id'      => $formatted_order_id, // ส่งแบบ #00154
+      'order_id'      => $formatted_order_id, // ส่งแบบ 00154
       'customer_id'   => $customer_id,
       'customer_name' => $order['name'],
       'email'         => $order['email'],     // ส่ง email ไปด้วย
@@ -331,7 +331,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
           <div class="p-3 rounded-3" style="background-color: #fff4f4; border: 1px dashed #D10024;">
             <div class="text-danger small fw-bold mb-1"><i class="bi bi-pencil-square me-1"></i>กรุณาระบุบันทึกช่วยจำ (Memo) ตอนโอนเงิน:</div>
-            <div class="fs-4 fw-bold text-dark">#<?= str_pad($order_id, 5, '0', STR_PAD_LEFT) ?></div>
+            <div class="fs-4 fw-bold text-dark"><?= str_pad($order_id, 5, '0', STR_PAD_LEFT) ?></div>
           </div>
           
         </div>
