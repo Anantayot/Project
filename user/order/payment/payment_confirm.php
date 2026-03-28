@@ -324,9 +324,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div id="qrcode"></div>
           </div>
           
-          <div class="mt-3">
+          <div class="mt-3 mb-3">
             <div class="text-muted small">ยอดที่ต้องชำระ</div>
             <div class="total-price"><?= number_format($order['total_price'], 2) ?> ฿</div>
+          </div>
+
+          <div class="p-3 rounded-3" style="background-color: #fff4f4; border: 1px dashed #D10024;">
+            <div class="text-danger small fw-bold mb-1"><i class="bi bi-pencil-square me-1"></i>กรุณาระบุบันทึกช่วยจำ (Memo) ตอนโอนเงิน:</div>
+            <div class="fs-4 fw-bold text-dark">#<?= str_pad($order_id, 5, '0', STR_PAD_LEFT) ?></div>
           </div>
           
         </div>
