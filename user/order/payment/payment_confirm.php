@@ -21,8 +21,8 @@ if (!isset($_GET['id'])) {
 
 $order_id = intval($_GET['id']);
 
-// ดึงข้อมูลคำสั่งซื้อพร้อมชื่อลูกค้า
-$stmt = $conn->prepare("SELECT o.*, c.name 
+// ✅ ดึงข้อมูลคำสั่งซื้อพร้อมชื่อลูกค้า และอีเมล (เพิ่ม c.email)
+$stmt = $conn->prepare("SELECT o.*, c.name, c.email 
                         FROM orders o 
                         JOIN customers c ON o.customer_id = c.customer_id 
                         WHERE o.order_id = ? AND o.customer_id = ?");
@@ -159,11 +159,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       ======================================================= */
   $webhook_url = "http://103.40.119.91:5678/webhook-test/778284f3-0ba4-473f-9d10-fee5d2416f4f";
 
+  // ✅ สร้างรหัสคำสั่งซื้อแบบ #00154
+  $formatted_order_id = "#" . str_pad($order_id, 5, '0', STR_PAD_LEFT);
+
   $payload_data = [
-      'order_id'      => $order_id,
+      'order_id'      => $formatted_order_id, // ส่งแบบ #00154
       'customer_id'   => $customer_id,
       'customer_name' => $order['name'],
-      'amount'        => $total_amount, // ใช้ค่าที่ดึงมาใหม่
+      'email'         => $order['email'],     // ส่ง email ไปด้วย
+      'amount'        => $total_amount,
       'slip_image'    => $fileName,
       'status'        => 'payment_submitted',
       'timestamp'     => date('Y-m-d H:i:s')
