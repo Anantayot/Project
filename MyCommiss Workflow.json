@@ -211,7 +211,7 @@
     },
     {
       "parameters": {
-        "jsCode": "let sale_date = null;\nlet paid_total = 0;\nlet unpaid_total = 0;\nlet ordersMap = {};\n\n// เมื่อวานตามเวลาไทย (Asia/Bangkok) แบบนิ่ง ไม่พึ่ง timezone ของเครื่อง\nconst nowBkk = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));\nnowBkk.setDate(nowBkk.getDate() - 1);\nconst yesterdayText = nowBkk.toLocaleDateString('th-TH');\n\nconst sheet_url = \"https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=sharing\";\nconst looker_url = \"https://lookerstudio.google.com/reporting/11d93bcd-f176-46e8-949a-371801353d2a\";\n\n// items = ข้อมูลจาก node ก่อนหน้าใน n8n (แต่ละ item = 1 row)\nfor (const item of items) {\n  const j = item.json;\n\n  sale_date = sale_date || j.sale_date;\n  const amount = Number(j.subtotal || 0);\n\n  if (j.payment_status === 'ชำระเงินแล้ว') paid_total += amount;\n  else unpaid_total += amount;\n\n  // ===== เพิ่ม: แปลงวิธีชำระเงิน (COD = เงินสด) =====\n  let paymentMethodText = 'ไม่มีข้อมูล';\n  if (j.payment_method === 'COD') paymentMethodText = '💵 เงินสด';\n  else if (j.payment_method === 'QR') paymentMethodText = '📲 โอนผ่านธนาคาร';\n\n  if (!ordersMap[j.order_id]) {\n    ordersMap[j.order_id] = {\n      customer_name: j.customer_name,\n      payment_status: j.payment_status,\n      payment_method: paymentMethodText,     // << เพิ่ม\n      total_amount: 0,\n      categories: {}\n    };\n  }\n\n  const catName = j.cat_name || 'ทั่วไป';\n  if (!ordersMap[j.order_id].categories[catName]) {\n    ordersMap[j.order_id].categories[catName] = [];\n  }\n\n  ordersMap[j.order_id].categories[catName].push(`      ◦ ${j.product_name}\\n(จำนวน ${j.qty} ชิ้น)`);\n  ordersMap[j.order_id].total_amount += amount;\n}\n\n// ทำรายละเอียดรายออเดอร์\nlet detail_lines = [];\nfor (const order_id in ordersMap) {\n  const order = ordersMap[order_id];\n\n  let categorySections = [];\n  for (const cat in order.categories) {\n    categorySections.push(`   📂 หมวดหมู่: ${cat}\\n${order.categories[cat].join('\\n')}`);\n  }\n\n  detail_lines.push(\n`🆔 ออเดอร์: #${order_id}\n👤 ลูกค้า: คุณ ${order.customer_name}\n${categorySections.join('\\n')}\n💰 ยอดรวม: ${order.total_amount.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n📍 สถานะชำระเงิน: ${order.payment_status === 'ชำระเงินแล้ว' ? '✅ จ่ายแล้ว' : '⏳ รอชำระ'}\n💳 วิธีชำระ: ${order.payment_method}`\n  );\n}\n\n// ===== ส่วนที่คุณขอ: unshift สรุปขึ้นก่อน =====\nlet all_messages = [];\n\nall_messages.unshift(\n`┏━━━━━━━━━━━━━┓\n        📊 สรุปยอดขายประจำวัน\n┗━━━━━━━━━━━━━┛\n📅 วันที่: ${yesterdayText}\n\n💰 ยอดรวมทั้งหมด: ${(paid_total + unpaid_total).toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n----------------------------------\n✅ จ่ายแล้ว: ${paid_total.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n❌ ยังไม่จ่าย: ${unpaid_total.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n\n📊 Dashboard วิเคราะห์ยอดขาย :\n🔗 ${looker_url}\n📁 ตรวจสอบรายการทั้งหมด :\n🔗 ${sheet_url}\n\nภาพรวมวันนี้ประมาณนี้ครับ 😎`\n);\n\n// เติมรายละเอียดตามหลัง (ทีละ 5)\nfor (let i = 0; i < detail_lines.length; i += 5) {\n  const chunk = detail_lines.slice(i, i + 5);\n\n  all_messages.push(\n`📝 รายละเอียดรายการ (${i + 1}-${Math.min(i + 5, detail_lines.length)})\n━━━━━━━━━━━━━━\n${chunk.join('\\n------------------------------\\n')}\n━━━━━━━━━━━━━━`\n  );\n}\n\n// คืนค่าเป็นหลาย items เพื่อให้ Split Out ทำงานต่อ\nreturn all_messages.map(msg => ({ json: { line_text: msg } }));\n"
+        "jsCode": "let sale_date = null;\nlet paid_total = 0;\nlet unpaid_total = 0;\nlet ordersMap = {};\n\n// เมื่อวานตามเวลาไทย (Asia/Bangkok) แบบนิ่ง ไม่พึ่ง timezone ของเครื่อง\nconst nowBkk = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));\nnowBkk.setDate(nowBkk.getDate() - 1);\nconst yesterdayText = nowBkk.toLocaleDateString('th-TH');\n\nconst sheet_url = \"https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=sharing\";\nconst looker_url = \"https://lookerstudio.google.com/s/mfnJ-P1su1A\";\n\n// items = ข้อมูลจาก node ก่อนหน้าใน n8n (แต่ละ item = 1 row)\nfor (const item of items) {\n  const j = item.json;\n\n  sale_date = sale_date || j.sale_date;\n  const amount = Number(j.subtotal || 0);\n\n  if (j.payment_status === 'ชำระเงินแล้ว') paid_total += amount;\n  else unpaid_total += amount;\n\n  // ===== เพิ่ม: แปลงวิธีชำระเงิน (COD = เงินสด) =====\n  let paymentMethodText = 'ไม่มีข้อมูล';\n  if (j.payment_method === 'COD') paymentMethodText = '💵 เงินสด';\n  else if (j.payment_method === 'QR') paymentMethodText = '📲 โอนผ่านธนาคาร';\n\n  if (!ordersMap[j.order_id]) {\n    ordersMap[j.order_id] = {\n      customer_name: j.customer_name,\n      payment_status: j.payment_status,\n      payment_method: paymentMethodText,     // << เพิ่ม\n      total_amount: 0,\n      categories: {}\n    };\n  }\n\n  const catName = j.cat_name || 'ทั่วไป';\n  if (!ordersMap[j.order_id].categories[catName]) {\n    ordersMap[j.order_id].categories[catName] = [];\n  }\n\n  ordersMap[j.order_id].categories[catName].push(`      ◦ ${j.product_name}\\n(จำนวน ${j.qty} ชิ้น)`);\n  ordersMap[j.order_id].total_amount += amount;\n}\n\n// ทำรายละเอียดรายออเดอร์\nlet detail_lines = [];\nfor (const order_id in ordersMap) {\n  const order = ordersMap[order_id];\n\n  let categorySections = [];\n  for (const cat in order.categories) {\n    categorySections.push(`   📂 หมวดหมู่: ${cat}\\n${order.categories[cat].join('\\n')}`);\n  }\n\n  detail_lines.push(\n`🆔 ออเดอร์: #${order_id}\n👤 ลูกค้า: คุณ ${order.customer_name}\n${categorySections.join('\\n')}\n💰 ยอดรวม: ${order.total_amount.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n📍 สถานะชำระเงิน: ${order.payment_status === 'ชำระเงินแล้ว' ? '✅ จ่ายแล้ว' : '⏳ รอชำระ'}\n💳 วิธีชำระ: ${order.payment_method}`\n  );\n}\n\n// ===== ส่วนที่คุณขอ: unshift สรุปขึ้นก่อน =====\nlet all_messages = [];\n\nall_messages.unshift(\n`┏━━━━━━━━━━━━━┓\n        📊 สรุปยอดขายประจำวัน\n┗━━━━━━━━━━━━━┛\n📅 วันที่: ${yesterdayText}\n\n💰 ยอดรวมทั้งหมด: ${(paid_total + unpaid_total).toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n----------------------------------\n✅ จ่ายแล้ว: ${paid_total.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n❌ ยังไม่จ่าย: ${unpaid_total.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท\n\n📊 Dashboard วิเคราะห์ยอดขาย :\n🔗 ${looker_url}\n📁 ตรวจสอบรายการทั้งหมด :\n🔗 ${sheet_url}\n\nภาพรวมวันนี้ประมาณนี้ครับ 😎`\n);\n\n// เติมรายละเอียดตามหลัง (ทีละ 5)\nfor (let i = 0; i < detail_lines.length; i += 5) {\n  const chunk = detail_lines.slice(i, i + 5);\n\n  all_messages.push(\n`📝 รายละเอียดรายการ (${i + 1}-${Math.min(i + 5, detail_lines.length)})\n━━━━━━━━━━━━━━\n${chunk.join('\\n------------------------------\\n')}\n━━━━━━━━━━━━━━`\n  );\n}\n\n// คืนค่าเป็นหลาย items เพื่อให้ Split Out ทำงานต่อ\nreturn all_messages.map(msg => ({ json: { line_text: msg } }));\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -324,7 +324,7 @@
             {
               "id": "f24fb7a4-4a58-40e4-9526-c298b5f36a17",
               "name": "=line_text",
-              "value": "=┏━━━━━━━━━━━━━┓\\n        📊 สรุปยอดขายประจำวัน\\n┗━━━━━━━━━━━━━┛📅 วันที่: {{ \n  (() => {\n    const nowBkk = new Date(\n      new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })\n    );\n    nowBkk.setDate(nowBkk.getDate() - 1);\n    return nowBkk.toLocaleDateString('th-TH');\n  })()\n}}\n \\nวันนี้ไม่มีออเดอร์เข้ามาครับ\\nงานเรียบร้อยดี พักผ่อนได้เลยครับ! ----------------------------------\\n\n📊 Dashboard วิเคราะห์ยอดขาย :\\n🔗 https://lookerstudio.google.com/reporting/11d93bcd-f176-46e8-949a-371801353d2a\\n\n📁 ตรวจสอบรายการย้อนหลังได้ที่นี่ :\\n🔗 https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=sharing",
+              "value": "=┏━━━━━━━━━━━━━┓\\n        📊 สรุปยอดขายประจำวัน\\n┗━━━━━━━━━━━━━┛📅 วันที่: {{ \n  (() => {\n    const nowBkk = new Date(\n      new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })\n    );\n    nowBkk.setDate(nowBkk.getDate() - 1);\n    return nowBkk.toLocaleDateString('th-TH');\n  })()\n}}\n \\nวันนี้ไม่มีออเดอร์เข้ามาครับ\\nงานเรียบร้อยดี พักผ่อนได้เลยครับ! ----------------------------------\\n\n📊 Dashboard วิเคราะห์ยอดขาย :\\n🔗 https://lookerstudio.google.com/s/mfnJ-P1su1A\\n\n📁 ตรวจสอบรายการย้อนหลังได้ที่นี่ :\\n🔗 https://docs.google.com/spreadsheets/d/1tdmtxnrDUllNzewTxA8Xdc6BrIUH0teCFHJEVoU84sw/edit?usp=sharing",
               "type": "string"
             }
           ]
@@ -873,8 +873,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -544,
-        672
+        -848,
+        768
       ],
       "id": "c4868fee-04f5-401d-9ddd-223173af93f8",
       "name": "Webhook",
@@ -888,8 +888,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -304,
-        672
+        -608,
+        768
       ],
       "id": "92d74956-62db-4604-9983-5b723fccdb35",
       "name": "HTTP Request5"
@@ -897,15 +897,15 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=อ่านข้อมูลจากสลิปโอนเงินที่แนบมา และเปรียบเทียบกับข้อมูลอ้างอิงด้านล่างนี้:\n\nข้อมูลอ้างอิงจากระบบ:\n- ชื่อลูกค้าผู้ซื้อ: {{ $json.body.customer_name }}\n- ยอดเงินที่ต้องโอน: {{ $json.body.amount }}\n\nคำสั่ง:\n1. ตรวจสอบว่า \"ชื่อผู้โอน\" ในสลิป ตรงกับ \"ชื่อลูกค้าผู้ซื้อ\" หรือไม่ (ตัดคำนำหน้า นาย, น.ส., นาง, ด.ช., ด.ญ. ออกก่อนเทียบ) พร้อมทั้งตัดนามสกุลออกด้วย\n2. ตรวจสอบว่า \"จำนวนเงิน\" ในสลิป ตรงกับ \"ยอดเงินที่ต้องโอน\" หรือไม่\n3. ตรวจสอบว่าสลิปมีความชัดเจนและเป็นสลิปจริงหรือไม่\n4. ตรวจสอบ \"ชื่อผู้รับ\" ในสลิปต้องชื่อ \"อนันตยศ อินทราพงษ์\" มีคำนำหน้าว่า นาย หรือไม่มีก็ได้\n\nสรุปผลเป็น JSON เท่านั้น ห้ามมีข้อความอื่นนอกจาก JSON\n\nโครงสร้าง JSON:\n{\n  \"output\": {\n    \"amount\": number, (ยอดเงินที่อ่านได้จากสลิป)\n    \"valid\": boolean (เป็น true ต่อเมื่อชื่อผู้โอนตรงกับชื่อลูกค้า และยอดเงินถูกต้อง และสลิปชัดเจน และชื่อผู้รับถูกต้อง)\n  }\n}",
+        "text": "=บทบาท: คุณคือผู้ช่วยตรวจสอบสลิปโอนเงินอัจฉริยะที่แม่นยำสูง\nคำสั่ง:\nอ่านข้อมูลจากรูปภาพสลิปโอนเงินที่แนบมา และเปรียบเทียบกับข้อมูลอ้างอิงจากระบบดังนี้:\nข้อมูลอ้างอิง (Reference Data):\nเลขคำสั่งซื้อ (Order ID): {{ $json.body.order_id }}\nชื่อลูกค้าผู้สั่งซื้อ: {{ $json.body.customer_name }}\nยอดเงินที่ต้องโอน: {{ $json.body.amount }}\nชื่อผู้รับเงินที่ถูกต้อง: \"อนันตยศ อินทราพงษ์\" หรือ \"Anantayot Intharaphong\"\nขั้นตอนการตรวจสอบ:\nVerify Order ID: ตรวจสอบว่าในสลิปมีตัวเลขคำสั่งซื้อตรงกับ {{ $json.body.order_id }} หรือไม่\nVerify Sender Name (Crucial): ตรวจสอบชื่อ \"ผู้โอน\" ในสลิป เปรียบเทียบกับชื่อลูกค้า {{ $json.body.customer_name }}\nกฎการตรวจสอบ: ให้ \"ตัดคำนำหน้าชื่อออกทั้งหมด\" (เช่น นาย, นาง, นางสาว, Mr., Mrs., Ms.)และนามสกุล ทั้งจากข้อมูลในสลิปและข้อมูลอ้างอิง ก่อนจะนำชื่อมาตรวจ\nVerify Amount: ตรวจสอบ \"จำนวนเงิน\" ในสลิปว่าตรงกับยอด {{ $json.body.amount }} หรือไม่\nVerify Receiver: ตรวจสอบชื่อผู้รับเงิน ต้องเป็นชื่อตามที่ระบุไว้ข้างต้น (อนุโลมเรื่องคำนำหน้าชื่อ)\nVerify Authenticity: ตรวจสอบความชัดเจนและร่องรอยการแก้ไขสลิป ต้องมีเลขที่รายการครบถ้วน\nเงื่อนไขการตัดสินใจ (valid = true):\nค่า valid จะเป็น true ก็ต่อเมื่อ:\nพบเลข Order ID ที่ตรงกันในสลิป\nชื่อผู้โอน (หลังตัดคำนำหน้าและนามสกุลออกแล้ว) ตรงกับชื่อลูกค้า\nยอดเงินตรงกันเป๊ะๆ\nชื่อผู้รับเงินถูกต้อง และสลิปมีความน่าเชื่อถือ",
         "hasOutputParser": true,
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        -48,
-        672
+        -352,
+        768
       ],
       "id": "eaafea2b-2032-4711-82a4-806aa038c137",
       "name": "AI Agent1"
@@ -917,8 +917,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -144,
-        864
+        -448,
+        960
       ],
       "id": "f9c302f8-0d7f-4e55-ab9f-6b522aece9ce",
       "name": "Google Gemini Chat Model1",
@@ -931,13 +931,13 @@
     },
     {
       "parameters": {
-        "jsonSchemaExample": "{\n  \"output\": {\n    \"amount\": 140,\n    \"valid\": true\n  }\n}"
+        "jsonSchemaExample": "{\n  \"output\": {\n    \"order_id_found\": \"string\",\n    \"amount\": 0.0,\n    \"valid\": false\n  }\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        160,
-        864
+        -144,
+        960
       ],
       "id": "07070bf1-b7f3-46c3-bae6-9325d1e18bcf",
       "name": "Structured Output Parser1"
@@ -969,8 +969,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        320,
-        672
+        16,
+        768
       ],
       "id": "a74f7222-e1ed-4173-a4a7-027f7974852c",
       "name": "If3"
@@ -1008,8 +1008,8 @@
       "type": "n8n-nodes-base.mySql",
       "typeVersion": 2.5,
       "position": [
-        640,
-        560
+        288,
+        656
       ],
       "id": "8fed6999-5b60-4911-a61e-df1298a65efc",
       "name": "Update rows in a table",
@@ -1053,8 +1053,8 @@
       "type": "n8n-nodes-base.mySql",
       "typeVersion": 2.5,
       "position": [
-        640,
-        752
+        288,
+        848
       ],
       "id": "11448ed9-cb56-439c-b583-0fa4209f90d8",
       "name": "Update rows in a table1",
@@ -1062,6 +1062,118 @@
         "mySql": {
           "id": "JBTP6ufZQoCmYc8K",
           "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f83d6cf2-366e-4a7e-aa20-853314b568c2",
+              "name": "subject",
+              "value": "=แจ้งเตือน: สลิปการโอนเงินถูกปฏิเสธ - คำสั่งซื้อ #{{ $('Webhook').item.json.body.order_id }}",
+              "type": "string"
+            },
+            {
+              "id": "679ed58a-d2f8-4e95-9d39-66d7d9e56c31",
+              "name": "html",
+              "value": "=<div style=\"font-family: sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;\">\n    \n    <h2 style=\"color: #D10024;\">สวัสดีคุณ {{ $('Webhook').item.json.body.customer_name }}</h2>\n    \n    <p>ระบบได้ทำการตรวจสอบสลิปการโอนเงินของคุณสำหรับ <strong>คำสั่งซื้อ #{{ $('Webhook').item.json.body.order_id }}</strong> ยอดเงิน <strong>{{ $('Webhook').item.json.body.amount }} บาท</strong></p>\n    \n    <div style=\"background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 10px 15px; margin: 20px 0;\">\n        <p style=\"color: #b91c1c; margin: 0;\"><strong>ผลการตรวจสอบ: สลิปการชำระเงินของคุณถูกปฏิเสธ</strong></p>\n    </div>\n    \n    <p>สาเหตุอาจเกิดจากภาพสลิปไม่ชัดเจน, ยอดเงินไม่ตรงกับคำสั่งซื้อ, หรือมีการใช้สลิปซ้ำ</p>\n    <p>กรุณาตรวจสอบความถูกต้อง และทำการแนบหลักฐานการชำระเงินเข้ามาใหม่อีกครั้งผ่านลิงก์ด้านล่างนี้ครับ</p>\n    \n    <div style=\"text-align: center; margin: 30px 0;\">\n        <a href=\"http://103.40.119.91/Project/user/index.php\" style=\"background-color: #D10024; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;\">คลิกดูรายละเอียดและแจ้งชำระเงินใหม่</a>\n    </div>\n    \n    <hr style=\"border: none; border-top: 1px solid #eee; margin: 20px 0;\">\n    <p style=\"font-size: 12px; color: #777;\">ขอบคุณที่ใช้บริการ MyCommiss<br>หากมีข้อสงสัยเพิ่มเติม สามารถติดต่อแอดมินได้เลยครับ</p>\n\n</div>",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        848
+      ],
+      "id": "c569fe69-bda1-46de-9222-d61f72e13dab",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "fromEmail": "mycommiss.info@gmail.com",
+        "toEmail": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        848
+      ],
+      "id": "b294c36f-b505-4309-a6f2-904e339b3477",
+      "name": "Send an Email2",
+      "webhookId": "b83a60ba-b7b2-4eb6-ad3b-809499a50139",
+      "credentials": {
+        "smtp": {
+          "id": "UowHqKwKgvYyBirp",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f83d6cf2-366e-4a7e-aa20-853314b568c2",
+              "name": "subject",
+              "value": "=แจ้งเตือน: ชำระเงินสำเร็จ ✅ - คำสั่งซื้อ #{{ $('Webhook').item.json.body.order_id }}",
+              "type": "string"
+            },
+            {
+              "id": "679ed58a-d2f8-4e95-9d39-66d7d9e56c31",
+              "name": "html",
+              "value": "=<div style=\"font-family: sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;\">\n    \n    <h2 style=\"color: #22c55e;\">สวัสดีคุณ {{ $('Webhook').item.json.body.customer_name }}</h2>\n    \n    <p>ระบบได้รับและตรวจสอบยอดเงินจำนวน <strong>{{ $('Webhook').item.json.body.amount }} บาท</strong> สำหรับ <strong>คำสั่งซื้อ #{{ $('Webhook').item.json.body.order_id }}</strong> ของคุณเรียบร้อยแล้ว</p>\n    \n    <div style=\"background-color: #f0fdf4; border-left: 4px solid #22c55e; padding: 10px 15px; margin: 20px 0;\">\n        <p style=\"color: #16a34a; margin: 0;\"><strong>สถานะ: ชำระเงินสำเร็จ ✅</strong></p>\n    </div>\n    \n    <p>ขณะนี้ทางร้านกำลังจัดเตรียมสินค้า และจะทำการจัดส่งให้คุณโดยเร็วที่สุดครับ คุณสามารถตรวจสอบรายละเอียดและติดตามสถานะคำสั่งซื้อของคุณได้ตลอดเวลาผ่านปุ่มด้านล่างนี้</p>\n    \n    <div style=\"text-align: center; margin: 30px 0;\">\n        <a href=\"http://103.40.119.91/Project/user/order/orders.php\" style=\"background-color: #22c55e; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;\">คลิกดูสถานะคำสั่งซื้อ</a>\n    </div>\n    \n    <hr style=\"border: none; border-top: 1px solid #eee; margin: 20px 0;\">\n    <p style=\"font-size: 12px; color: #777;\">ขอบคุณที่ไว้วางใจใช้บริการ MyCommiss<br>หากมีข้อสงสัยเพิ่มเติม สามารถติดต่อแอดมินได้ตลอดเวลาครับ</p>\n\n</div>",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        656
+      ],
+      "id": "b43f4f84-9ef8-4a1c-a92c-1f34c3114c6f",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "fromEmail": "mycommiss.info@gmail.com",
+        "toEmail": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        656
+      ],
+      "id": "a44f77c2-84f8-46ec-a9af-2aabd8288b48",
+      "name": "Send an Email3",
+      "webhookId": "b83a60ba-b7b2-4eb6-ad3b-809499a50139",
+      "credentials": {
+        "smtp": {
+          "id": "UowHqKwKgvYyBirp",
+          "name": "SMTP account"
         }
       }
     }
@@ -1465,6 +1577,50 @@
           }
         ]
       ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Send an Email2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update rows in a table1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Send an Email3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -1476,7 +1632,7 @@
     "timezone": "Asia/Bangkok",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "966e0c73-6db1-4610-ad71-51758518a4ce",
+  "versionId": "1c64924b-26e5-4214-882a-23d470a5f6e7",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "897fa275083eef3a820e0b41d7de24b01122dca0848a5de4d3e67b1846c14d72"
