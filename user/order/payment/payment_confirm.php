@@ -21,8 +21,8 @@ if (!isset($_GET['id'])) {
 
 $order_id = intval($_GET['id']);
 
-// ✅ ดึงข้อมูลคำสั่งซื้อพร้อมชื่อและอีเมลลูกค้า
-$stmt = $conn->prepare("SELECT o.*, c.name, c.email 
+// ดึงข้อมูลคำสั่งซื้อพร้อมชื่อลูกค้า
+$stmt = $conn->prepare("SELECT o.*, c.name 
                         FROM orders o 
                         JOIN customers c ON o.customer_id = c.customer_id 
                         WHERE o.order_id = ? AND o.customer_id = ?");
@@ -159,20 +159,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       ======================================================= */
   $webhook_url = "http://103.40.119.91:5678/webhook-test/778284f3-0ba4-473f-9d10-fee5d2416f4f";
 
-  // ✅ เพิ่มรหัสคำสั่งซื้อที่มี # และ email ของลูกค้าเข้าไปใน payload
   $payload_data = [
       'order_id'      => $order_id,
-      'order_number'  => '#' . str_pad($order_id, 5, '0', STR_PAD_LEFT), // เพิ่ม #00154
       'customer_id'   => $customer_id,
       'customer_name' => $order['name'],
-      'customer_email'=> $order['email'], // เพิ่ม Email ลูกค้า
-      'amount'        => $total_amount, 
+      'amount'        => $total_amount, // ใช้ค่าที่ดึงมาใหม่
       'slip_image'    => $fileName,
       'status'        => 'payment_submitted',
       'timestamp'     => date('Y-m-d H:i:s')
   ];
 
-  // ตรวจสอบว่ามีฟังก์ชัน curl_init ไหม
+  // ตรวจสอบว่ามีฟังก์ชัน curl_init ไหม (กัน Error 500 กรณี Server ไม่รองรับ)
   if (function_exists('curl_init')) {
       $ch = curl_init($webhook_url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -191,3 +188,193 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   exit;
 }
 ?>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แจ้งชำระเงิน | MyCommiss</title>
+  <link rel="icon" type="image/png" href="../../includes/icon_mycommiss.png">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  
+  <style>
+    body { background-color: #f8f9fa; font-family: "Prompt", sans-serif; color: #333; }
+    .payment-wrapper { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 40px 15px; }
+
+    /* 🔹 Card Layout */
+    .card-payment {
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      background: #fff;
+      width: 100%;
+      max-width: 550px;
+      overflow: hidden;
+    }
+    .card-header-payment {
+      background-color: #D10024;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    /* 🔹 QR Code Box */
+    .qr-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px dashed #D10024;
+      display: inline-block;
+      margin: 15px 0;
+    }
+    #qrcode img { margin: 0 auto; } /* จัด QR ให้อยู่กึ่งกลาง */
+
+    .total-price {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #D10024;
+      margin-bottom: 0;
+    }
+
+    /* 🔹 Form Elements */
+    .form-control {
+      border-radius: 10px;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      background-color: #fcfcfc;
+    }
+    .form-control:focus {
+      border-color: #D10024;
+      box-shadow: 0 0 0 0.2rem rgba(209, 0, 36, 0.15);
+      background-color: #fff;
+    }
+
+    /* 🔹 Buttons */
+    .btn-submit {
+      background-color: #D10024;
+      color: #fff;
+      border-radius: 50px;
+      font-weight: 600;
+      padding: 12px;
+      border: none;
+      transition: 0.3s;
+    }
+    .btn-submit:hover {
+      background-color: #a5001b;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(209, 0, 36, 0.2);
+    }
+    .btn-outline-custom {
+      border: 1px solid #ddd;
+      color: #555;
+      border-radius: 50px;
+      font-weight: 500;
+      padding: 10px;
+      transition: 0.3s;
+      background: #fff;
+    }
+    .btn-outline-custom:hover { background-color: #f1f1f1; color: #333; }
+
+    /* 🔹 Footer */
+    footer {
+      background-color: #fff;
+      color: #6c757d;
+      padding: 20px;
+      font-size: 0.9rem;
+      border-top: 1px solid #eee;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<?php include("../../includes/navbar_user.php"); ?>
+
+<div class="payment-wrapper">
+  <div class="card-payment">
+    <div class="card-header-payment">
+      <i class="bi bi-qr-code-scan me-2"></i>แจ้งชำระเงิน
+    </div>
+    <div class="card-body p-4 p-md-5">
+      
+      <div class="text-center mb-4">
+        <p class="text-muted mb-1">คำสั่งซื้อหมายเลข</p>
+        <h4 class="fw-bold text-dark">#<?= str_pad($order_id, 5, '0', STR_PAD_LEFT) ?></h4>
+      </div>
+
+      <?php if ($order['payment_method'] === 'QR'): ?>
+        <?php
+          $shopPromptPay = "0903262100"; // หมายเลขพร้อมเพย์ร้าน
+          $payload = generatePromptPayPayload($shopPromptPay, $order['total_price']);
+        ?>
+        <div class="text-center bg-light rounded-4 p-4 mb-4 border">
+          <p class="fw-semibold text-secondary mb-3">สแกน QR Code เพื่อชำระเงินผ่านแอปธนาคาร</p>
+          
+          <div class="qr-box shadow-sm">
+            <div id="qrcode"></div>
+          </div>
+          
+          <div class="mt-3">
+            <div class="text-muted small">ยอดที่ต้องชำระ</div>
+            <div class="total-price"><?= number_format($order['total_price'], 2) ?> ฿</div>
+          </div>
+          
+        </div>
+
+        <script>
+          // สร้าง QR Code อัตโนมัติ
+          const payload = "<?= $payload ?>";
+          new QRCode(document.getElementById("qrcode"), {
+            text: payload,
+            width: 180,
+            height: 180,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+          });
+        </script>
+      <?php endif; ?>
+
+      <hr class="text-muted opacity-25 my-4">
+
+      <form method="post" enctype="multipart/form-data">
+        <div class="mb-4">
+          <label for="slip" class="form-label fw-semibold text-dark">
+            <i class="bi bi-image me-2 text-muted"></i>แนบหลักฐานการโอนเงิน (สลิป) <span class="text-danger">*</span>
+          </label>
+          <input type="file" name="slip" id="slip" class="form-control" accept="image/*" required>
+          <div class="form-text mt-2"><i class="bi bi-info-circle me-1"></i>กรุณาแนบภาพสลิปที่เห็นยอดเงินและวันที่ชัดเจน (ขนาดไม่เกิน 5MB)</div>
+        </div>
+
+        <div class="d-grid gap-3 mt-5">
+          <button type="submit" class="btn btn-submit fs-5">
+            <i class="bi bi-cloud-arrow-up me-2"></i>ยืนยันการชำระเงิน
+          </button>
+          <div class="row g-2">
+            <div class="col-6">
+              <a href="../orders.php" class="btn btn-outline-custom w-100"><i class="bi bi-clock-history me-2"></i>ประวัติสั่งซื้อ</a>
+            </div>
+            <div class="col-6">
+              <a href="../order_detail.php?id=<?= $order_id ?>" class="btn btn-outline-custom w-100"><i class="bi bi-file-earmark-text me-2"></i>รายละเอียด</a>
+            </div>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  © <?= date('Y') ?> MyCommiss | ระบบร้านค้าออนไลน์คอมพิวเตอร์
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
